@@ -1,30 +1,14 @@
 # [umi0410.github.io](https://umi0410.github.io)
 ![README_preview.png](README_preview.png)
-* themes/hugo-tranquilpeak-theme/layouts/index.html
-{{ partial "head.html" . }}
-  <body>
-    <div id="blog">
-      {{ partial "header.html" . }}
-      {{ partial "sidebar.html" . }}
-      {{ partial "post/header-cover.html" . }}
-      <div id="main" data-behavior="{{ .Scratch.Get "sidebarBehavior" }}"
-        class="{{ with .Params.coverimage }}hasCover{{ end }}
-               {{ if eq .Params.covermeta "out" }}hasCoverMetaOut{{ else }}hasCoverMetaIn{{ end }}
-               {{ with .Params.coverCaption }}hasCoverCaption{{ end }}">
-        <section class="postShorten-group main-content-wrap">
-          {{ $paginator := .Paginate (where .Site.RegularPages "Title" "Portfolio") }}
-          {{ range $paginator.Pages }}
-            {{ .Render "single" }}
-          {{ end }}
-        </section>
-        {{ partial "meta.html" . }}
-  
-        {{ partial "footer.html" . }}
-      </div>
-    </div>
-{{ partial "foot.html" . }}
-
-
+* themes/hugo-tranquilpeak-theme에서 landing page가 블로그 형식으로 되어있어서 이 부분을 따로 수정했음
+  * `themes/hugo-tranquilpeak-theme/layouts/index.html`
+    ```html
+    {{ $paginator := .Paginate (where .Site.RegularPages "Title" "Portfolio") }}
+    {{ range $paginator.Pages }}
+        {{ .Render "single" }}
+    {{ end }}
+    ```
+  * submodule을 통해 theme을 깔끔하게 이용하고 싶었지만, 수정사항을 적용하려다보니 단순 clone을 이용하게됨.
 
 * 개발은 dev 브랜치에서
 * 배포 자동화
