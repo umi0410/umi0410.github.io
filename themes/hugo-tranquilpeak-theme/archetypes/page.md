@@ -1,8 +1,12 @@
 ---
-title: "Empty Page"
-date: 2020-09-01T14:44:40+09:00
+title: "{{ replace .TranslationBaseName "-" " " | title }}"
+date: {{ .Date }}
 categories:
+- category
+- subcategory
 tags:
+- tag1
+- tag2
 keywords:
 - tech
 comments:       false
@@ -10,4 +14,4 @@ showMeta:       false
 showActions:    false
 #thumbnailImage: //example.com/image.jpg
 ---
-This is a temporary empty page.
+

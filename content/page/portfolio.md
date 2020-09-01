@@ -13,6 +13,7 @@ comments:       false
 showMeta:       false
 showActions:    false
 #thumbnailImage: //example.com/image.jpg
+
 ---
 
 ## 😄 {{< hl-text cyan >}}소개{{< /hl-text >}}
