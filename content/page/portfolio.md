@@ -32,10 +32,6 @@ showActions:    false
 * **자기소개**
   > 귀여운 도커의 고래는 오늘도 춤을 추고 있습니다.
 
-{{< alert info >}}
-Test Labels
-{{< /alert >}}
-
 ## 🥅 {{< hl-text cyan >}}활동 내용{{< /hl-text >}}
 
 * Megazone Cloud DevOps 인턴
