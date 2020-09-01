@@ -8,6 +8,10 @@
         {{ .Render "single" }}
     {{ end }}
     ```
+  * Delete `{{ partial "header.html" . }}`
+  * Delete section
+  * Delete pagination
+  * Delete footer
   * submodule을 통해 theme을 깔끔하게 이용하고 싶었지만, 수정사항을 적용하려다보니 단순 clone을 이용하게됨.
 
 * 개발은 dev 브랜치에서

@@ -97,13 +97,6 @@ canonifyurls = true
 #  pre = "<i class=\"sidebar-button-icon fa fa-lg fa-question\"></i>"
 #  url = "/#about"
 
-[[menu.main]]
-  weight = 5
-  identifier = "contact"
-  name = "Contact"
-  pre = "<i class=\"sidebar-button-icon fa fa-lg fa-contect\"></i>"
-  url = "/page/contact"
-
 [[menu.links]]
   weight = 1
   identifier = "github"
@@ -233,8 +226,8 @@ canonifyurls = true
     url = "/#about"
 
   # Customize link of author avatar in sidebar
-  # [params.sidebar.profile]
-  #   url = "/#about"
+  [params.sidebar.profile]
+    url = "/"
 
   # Customize copyright value "© 2017 <CUSTOMIZATION>. All Rights Reserved"
   [params.footer]
