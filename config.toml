@@ -58,9 +58,9 @@ canonifyurls = true
 [[menu.main]]
   weight = 1
   identifier = "portfolio"
-  name = "portfolio"
+  name = "Home"
   pre = "<i class=\"sidebar-button-icon fa fa-lg fa-home\"></i>"
-  url = "/page/portfolio"
+  url = "/"
 
 [[menu.main]]
   weight = 2
