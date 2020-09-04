@@ -12,7 +12,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           # submodules: true
 
-      - name: 🖨️ Copy content/1_portfolio/_index.md to content/_index.md
+      - name: 🖨️ Overwrite content/_index.md with content/1_portfolio
         run: |
           cp content/1_portfolio/_index.md content/
 
