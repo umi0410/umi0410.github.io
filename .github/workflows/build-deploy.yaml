@@ -1,9 +1,6 @@
 name: Build and Deploy
 on: 
-  push:
-    branches:
-      - "dev"
-  workflow_dispatch:
+  [push, workflow_dispatch]
 
 jobs:
   build-and-deploy:
@@ -14,6 +11,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           # submodules: true
+
+      - name: 🖨️ Copy content/1_portfolio/_index.md to content/_index.md
+        run: |
+          cp content/1_portfolio/_index.md content/
 
       - name: 🔧 Setup Hugo
         uses: peaceiris/actions-hugo@v2

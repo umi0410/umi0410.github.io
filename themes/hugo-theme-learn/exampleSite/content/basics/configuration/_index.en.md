@@ -1,22 +1,25 @@
-baseURL = "https://umi0410.github.io"
-languageCode = "ko-kr"
-title = "Jinsu Playground"
-theme = "hugo-theme-learn"
-[outputs]
-home = [ "HTML", "RSS", "JSON"]
+---
+date: 2016-04-09T16:50:16+02:00
+title: Configuration
+weight: 20
+---
 
+## Global site parameters
 
+On top of [Hugo global configuration](https://gohugo.io/overview/configuration/), **Hugo-theme-learn** lets you define the following parameters in your `config.toml` (here, values are default).
+
+Note that some of these parameters are explained in details in other sections of this documentation.
+
+```toml
 [params]
-  themeVariant = "umi0410"
-
   # Prefix URL to edit current page. Will display an "Edit this page" button on top right hand corner of every page.
   # Useful to give opportunity to people to create merge request for your doc.
   # See the config.toml file from this documentation site to have an example.
   editURL = ""
   # Author of the site, will be used in meta information
-  author = "umi0410"
+  author = ""
   # Description of the site, will be used in meta information
-  description = "Backend 개발자, DevOps 엔지니어 경희대학교 박진수의 개인 블로그 및 웹 포트폴리오"
+  description = ""
   # Shows a checkmark for visited pages on the menu
   showVisitedLinks = false
   # Disable search function. It will hide search bar
@@ -33,18 +36,25 @@ home = [ "HTML", "RSS", "JSON"]
   # Hide breadcrumbs in the header and only show the current page title
   disableBreadcrumb = true
   # Hide Next and Previous page buttons normally displayed full height beside content
-  disableNextPrev = false
+  disableNextPrev = true
   # Order sections in menu by "weight" or "title". Default to "weight"
   ordersectionsby = "weight"
   # Change default color scheme with a variant one. Can be "red", "blue", "green".
-  # themeVariant = ""
+  themeVariant = ""
   # Provide a list of custom css files to load relative from the `static/` folder in the site root.
-  custom_css = [""]
+  custom_css = ["css/foo.css", "css/bar.css"]
+```
 
-[[menu.shortcuts]]
-name = "<i class='fab fa-github'></i> Github"
-identifier = "github-link"
-url = "https://github.com/umi0410"
-weight = 10
-[markup.goldmark.renderer]
-unsafe = true
+## Activate search
+
+If not already present, add the follow lines in the same `config.toml` file.
+
+```toml
+[outputs]
+home = [ "HTML", "RSS", "JSON"]
+```
+
+Learn theme uses the last improvement available in hugo version 20+ to generate a json index file ready to be consumed by lunr.js javascript search engine.
+
+> Hugo generate lunrjs index.json at the root of public folder.
+> When you build the site with `hugo server`, hugo generates it internally and of course it doesn’t show up in the filesystem
