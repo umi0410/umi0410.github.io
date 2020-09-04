@@ -2,6 +2,8 @@ baseURL = "https://umi0410.github.io"
 languageCode = "ko-kr"
 title = "Jinsu Playground"
 theme = "hugo-theme-learn"
+disqusShortname = "jinsuparkumi"
+
 [outputs]
 home = [ "HTML", "RSS", "JSON"]
 
@@ -42,9 +44,9 @@ home = [ "HTML", "RSS", "JSON"]
   custom_css = ["css/custom-umi0410.css"]
 
 [[menu.shortcuts]]
-name = "<i class='fab fa-github'></i> Github"
-identifier = "github-link"
-url = "https://github.com/umi0410"
-weight = 10
+  name = "<i class='fab fa-github'></i> Github"
+  identifier = "github-link"
+  url = "https://github.com/umi0410"
+  weight = 10
 [markup.goldmark.renderer]
-unsafe = true
+  unsafe = true
