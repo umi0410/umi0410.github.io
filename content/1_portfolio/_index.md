@@ -5,9 +5,6 @@ weight: 1
 chapter: false
 pre: ""
 ---
-<p align="center">
-  <img id="portfolio_profile_img" src="/media/profile.png?width=300px">
-</p>
 
 ### 😄 소개
 
