@@ -25,6 +25,8 @@
 * local에서 disqus가 이용되지 않는 경우
   * [localtest.me란](https://superuser.com/questions/1280827/why-does-the-registered-domain-name-localtest-me-resolve-to-127-0-0-1)
   * trusted domains 에 [localtest.me](localtest.me) 추가하기
+* [google search console](https://search.google.com/search-console/sitemaps) 설정
+  * static/robots.txt 작성
 
 ## Refs
 
