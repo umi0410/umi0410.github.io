@@ -47,7 +47,7 @@ p{
 #chapter p{
   text-align: left;
   /*font-size: 0.9rem;*/
-  font-size: 18px;
+  font-size: 20px;
 }
 
 #shortcuts h3{
@@ -64,12 +64,17 @@ p{
 }
 
 blockquote {
-    display: block;
-    margin-block-start: 0rem;
-    margin-block-end: 0rem;
-    margin-inline-start: 5px;
-    margin-inline-end: 5px;
+  display: block;
+  margin-block-start: 0rem;
+  margin-block-end: 0rem;
+  margin-inline-start: 5px;
+  margin-inline-end: 5px;
+  padding-left: 0.1rem;
 }
 blockquote p{
     font-size: 16px;
+}
+
+body{
+  font-size: 20px !important;
 }

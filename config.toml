@@ -8,7 +8,7 @@ disqusShortname = "umi0410"
 home = [ "HTML", "RSS", "JSON"]
 
 [params]
-  themeVariant = "umi0410"
+  themeVariant = "umi0410-blue"
 
   # Prefix URL to edit current page. Will display an "Edit this page" button on top right hand corner of every page.
   # Useful to give opportunity to people to create merge request for your doc.
