@@ -5,6 +5,7 @@
   * `themes/hugo-theme-learn/layouts/partials/menu.html`에서 해당 사이드바 프로필을 import
   * `themes/hugo-theme-learn/statics/css/hugo-theme.css`에서 일부 변경
   * `themes/hugo-theme-learn/statics/css/theme-umi0410.css`에서 custom theme 정의
+  * `themes/hugo-theme-learn/statics/css/custom-umi0410.css`에서 custom css 추가
   * submodule을 통해 theme을 깔끔하게 이용하고 싶었지만, customization을 위해서는 수정사항을 적용하려다보니 단순 clone을 이용하게됨.
 
 * 개발은 dev 브랜치에서
