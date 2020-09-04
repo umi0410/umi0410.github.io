@@ -14,7 +14,7 @@
     {{ end }}
     ```
     각각의 페이지에서 parameter로 disqus를 막을 페이지에서는 `noDisqus: true`를 정의해준다.
-
+  * `themes/hugo-theme-learn/layouts/partials/favicon.html`에서 favicon을 `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png`로 설정
 * 개발은 dev 브랜치에서
 * default branch는 master=>dev로 변경했음.
 * 배포 자동화

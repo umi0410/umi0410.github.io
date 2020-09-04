@@ -1,7 +1,6 @@
 ---
 title: "Kyunghee Univ"
 date: 2020-09-04T11:27:30+09:00
-draft: true
 description: "경희대학교에서 참여했던 활동들...."
 weight: 3
 ---

@@ -41,10 +41,13 @@ h6 {
 
 
 
-
+p{
+  font-size: 20px;
+}
 #chapter p{
   text-align: left;
-  font-size: 0.7rem;
+  /*font-size: 0.9rem;*/
+  font-size: 18px;
 }
 
 #shortcuts h3{
