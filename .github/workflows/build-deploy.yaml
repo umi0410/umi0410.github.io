@@ -12,9 +12,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           # submodules: true
 
-      - name: 🖨️ Overwrite content/_index.md with content/1_portfolio
+      - name: 🖨️ Overwrite content/_index.md with content/portfolio
         run: |
-          cp content/1_portfolio/_index.md content/
+          cp content/portfolio/_index.md content/
 
       - name: 🔧 Setup Hugo
         uses: peaceiris/actions-hugo@v2
