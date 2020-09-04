@@ -1,7 +1,12 @@
-+++
-title = "{{ replace .Name "-" " " | title }}"
-date =  {{ .Date }}
-weight = 5
-+++
+---
+title: "{{ replace .Name "-" " " | title }}"
+date: {{ .Date }}
+weight: 5
+chapter: false
+pre: ""
+noDisqus: false
+---
 
-Lorem Ipsum.
+## Some Chapter title
+
+> What would be covered.

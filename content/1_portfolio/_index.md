@@ -4,6 +4,7 @@ date: 2020-09-04T11:46:14+09:00
 weight: 1
 chapter: false
 pre: ""
+noDisqus: true
 ---
 
 ### 😄 소개
@@ -26,5 +27,7 @@ pre: ""
 * AUSG 3기
 * 경희대학교 소프트웨어 페스티발 웹/앱 최우수상 수상
   
-
+{{% notice note %}}
 To be updated soon........
+{{% /notice %}}
+

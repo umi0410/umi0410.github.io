@@ -2,11 +2,10 @@ baseURL = "https://umi0410.github.io"
 languageCode = "ko-kr"
 title = "Jinsu Playground"
 theme = "hugo-theme-learn"
-disqusShortname = "jinsuparkumi"
+disqusShortname = "umi0410"
 
 [outputs]
 home = [ "HTML", "RSS", "JSON"]
-
 
 [params]
   themeVariant = "umi0410"
