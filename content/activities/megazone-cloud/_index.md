@@ -28,7 +28,7 @@ description: |
 참여하곤 했는데요. 그곳에서 저희 팀원들을 만나게 되었고, 그것이 인연이 되어
 채용으로까지 이어질 수 있었습니다.
 
-평소 [AUSG](https://velog.io/@ausg)) 라는 대학생 AWS 사용자 모임의
+평소 [AUSG](https://velog.io/@ausg) 라는 대학생 AWS 사용자 모임의
 일원으로서 참여하며 `AWS` 를 이용한 클라우드 인프라, `CI/CD` 파이프라인 구축을 통한 자동화, `컨테이너` 등에
 관심이 많았는데, 마침 메가존 클라우드의 저희 CloudOne 팀에서는 팀의 모든 마이크로서비스 및 기타 서비스들을
 `EKS`라는 `AWS`의 Managed Kubernetes Cluster Service 위에 자동화시켜 배포를 하고있었고,
@@ -39,10 +39,12 @@ description: |
 > [Megazone Cloud](https://www.megazone.com/): 국내 최초 & 최대 AWS 프리미어 컨설팅 파트너, AWS 컨설팅, 구축, 운영 및 빌링 서비스 제공. 메가존클라우드는 2009년부터 클라우드를 차세대 핵심 사업으로 성장시키며 ‘클라우드 이노베이터(Cloud Innovator)’로서 고객님들의 클라우드 전환의 과정마다 최선의 선택을 하실 수 있도록 다양한 서비스를 제공하고 있습니다. - 출처(https://www.megazone.com/)
 <!-- ![spaceone_preview_1](spaceone_preview_1.png) -->
 ![spaceone_preview_2](spaceone_preview_2.png)
+<p align="center">SpaceONE Preview</p>
 메가존 클라우드에 대한 설명은 위와 같고, 제가 근무했던 CloudOne Team에 대해 간단히 소개해보겠습니다.
 CloudOne 팀은 SpaceONE 이라는 Multi Cloud 에 대한 오픈소스 CMP(Cloud Management Platform)를 개발하는 팀입니다.
 AWS, Azure, GCP, IDC에 대한 다양한 관리, 모니터링을 지원하는 것이 목표이고, 빠르게 발전되어나가고있습니다! 
 주요 내용들은 아래와 같은 키워드를 갖고 있습니다.
+
 * `AWS` `EKS`를 이용한 `Kubernetes` 환경, 마이크로서비스 아키텍쳐
 * Composition API를 이용하는 최신 `Vue` 기술
 * `Terraform`을 통한 `IaC`
@@ -67,12 +69,12 @@ AWS, Azure, GCP, IDC에 대한 다양한 관리, 모니터링을 지원하는 �
 * [2020.08: spacectl 설계, 개발 참여](spacectl)
   * 우리 팀의 서비스인 SpaceONE에 대한 API 작업을 수행하는 CLI 도구에 대한 설계와 개발에 참여함.
 
-## 종합적인 느낀 점
+## 느낀 점
 
 그 동안 혼자 개발 및 평소 관심분야였던 클라우드, 컨테이너 등등의 주제로 공부해왔었는데,
 과연 이 내용들이 정말 실무에 도움이 될 지, 제가 잘 나아가고 있는 건지 확신이 들지 않았습니다.
-하지만 `CloudOne`팀에서 다양한 경험을 하면서 제가 공부해온 길이 틀리지 많은 않았구나라는 느낌을 받을
-수 있었고, 고치고 보완해야할 부분들은 보완하면서 불확실한 마음이 아닌 확신과 열정을 가진 자세로
+하지만 `CloudOne`팀에서 다양한 경험을 하면서 '제가 공부해온 길이 틀리지만은 않았구나'라는 느낌을 받을
+수 있었고, 보완해야할 부분들은 보완하면서 불확실한 마음이 아닌 확신과 열정을 가진 자세로
 좀 더 몰두할 수 있을 것 같습니다!
  
 배우고 느낀 내용이 너무 많아 글이 다소 길어졌습니다. 기술을 거부감 없이 접하되 

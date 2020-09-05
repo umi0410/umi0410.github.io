@@ -48,14 +48,13 @@ h5 {
 
 
 #body-inner p{
-  font-size: 20px;
+  font-size: 18px;
   margin-top: 5px;
   margin-bottom: 10px;
 }
 #chapter p{
   text-align: left;
-  /*font-size: 0.9rem;*/
-  font-size: 20px;
+  font-size: 18px;
 }
 
 #shortcuts h3{
@@ -81,11 +80,11 @@ blockquote {
   margin-bottom: 0.4rem;
 }
 blockquote p{
-    font-size: 16px;
+    font-size: 14px;
 }
 
 body{
-  font-size: 20px !important;
+  font-size: 18px !important;
 }
 
 .topics>li>ul>li, .topics>li>ul>li[class="visited"] {
@@ -93,7 +92,7 @@ body{
 }
 
 nav#TableOfContents {
-    font-size: 20px !important;
+    font-size: 18px !important;
     max-height: 85vh;
     overflow: auto;
     padding: 15px !important;
@@ -104,7 +103,7 @@ nav#TableOfContents {
 }
 
 .progress{
-  margin-left: 20px;
+  margin-top: 40px;
   background: #fcfcfc;
   border-radius: 10px;
 }

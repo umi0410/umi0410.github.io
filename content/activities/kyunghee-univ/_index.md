@@ -11,12 +11,13 @@ weight: 3
 
 ## Head 1
 
-a
+foo
 
 ### Head 1 inner inner
 
-#### Head 1 inner inner inner
-
-b
+bar
 
 ## Head 2
+
+foobar
+

@@ -6,18 +6,17 @@ chapter: false
 pre: "<b></b>"
 weight: 20
 description: |
-  저희 팀의 개발 인프라는 위와 같습니다. 마침 제가 입사할 쯤이 기존에 존재하던 인프라를
-  해야할 시점이었습니다. 덕분에 저는 저희 개발 환경을 처음부터 구축하고, 우리의 서비스를
-  배포해보고, 이후 운영하면서 여러 경험들을 할 수 있었습니다. 
+  설 
 ---
 {{%toc%}}
 ## Github Action을 사용하게 된 배경
 
-저희 팀은 원래 CI용으로 `Jenkins`를 사용했습니다. 하지만 애초에 팀이 개발 중이던 서비스가
-오픈소스가 목표인 프로젝트였고, 어느 정도 프로젝트 구조가 잡힌 뒤에는 Github의 Public
-Repository를 이용하게되었습니다. 그렇게 되면서 요즘 새로 나온 오픈 소스를 적극 활용하면서
-또 빠르게 발전하고 있던 Github Action을 CI 도구로 채택하게되었고, Integration Test를
-제외한 모든 빌드 및 일부 배포를 Github Action을 이용하게되었고, 대부분의 배포는 사용하던대로
+저희 팀은 원래 CI용으로 `Jenkins`를 사용했습니다만 팀이 개발 중이던 서비스가
+오픈소스가 목표인 프로젝트였고, Github Action이 빠르게 발전해나가면서
+비용도 무료가 되었고, 좋은 Action들이 많이 생겨나고 있었기에
+어느 정도 프로젝트 구조가 잡힌 뒤에는 Github의 Public Repository로 프로젝트를 관리하고
+Github Action을 CI 도구로 채택하게되었습니다. Integration Test를
+제외한 모든 빌드 및 일부 배포를 Github Action을 이용하게되었고, 대부분의 배포에는 사용하던대로
 Spinnaker을 이용했습니다.
 
 ## Github Action vs Jenkins
@@ -29,7 +28,7 @@ Spinnaker을 이용했습니다.
 | 내가 서버를 관리할 필요가 없다.   | 내가 직접 master을 띄우고, slave를 띄워우고, 관리해줘야한다. |
 | VM이 배치되어 제공되는 데에 좀 시간이 든다. 내 커스텀 이미지를 사용할 수가 없다보니 반복되는 패키지 설치나 환경 설정을 매번 해야해서 좀 느리다.| 내가 필요한 Plugin을 설치해놓거나 설정을 입력해 놓으면 매번 빌드할 때 따로 제공할 필요 없다. |
 | Code로 관리가 가능하다! 처음엔 조금 어려울 수 있지만, 알고 나면 쓰기 너무 쉽다. | 처음 접한 사람이 사용하기에는 Github Action보다 편리할 수 있지만, 그렇다고 훌륭한 UI/UX는 아닌 듯 하다. |
-| 요즘 핫하고, 빠르게 발전 중이다. | 구식이다... |
+| 요즘 핫하고, 빠르게 발전 중이다. | 구식이다. |
 
 비용이 저렴하게 풀리고 있고(퍼블릭의 경우 아마 무조건 무제한 공짜),
 원래 지원하지 않던 매뉴얼 트리거가 2020.07부터 제공되기 시작했다는 점,
@@ -46,16 +45,16 @@ Spinnaker을 이용했습니다.
 깃헙액션 및 CI/CD 진행 방식에 대해 요약해보겠습니다. (Chart를 작성한 지가 좀 돼서 설명과 조금
 다른 부분이 있을 수도 있습니다.)
 
-개발 스프린트 진행 시에는 아래와 같이 진행되었습니다. (\<상황 설명\> => \<Github Action\> 수행 내용 형식입니다.)
+개발 스프린트 진행 시에는 아래와 같이 진행되었습니다. (\<상황 설명\> => \<Github Action 수행 내용\> 형식으로 나했습니다.)
 
-1. 개별 Fork 후 Master Branch에 Pull Request => lint, basic unit test 진행. 통과된 PR만 Merge
-2. Master에 Merge 혹은 Commit이 Push => CI Action이 실행됩니다.
+1. 개별 Fork 후 Master Branch에 Pull Request => lint, basic unit test 진행. 통과된 PR만 Merge열
+2. Master에 Merge 혹은 Commit이 Push됨 => CI Action이 실행됩니다.
 3. 개발용 docker registry 에 업로드
 4. 해당 registry에 업로드 된 것을 감지하고 `Spinnaker`가 Experiment 환경에 배포
 5. Experimental 환경을 이용해 `Jenkins`가 Integration Test를 진행
 6. Integration Test 성공 시에 Dev 환경에 배포.
 
-이후 스프린트 막바지 QA 기간에는 `Experiment, Dev 환경이 주로 QA 환경으로 사용되었고,
+이후 스프린트 막바지 QA 기간에는 Experiment, Dev 환경이 주로 QA 환경으로 사용되었고,
 파이프라인은 다음과 같았습니다.
 
 1. 검증이 어느 정도 끝난 커밋에 대해 Git Tag를 `{{VERSION}}-rc{{RC_NUMBER}}` 형태로 달아 푸시 - Github Release가 생김
