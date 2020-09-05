@@ -24,6 +24,10 @@
     --MENU-VISITED-color: #33a1ff; /* Color of 'page visited' icons in menu */
     --MENU-SECTION-HR-color: white; /* Color of <hr> separator in menu */
 }
+code{
+  background: #c6f3f7;
+  border: 1px solid #a6ecff;
+}
 
 #footer{
   color: white;

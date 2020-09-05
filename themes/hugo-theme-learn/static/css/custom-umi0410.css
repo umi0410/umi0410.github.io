@@ -7,7 +7,7 @@ lockquote {
 }
 
 ul, ol{
-  margin: 0.3rem;
+  margin: 0.6rem;
   padding-inline-start: 8px;
 }
 h1{
@@ -22,7 +22,7 @@ h2 {
 }
 
 h3 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   line-height: 110% !important;
   margin: 1.0rem 0 0.6rem 0;
 }
@@ -97,4 +97,14 @@ nav#TableOfContents {
     max-height: 85vh;
     overflow: auto;
     padding: 15px !important;
+}
+
+#sidebar ul > li > ul > li{
+  padding-left: 0.4rem;
+}
+
+.progress{
+  margin-left: 20px;
+  background: #fcfcfc;
+  border-radius: 10px;
 }

@@ -13,7 +13,7 @@ description: |
 {{%toc%}}
 ## Github Action을 사용하게 된 배경
 
-저희 팀은 원래 CI용으로 Jenkins를 사용했습니다. 하지만 애초에 팀이 개발 중이던 서비스가
+저희 팀은 원래 CI용으로 `Jenkins`를 사용했습니다. 하지만 애초에 팀이 개발 중이던 서비스가
 오픈소스가 목표인 프로젝트였고, 어느 정도 프로젝트 구조가 잡힌 뒤에는 Github의 Public
 Repository를 이용하게되었습니다. 그렇게 되면서 요즘 새로 나온 오픈 소스를 적극 활용하면서
 또 빠르게 발전하고 있던 Github Action을 CI 도구로 채택하게되었고, Integration Test를
@@ -51,14 +51,14 @@ Spinnaker을 이용했습니다.
 1. 개별 Fork 후 Master Branch에 Pull Request => lint, basic unit test 진행. 통과된 PR만 Merge
 2. Master에 Merge 혹은 Commit이 Push => CI Action이 실행됩니다.
 3. 개발용 docker registry 에 업로드
-4. 해당 registry에 업로드 된 것을 감지하고 Spinnaker가 Experiment 환경에 배포
-5. Experimental 환경을 이용해 Jenkins가 Integration Test를 진행
+4. 해당 registry에 업로드 된 것을 감지하고 `Spinnaker`가 Experiment 환경에 배포
+5. Experimental 환경을 이용해 `Jenkins`가 Integration Test를 진행
 6. Integration Test 성공 시에 Dev 환경에 배포.
 
-이후 스프린트 막바지 QA 기간에는 Experiment, Dev 환경이 주로 QA 환경으로 사용되었고,
+이후 스프린트 막바지 QA 기간에는 `Experiment, Dev 환경이 주로 QA 환경으로 사용되었고,
 파이프라인은 다음과 같았습니다.
 
-1. 검증이 어느 정도 끝난 커밋에 대해 Git Tag를 `version-rc` 형태로 달아 푸시 - Github Release가 생김
+1. 검증이 어느 정도 끝난 커밋에 대해 Git Tag를 `{{VERSION}}-rc{{RC_NUMBER}}` 형태로 달아 푸시 - Github Release가 생김
 => 도커 이미지 빌드 후 Production Docker Registry에 이미지 업로드
 => tag가 달린 커밋을 기점으로 자동으로 버전 명의 브랜치를 만듦.
 2. Production Docker Registry의 업로드를 감지하고 Dev에서 손수 QA 진행
@@ -71,14 +71,20 @@ Spinnaker을 이용했습니다.
 처음에는 Github Action에 그렇게 만족을 하지 못했습니다. 초기에는 Manual Trigger가 지원되지
 않았던 데다가, 가뜩이나 Github Action을 잘 몰랐기에 한 번 Github Action을 수정하여
 테스트 하고싶을 때 마다 커밋을 하나씩 날려야했던 게 불편했고, 브랜치를 따로 만들거나 fork를 떠서 Github Action 테스트 후
-해당 workflow만 마스터에 머지하는 방식 등등 다양한 방식을 사용했었는데, 어느 정도 익숙해지고 Github Action에
+해당 `workflow`만 마스터에 머지하는 방식 등등 다양한 방식을 사용했었는데, 어느 정도 익숙해지고 Github Action에
 Manual Trigger도 등장하게 되면서 꽤나 만족도가 높아졌습니다.
 
-Jenkins와 달리 제가 서버를 이용하지 않아도 된다는 점도 맘에 들긴했는데, 종종 Github 서버가 죽는 일이
+`Jenkins`와 달리 제가 서버를 이용하지 않아도 된다는 점도 맘에 들긴했는데, 종종 Github 서버가 죽는 일이
 발생해서 난감했던 적이 있긴합니다.
 
-후에 저희 SpaceONE의 CLI API 클라이언트인 spacectl의 설계와 개발에도 Github Action에 대한 지식이
-많은 도움이 되었고, 퇴사 후에도 개인적인 Github 활동을 하면서 자유롭게 Github Action을 사용할 수 있었기에
-든든한 개발 도구를 얻은 느낌입니다. 코드로 제가 하고싶은 것을 뭐든 정의할 수 있고, 만들어져 있는 작업은 편하게 가져다 쓰면 되기 때문에
-빌드나 배포에 관해 재미있는 번뜩이는 아이디어가 있을 때 바로 바로 적용할 수 있고, 실제로 현재의 Github Page도 Github Action을 통해 다양한 트릭을 이용할 수도 있었고,
+하나 재미있었던 점은 Github Action을 이용하면서 저의의 `CI/CD` 전략이 꽤나 고도화되었는데,
+그 과정에서 팀원들과 자유롭게 의사소통하는 과정이 재미있었고, 저 또한 자유롭게 의견을 나눌 수 있었던 것 경험을 했다는 것입니다.
+
+후에 저희 `SpaceONE`의 CLI API 클라이언트인 `spacectl`의 설계에도 `Github Action`의 구조를 모티브삼았는데
+이때에도 Github Action에 대한 지식이 많은 도움이 되었고, 퇴사 후에도
+개인적인 Github 활동을 하면서 자유롭게 Github Action을 사용할 수 있었기에
+든든한 개발 도구를 얻은 느낌입니다. 코드로 제가 하고싶은 것을 뭐든 정의할 수 있고,
+만들어져 있는 작업은 편하게 가져다 쓰면 되기 때문에
+빌드나 배포에 관해 재미있는 번뜩이는 아이디어가 있을 때 바로 바로 적용할 수 있고, 실제로 현재의 `Github Page`도
+`Github Action`을 통해 다양한 트릭을 이용할 수도 있었고,
 빌드 후 배포 또한 자동화 되어있습니다!
