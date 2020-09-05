@@ -14,9 +14,10 @@
     {{ end }}
     ```
     각각의 페이지에서 parameter로 disqus를 막을 페이지에서는 `noDisqus: true`를 정의해준다.
-  * `themes/hugo-theme-learn/layouts/partials/favicon.html`에서 favicon을 `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png`로 설정
+  * `themes/hugo-theme-learn/layouts/shortcodes/toc.html`을 정의함으로써 본문 어디서든 `{{%toc%}}`을 통해 Table of Contents를 사용 가능
+  * `themes/hugo-theme-learn/layouts/partials/favicon.html`에서 favicon을 `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png` 로 설정
 * 개발은 dev 브랜치에서
-* default branch는 master=>dev로 변경했음.
+* default branch는 master => dev로 변경했음.
 * 배포 자동화
   * branch:dev에서 게시글 작성
   * branch:dev에 push할 경우 Github Action을 통해 빌드
@@ -27,6 +28,7 @@
   * trusted domains 에 [localtest.me](localtest.me) 추가하기
 * [google search console](https://search.google.com/search-console/sitemaps) 설정
   * static/robots.txt 작성
+
 
 ## Refs
 

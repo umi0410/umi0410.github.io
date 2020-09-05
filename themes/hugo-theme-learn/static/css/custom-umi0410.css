@@ -8,6 +8,7 @@ lockquote {
 
 ul, ol{
   margin: 0.3rem;
+  padding-inline-start: 8px;
 }
 h1{
   font-size: 2rem;
@@ -89,4 +90,11 @@ body{
 
 .topics>li>ul>li, .topics>li>ul>li[class="visited"] {
   padding: 0px !important;
+}
+
+nav#TableOfContents {
+    font-size: 20px !important;
+    max-height: 85vh;
+    overflow: auto;
+    padding: 15px !important;
 }

@@ -8,6 +8,7 @@ weight: 30
 description: |
   요약
 ---
+{{%toc%}}
 ## Argo PoC를 진행하계 된 배경
 
 입사 초기부터 Argo에 대해 간간히 이야기를 들어왔습니다. 저희는 원래 Spinnaker을 사용했는데,
@@ -87,11 +88,11 @@ UI가 직관적이고 알아보기 쉽지만, 반대로 대규모 애플리케�
 Argo workflow를 통해 다양한 step들을 이용하기 위해 바로 ArgoCD가 Github Push를 받지 않고,
 Argo Event가 받도록 했습니다.
 2. Argo Workflow의 step들 수행
-  * Slack에 workflow 시작 알림
-  * Experiment 환경에 배포 (Argo CD 이용)
-  * Interation Test 실행 트리거 (Jenkins 이용)
-  * Integration Test 결과가 성공이면 Dev 환경에 배포 (Argo CD 이용)
-  * 어느 step에서든 실패 시 Slack에 실패 알림
+    * Slack에 workflow 시작 알림
+    * Experiment 환경에 배포 (Argo CD 이용)
+    * Interation Test 실행 트리거 (Jenkins 이용)
+    * Integration Test 결과가 성공이면 Dev 환경에 배포 (Argo CD 이용)
+    * 어느 step에서든 실패 시 Slack에 실패 알림
 
 이 정도 Pipeline을 짜면 사실 사용할 정도는 될 수 있겠지만, "일"로서 본다면 굳이 현재 사용 중인
 Spinnaker에 비해 장점이 뚜렷하게 느껴지지 않는 Argo를 위해 파이프라인을 이전하기에는 역부족이라는

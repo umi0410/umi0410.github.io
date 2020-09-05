@@ -10,6 +10,7 @@ description: |
   해야할 시점이었습니다. 덕분에 저는 저희 개발 환경을 처음부터 구축하고, 우리의 서비스를
   배포해보고, 이후 운영하면서 여러 경험들을 할 수 있었습니다. 
 ---
+{{%toc%}}
 ## Stargate라는 개발 인프라 구축기
 
 ![dev-architecture](../dev-architecture.svg)
