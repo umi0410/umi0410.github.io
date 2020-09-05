@@ -8,12 +8,11 @@
   ```bash
   $ hugo new --kind chapter {{*.md_FILE_REL_PATH_ABOUT_/content/}}
   ```
-* 개발은 dev 브랜치에서
-* default branch는 master => dev로 변경했음.
+
 * 배포 자동화
-  * branch:dev에서 게시글 작성
-  * branch:dev에 push할 경우 Github Action을 통해 빌드
-  * 빌드된 파일은 branch:master에 배포~! (Github Page가 master 브랜치를 바라보기 때문.)
+  * branch:master에서 게시글 작성
+  * branch:**에 push할 경우 Github Action을 통해 빌드
+  * 빌드된 파일은 branch:gh-pages에 배포~! (Github Page가 gh-pages 브랜치를 바라보기 때문.)
 * 재미삼아 개발 중~!
 
 
