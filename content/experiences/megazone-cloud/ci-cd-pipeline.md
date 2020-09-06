@@ -1,6 +1,6 @@
 ---
-title: "Github Action, Spinnaker을 이용한 CI/CD 자동화"
-menuTitle: "CI/CD 자동화"
+title: "Github Action, Spinnaker을 이용한 CI/CD 파이프라기기"
+menuTitle: "CI/CD 파이프라인"
 date: 2020-09-04T12:46:54+09:00
 chapter: false
 pre: "<b></b>"

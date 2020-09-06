@@ -1,6 +1,6 @@
 ---
-title: "Megazone Cloud DevOps"
-menuTitle: "Megazone Cloud DevOps 인턴"
+title: "메가존 클라우드 데브옵스 인턴 후"
+menuTitle: "Megazone Cloud DevOps"
 date: 2020-09-04T12:46:54+09:00
 chapter: false
 pre: "<b></b>"
