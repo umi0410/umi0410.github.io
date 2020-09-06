@@ -1,0 +1,109 @@
+lockquote {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 40px;
+    margin-inline-end: 40px;
+}
+
+ul, ol{
+  margin: 0.6rem;
+  padding-inline-start: 8px;
+}
+h1{
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 1.8rem;
+  line-height: 110% !important;
+  margin: 1.4rem 0 0.8rem 0;
+}
+
+h3 {
+  font-size: 1.4rem;
+  line-height: 110% !important;
+  margin: 1.0rem 0 0.6rem 0;
+}
+
+h4 {
+  font-size: 1.3rem;
+  line-height: 110% !important;
+  margin: 1.0rem 0 0.6rem 0;
+}
+
+h5 {
+  font-size: 0.8rem;
+  line-height: 110% !important;
+  margin: 1.0rem 0 0.6rem 0;
+}
+
+/*h6 {*/
+/*  font-size: 0.9rem;*/
+/*  line-height: 110% !important;*/
+/*  margin: 0.5rem 0 0.2rem 0;*/
+/*}*/
+
+
+
+#body-inner p{
+  font-size: 18px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+#chapter p{
+  text-align: left;
+  font-size: 18px;
+}
+
+#shortcuts h3{
+  display: none;
+}
+
+#shortcuts ul>li>a{
+  line-height: 2rem;
+  font-size: 1.1rem;
+}
+
+#body img, #body .video-container {
+  margin: 1rem auto;
+}
+
+blockquote {
+  display: block;
+  margin-block-start: 0rem;
+  margin-block-end: 0rem;
+  margin-inline-start: 5px;
+  margin-inline-end: 5px;
+  padding-left: 0.1rem;
+  margin-bottom: 0.4rem;
+}
+blockquote p{
+    font-size: 14px;
+}
+
+body{
+  font-size: 18px !important;
+}
+
+.topics>li>ul>li, .topics>li>ul>li[class="visited"] {
+  padding: 0px !important;
+}
+
+nav#TableOfContents {
+    font-size: 18px !important;
+    max-height: 85vh;
+    overflow: auto;
+    padding: 15px !important;
+}
+
+#sidebar ul > li > ul > li{
+  padding-left: 0.4rem;
+}
+
+.progress{
+  margin-top: 40px;
+  background: #fcfcfc;
+  border-radius: 10px;
+}

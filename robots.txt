@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://umi0410.github.io/sitemap.xml
