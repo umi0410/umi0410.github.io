@@ -3,6 +3,7 @@ languageCode = "ko-kr"
 title = "Jinsu Playground"
 theme = "hugo-theme-learn"
 disqusShortname = "umi0410"
+googleAnalytics = "UA-177403492-1"
 
 [outputs]
 home = [ "HTML", "RSS", "JSON"]

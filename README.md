@@ -30,6 +30,7 @@ themes/hugo-theme-learn 을 바탕으로 몇몇 부분을 수정해서 운영하
     ```
     각각의 페이지에서 parameter로 disqus를 비활성화하려면 .Page.Params로 `noDisqus: true`를 정의해준다.
   * `favicon.html`에서 favicon을 `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png` 로 설정
+  * `custom-footer.html`에 Google Analytics 설정 추가
 
 * `themes/hugo-theme-learn/statics/css/` 에서 몇몇 css 변경
   * `theme-umi0410.css` Custom theme 정의
