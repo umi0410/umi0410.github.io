@@ -6,7 +6,8 @@ chapter: false
 pre: "<b></b>"
 weight: 30
 description: |
-  요약
+  메가존 클라우드의 클라우드 원 팀에서 일하면서 Argo의 다양한 서비스들에 대한 Poc(개념 증명)을
+  진행했던 이야기를 적어보았습니다.
 ---
 {{%toc%}}
 ## Argo PoC를 진행하게 된 배경

@@ -1,12 +1,12 @@
 ---
-title: "Github Action, Spinnaker을 이용한 CI/CD 파이프라기기"
+title: "Github Action, Spinnaker을 이용한 CI/CD 파이프라인 구축기"
 menuTitle: "CI/CD 파이프라인"
 date: 2020-09-04T12:46:54+09:00
 chapter: false
 pre: "<b></b>"
 weight: 20
 description: |
-  설 
+  Github Action과 Spinnaker을 이용한 CI/CD 파이프라인 구축기
 ---
 {{%toc%}}
 ## Github Action을 사용하게 된 배경

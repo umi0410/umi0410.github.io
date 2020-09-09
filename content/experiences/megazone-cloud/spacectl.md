@@ -6,7 +6,7 @@ chapter: false
 pre: "<b></b>"
 weight: 50
 description: |
-  설명
+  spacectl이라는 CLI 프로그램 개발기
 ---
 {{%toc%}}
 
