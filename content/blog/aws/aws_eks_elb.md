@@ -6,7 +6,6 @@ chapter: false
 pre: ""
 noDisqus: false
 ---
-
 ## 🐶 시작하며
 
 > 본 게시글은 AWS 대학생 유저그룹인 [AUSG](https://velog.io/@ausg)의 활동 중
