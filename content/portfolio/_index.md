@@ -1,5 +1,6 @@
 ---
-title: "Portfolio"
+menuTitle: "Portfolio"
+title: About Jinsu Park (umi0410)
 date: 2020-09-04T11:46:14+09:00
 weight: 1
 chapter: false
