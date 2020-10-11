@@ -41,6 +41,7 @@ home = [ "HTML", "RSS", "JSON"]
   # themeVariant = ""
   # Provide a list of custom css files to load relative from the `static/` folder in the site root.
   custom_css = ["css/custom-umi0410.css"]
+  sectionMaxDepth = 3
 
 [[menu.shortcuts]]
   name = "<i class='fab fa-github'></i> Github"
