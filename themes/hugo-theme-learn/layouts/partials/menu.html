@@ -23,7 +23,7 @@
           {{end}}
         {{else}}
           {{range .Site.Home.Sections.ByWeight}}
-          {{ template "section-tree-nav" dict "sect" . "currentnode" $currentNode "showvisitedlinks" $showvisitedlinks}}
+          {{ template "section-tree-nav" dict "sect" . "depth" 2 "currentDepth" 1 "currentnode" $currentNode "showvisitedlinks" $showvisitedlinks}}
           {{end}}
         {{end}}
     </ul>
@@ -98,6 +98,8 @@
 {{ $showvisitedlinks := .showvisitedlinks }}
 {{ $currentNode := .currentnode }}
 {{ $currentFileUniqueID := "" }}
+{{ $depth := int .depth }}
+{{ $currentDepth := int .currentDepth }}
 {{ with $currentNode.File }}{{ $currentFileUniqueID = .UniqueID }}{{ end }}
  {{with .sect}}
   {{if and .IsSection (or (not .Params.hidden) $.showhidden)}}
@@ -133,7 +135,10 @@
           {{ range $pages.ByWeight }}
             {{ if and .Params.hidden (not $.showhidden) }}
             {{else}}
-            {{ template "section-tree-nav" dict "sect" . "currentnode" $currentNode "showvisitedlinks" $showvisitedlinks }}
+              {{ if le $currentDepth $depth }}
+                {{ $nextDepth := add $currentDepth 1 }}
+                {{ template "section-tree-nav" dict "depth" $depth "currentDepth" $nextDepth  "sect" . "currentnode" $currentNode "showvisitedlinks" $showvisitedlinks }}
+              {{ end }}
             {{end}}
           {{ end }}
         {{end}}
