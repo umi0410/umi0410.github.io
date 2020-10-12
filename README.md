@@ -3,12 +3,13 @@
 
 ## About this blog
 
-* 글 적은 법
+* 글 적는 법
   * Project root에서
   ```bash
   $ hugo new --kind chapter {{*.md_FILE_REL_PATH_ABOUT_/content/}}
   ```
-
+  * 개발용(초안)으로 적는 글은 .Page.Params의 draft: true로 설정 후 `hugo serve -D`를 통해
+    draft 상태인 글도 볼 수 있다. 
 * 배포 자동화
   * branch:master에서 게시글 작성
   * branch:**에 push할 경우 Github Action을 통해 빌드
@@ -17,12 +18,13 @@
 
 
 ## Customization
-themes/hugo-theme-learn 을 바탕으로 몇몇 부분을 수정해서 운영하고있다. submodule을 통해 theme을 깔끔하게 이용하고 싶었지만, customization을 위해서는 수정사항을 적용하려다보니 단순 clone을 이용하게됨.
+themes/hugo-theme-learn 을 바탕으로 몇몇 부분을 수정해서 운영하고있다.
+submodule을 통해 원본 theme은 유지하고 `layout` directory를 수정함으로써 오버라이드하거나 커스터마이징 중이다.
 
-* `themes/hugo-theme-learn/layouts/partials/` 에서 몇몇 html 변경
-  * `custom-sidebar-profile.html`에 프로필을 추가.
-  * `menu.html`에서 해당 커스텀 사이드바 프로필을 import
-  * `custom-comments.html`에 disqus 관련 설정 추가
+* `layouts/partials/` 에서 몇몇 html 추가 및 오버라이드
+  * `custom-sidebar-profile.html` 에 프로필을 추가.
+  * `menu.html` 에서 `custom-sidebar-profile` 을 import
+  * `custom-comments.html` 에 disqus 관련 설정 추가
     ```html
     {{ if not .Params.noDisqus }}
     {{ template "_internal/disqus.html" . }}
@@ -32,15 +34,16 @@ themes/hugo-theme-learn 을 바탕으로 몇몇 부분을 수정해서 운영하
   * `favicon.html`에서 favicon을 `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png` 로 설정
   * `custom-footer.html`에 Google Analytics 설정 추가
 
-* `themes/hugo-theme-learn/statics/css/` 에서 몇몇 css 변경
-  * `theme-umi0410.css` Custom theme 정의
-    * 기본적인 테마 색상 변경
+* `layouts/shortcodes/` 을 변경
+  * `toc.html`을 이용해 각 페이지에서 내용을 요약하기 위한 Table of Contents 기능을 추가함.
+
+* `statics/css/` 에서 몇몇 css 추가 및 오버라이
+  * `theme-umi0410-blue.css` 를 통해 `learn theme` 의 css를 수정한 Custom theme 정의
+    * 기본적인 테마의 색상 변경
     * \<code\>에 대한 색상 변경
   * `custom-umi0410.css` 에서 부가적이고 잡다한 css 변경. 테마 자체에 대한 것 외의 css 수정사항은 거의 이곳에 위치.
     * 페이지 헤더의 브레드크럼의 토글되는 Table of Contents 부분인 `.progress` 에대한 수정
 
-* `themes/hugo-theme-learn/layouts/shortcodes/` 을 변경
-  * `toc.html`을 이용해 Table of Contents 기능을 추가함.
 
 ## Refs and Tips
 
