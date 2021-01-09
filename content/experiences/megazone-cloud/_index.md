@@ -4,7 +4,7 @@ menuTitle: "Megazone Cloud DevOps"
 date: 2020-09-04T12:46:54+09:00
 chapter: false
 pre: "<b></b>"
-weight: 1
+weight: 10
 description: |
   안녕하세요. 이번에 메가존 클라우드에서 데브옵스 인턴으로 근무를 하게되었던 박진수입니다.
   너무 좋은 팀원들과 많은 경험을 하며 단시간에 성장할 수 있었고, 일하는 동안 매 순간 순간이 너무

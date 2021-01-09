@@ -19,9 +19,14 @@ noDisqus: true
   * Golang
   * 오픈소스
 * **자기소개**
-  > 언제 어디서든 배움의 자세를 가지는 개발자가 되고싶습니다.
-  >
-  > 컨테이너와 자동화, 깔끔한 아키텍쳐 설계 및 구축에 관심이 많습니다.
+  
+  *(미정...)*
+  
+  Golang, Cloud services, MSA, 컨테이너와 자동화, 깔끔한 아키텍쳐에 관심이 많습니다.
+  
+  특히나 요즘은 Golang을 이용한 Go스러운 개발과 Message Service에 관심이 많습니다. 
+  
+  진행 중인 프로젝트에서는 MSA와 K8s, ArgoCD, Github Action, Golang, Python등을 적용하며 공부 중입니다.
 
 ### 🥅 활동 내용
 

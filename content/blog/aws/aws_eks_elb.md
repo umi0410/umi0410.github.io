@@ -17,7 +17,7 @@ noDisqus: false
 
 *본 포스트는 EKS를 통해 K8s를 이용할 때를 기준으로 설명합니다.*
 
-## 💁🏻‍♂️ EKS 에서 ELB를 사용해 서비스를 노출킬 때 마음에 새길 
+## 💁🏻‍♂️ EKS 에서 ELB를 사용해 서비스를 노출킬 때 유의사항들
 
 > 🧐 : " `ELB`, `NLB`, `ALB` 대체 뭐가 다른 거야..?ㅜㅜ **쿠버네티스**를 쓸 때는 어떻게 얘네를 지정하는 거지..? `kubectl expose deploy {{deployment_name}} --type=LoadBalancer` 하면 그냥 작동은 하던데..."
 
@@ -27,7 +27,7 @@ noDisqus: false
 
 > " `Label`을 사용하여 오브젝트를 선택하고, 특정 조건을 만족하는 오브젝트 컬렉션을 찾을 수 있다. 반면에, `annotation`은 오브젝트를 식별하고 선택하는데 사용되지 않는다. 어노테이션의 메타데이터는 작거나 크고, 구조적이거나 구조적이지 않을 수 있으며, 레이블에서 허용되지 않는 문자를 포함할 수 있다."
 
-### ⚠️ ALB를 사용할 때 마음에 새길 점
+### ⚠️ ALB를 사용할 때 유의할 점
 
 > 어떤 옵션들이 있고, 기본적으로는 어떻게 설정되는 지에 대한 이해가 있어야 오류 과정을 추적하기 쉬우므로 기본적으로 ALB를  AWS Console에서 사용해본 뒤에 설정할 것을 추천합니다.
 
@@ -36,7 +36,7 @@ noDisqus: false
 - internet facing한 alb를 만들지 internal한 alb를 만들지 고민해봐야한다.
 - `alb ingress controller`의 log를 통해 작업에 대한 log를 볼 수 있다.
 
-### ⚠️ NLB, CLB를 사용할 때 마음에 새길 점
+### ⚠️ NLB, CLB를 사용할 때 유의할 점
 
 [https://kubernetes.io/ko/docs/concepts/services-networking/service/#aws-nlb-support](https://kubernetes.io/ko/docs/concepts/services-networking/service/#aws-nlb-support)
 
@@ -320,7 +320,7 @@ nginx-nlb    LoadBalancer   10.100.180.174   ae27784521c4f4bcd96b22f2cca2358b-4b
 
 ![cert3.png](cert3.png)
 
-#점# 🐳 마치며
+## 🐳 마치며
 
 어차피 한 번의 검색이면 정보를 얻을 수 있는 모든 annotation이나 기타 설정에 대한 내용을 다루기 보단 나름 제가 **실제로 쿠버네티스를 관리하는** **데브옵스 인턴로서 일을 하면서 헷갈렸던 내용**과 **EKS에서의 ELB 관리에 대한 흐름**을 위주로 설명하려 노력했고, 저의 `삽질`이 깃든 내용들입니다 ㅎㅎㅎ
 
