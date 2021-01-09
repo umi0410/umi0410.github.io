@@ -1,4 +1,4 @@
-lockquote {
+blockquote {
     display: block;
     margin-block-start: 1em;
     margin-block-end: 1em;
@@ -106,4 +106,12 @@ nav#TableOfContents {
   margin-top: 40px;
   background: #fcfcfc;
   border-radius: 10px;
+}
+
+#TableOfContents > ul > li > ul > li {
+  margin-left: 8px; 
+}
+
+#TableOfContents > ul > li > a   {
+  padding: 0px; 
 }
