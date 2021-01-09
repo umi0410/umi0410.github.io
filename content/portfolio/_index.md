@@ -17,11 +17,11 @@ noDisqus: true
   * 컨테이너 오케스트레이션
   * 클라우드 컴퓨팅
   * Golang
-  * 오픈소스
+  * CI/CD 파이프라인
 * **자기소개**
-  
-  *(미정...)*
-  
+  {{% notice note %}}
+  *(미정...)* 차츰 업데이트 될 예정
+  {{% /notice %}}
   Golang, Cloud services, MSA, 컨테이너와 자동화, 깔끔한 아키텍쳐에 관심이 많습니다.
   
   특히나 요즘은 Golang을 이용한 Go스러운 개발과 Message Service에 관심이 많습니다. 
@@ -33,10 +33,8 @@ noDisqus: true
 * [2020.04~2020.08] [Megazone Cloud에서 DevOps 인턴](/experiences/megazone-cloud)
 * [2020.08~2020.09] [오픈스택 컨트리뷰톤: 오픈스택 팀 멘티](/experiences/open-source/open-source-contributhon-2020)
 * [2020.01~2020.03] 위시오피스 AWS 서버 관리자
-* [2019.06~] AUSG 3기
+* [2019.06~] 한국 AWS Communitiy KRUG의 대학생 그룹 AUSG에서 3기로 활동 중
 * [2019.11] 경희대학교 소프트웨어 페스티발 웹/앱 최우수상 수상
   
-{{% notice note %}}
-To be updated soon........
-{{% /notice %}}
+
 
