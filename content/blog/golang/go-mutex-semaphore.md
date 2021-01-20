@@ -1,5 +1,6 @@
 ---
-title: "Go 언어로 적용해보는 CS - Mutex와 Semaphore"
+title: "Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore"
+menuTitle: Mutex와 Semaphore
 date: 2021-01-20T15:25:54+09:00
 chapter: false
 pre: "<b></b>"
@@ -10,9 +11,10 @@ description: |
   Computer Science의 주요 파트 중 하나인 운영체제에서 이론적으로는 흔히 접할 수 있는 Mutex와 Semaphore가
   실제로는 어떤 식으로 사용될 수 있을 지 Go 언어를 통해 직접 적용시키며 알아보았습니다.
 ---
-Golang으로 실습해보는 CS의 첫 번째 내용으로 OS의 주제들 중 실습해보기 쉬운 `Mutex`, `Semaphore`, `DeadLock`에 대해 알아보려한다.
+Go 언어로 적용해보는 Computer Science의 첫 번째 내용으로 OS 관련 내용 중 이론적으로는 흔하게 접할 수 있지만 실제 적용에 대한 내용은
+찾아보기 힘들었던 `Mutex`, `Semaphore`에 대해 알아보려한다.
 
-우선 Mutex, Semaphore, DeadLock은 주로 다양한 컨텍스트에서 사용되는 개념이기에 '*이러한 추상적인 개념을 갖고있구나!*' 정도로 이해하면 될 것이고, 정확한 그 구현은 컨텍스트(e.g. 데이터베이스에 대한 건지 OS에 대한 건지 Go에 대한 건지)에 따라 달라질 수 있다고 생각한다. 예를 들어 Go에서의 Mutex는  주로 `sync.Mutex`를 이용한 서로 다른 Goroutine의 동시 접근에 대한 제어를 의미할 것이고, 다른 일반적인 프로그래밍 언어나 OS에서는 서로 다른 Thread나 Process에 대한 동시 접근 제어가 될 수 있을 수 있을 것 같다.
+Mutex와 Semaphore은 각각의 추상적인 개념을 바탕으로 OS나 Go 등에서 사용될 수 있기에 세부적인 내용은 문맥에 따라 달라질 수 있다고 생각한다. 예를 들어 Go에서의 Mutex는  주로 `sync.Mutex`를 이용한 서로 다른 Goroutine의 동시 접근에 대한 제어를 의미하는 반면, 다른 프로그래밍 언어나 OS에서는 주로 서로 다른 Kernel thread나 Process에 대한 동시 접근 제어를 의미할 수 있다.
 
 ## Mutex
 
@@ -50,7 +52,7 @@ Golang으로 실습해보는 CS의 첫 번째 내용으로 OS의 주제들 중 �
 
 - 우리가 일반적으로 익숙한 Sync 즉 동기적인 순차적 진행 시에는 당연히 10만번 +1, 10만번 -1 후에 결과가 0이었다.
 - 동시적 접근을 수행하자 10만번 +1, 10만번 -1을 했지만 `Count += 1` 을 수행하던 중 또 다른 `Count += 1`이 수행되는 등의 원치않던 상황이 야기될 수 있기에 결과값이 0인 경우를 찾기 힘들다.
-- 여러 Goroutine을 이용해 concurrent하게 작업을 수행하도록하며 `Count += 1`, `Count -= 1` 과 같은 **동시적 접근이 수행되어서는 안되는 영역은 Critical Area**로 설정하기 위해 그 전 후에 `sync.Mutex`를 이용해 Lock, Unlock 기능을 넣어주자 **원했던 대로 0의 결과**를 얻을 수 있었다.
+- 여러 Goroutine이 concurrent하게 진행하되 `Count += 1`, `Count -= 1` 과 같은 **동시적 접근이 수행되어서는 안되는 영역은 Critical Area**로 설정해 상호 배제적으로 작업되게 하기 위해 Critical section의 전/후에 `sync.Mutex`를 이용해 Lock, Unlock 기능을 넣어주자 **기대했던 대로 0의 결과**를 얻을 수 있었다.
 
 ### 💡 Mutex.. 그래서 언제 써요?
 
