@@ -1,10 +1,10 @@
 ---
 title: "Go의 Pipeline pattern. 언제 사용해야할까? - Golang concurrent patterns"
 menuTitle: Go의 Pipeline pattern. 언제 사용해야할까?
-date: 2020-01-11T12:46:54+09:00
+date: 2021-01-11T12:46:54+09:00
 chapter: false
 pre: "<b></b>"
-weight: 20
+weight: 90
 noDisqus: false
 draft: false
 description: |

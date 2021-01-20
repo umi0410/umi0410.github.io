@@ -1,8 +1,7 @@
 ---
-title: "Category: AWS"
-menuTitle: AWS
+title: AWS
 chapter: true
-weight: 20
+weight: 30
 description: AWS와 관련한 내용을 정리
 noDisqus: true
 ---
