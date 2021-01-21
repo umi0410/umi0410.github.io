@@ -131,16 +131,18 @@ channel을 이용한 Semaphore 코드를 설명하기 위해 전체 코드 중 �
 
 ### 💡 Semaphore.. 그래서 언제 쓰나요?
 
-> Semaphore 개념은 알겠는데, Mutex는 Thread safe하게 작업하려는 경우 사용하려는 건 알겠습니다. 근데 그럼 mutex나 쓰면 되지 일정 개수만큼만 동시접근을 허용하려는 경우가 있을까요?
+> Mutex는 thread-safe한 작업을 할 때 사용하면 되는 것 같은데 Semaphore는 개념은 알겠는데 언제 써야할 지를 잘 모르겠네요. 일정 개수만큼만 동시 접근을 허용하려는 경우가 있을까요?
 
-Semaphore을 사용하기 좋은 케이스는 **동시에 접근할 수 있는 워커 수를 제한하는 경우**이고, 이는 주로 **CPU Bound한 작업을 수행하거나 Memory 점유율을 낮추고자하는 경우**에 이용된다. 이러한 케이스는 Go의 Worker pool 패턴을 이용하는 경우나 Pipeline pattern을 이용하는 경우와 유사하다.(*처음엔 Go의 모든 Concurrent pattern들을 개별적으로 구별지으려했었는데, 공부하다보니 일정한 개수의 Worker를 이용하는 Worker Pool pattern, Channel을 기반으로 작업 내역을 쪼개어 실시간 처리하는 Pipeline, 한 채널, 여러 Goroutine을 이용하는 Fan-in Fan-out pattern 등등 다들 유사하고 연관이 되어있더라.*)
+Semaphore을 사용하기 좋은 케이스는 **동시에 접근할 수 있는 워커 수를 제한하는 경우**이고, 이는 주로 **전체 작업이 늘어지는 것을 방지하고자 하는 경우**에 이용된다. 많은 작업을 동시에 수행하려하면 먼저 수행될 수 있는 작업은 먼저 수행되도록 하기보다는 전체적으로 모든 작업이 늘어지게 되고 CPU나 Memory 리소스를 많이 소모하게 되고 이는 서버의 안정성에도 좋지 않다. Semaphore를 이용해 동시 접근 워커 수를 제한하고자하는 케이스는 Go의 Worker pool 패턴을 이용하는 경우나 Pipeline pattern을 이용하는 경우와 유사하다.(*처음엔 Go의 모든 Concurrent pattern들을 개별적으로 구별지으려했었는데, 공부하다보니 일정한 개수의 Worker를 이용하는 Worker Pool pattern, Channel을 기반으로 작업 내역을 쪼개어 실시간 처리하는 Pipeline, 한 채널, 여러 Goroutine을 이용하는 Fan-in Fan-out pattern 등등 다들 유사하고 연관이 되어있더라.*)
 
 **Semaphore로 동시 접근 Worker 수를 제한하지 않고 모든 Goroutine을 동시적으로 수행하는 경우엔 어떻게 될까?**
 
 Logical Processor 개수를 훨씬 넘는 모든 Goroutine 동시적으로 작업을 진행할 경우 아무리 Goroutine이 concurrent한 작업 수행에 뛰어난 성능을 보인다할지라도 과하게 많은 수의 Goroutine은 성능 저하를 야기하지 않을까 예상했다. 하지만 user-level thread 혹은 green level thread의 일종인 Goroutine은 OS(혹은 Kernel) thread와 달리 Context switch로 인한 penalty가 거의 없어서인지 거의 Throughput 면에서의 성능 차이가 없었다. 
 
-> 참고: Kernel level thread는 주로 Preemptive한 schedule을, User level thread는 주로 Cooperative한 schedule 방식을 이용하지만 Goroutine은 User level thread임에도 Go 1.14 버전부터는 10ns를 기준으로 asynchronously preemptive한 schedule 방식도 사용하고 있다고 한다. goroutine간의 cooperative한 스케쥴링 preemptive한 스케쥴링 방식 모두를 지원하고 있는 게 아닐까 싶은데, Go 1.14가 릴리즈된 지 얼마되지 않았기도 하고, 이에 대해서는 명확히 설명된 문서를 찾기 힘들었다. 
-User level thread의 예로는 RxJava in Java, Coroutine in Kotlin, Goroutine in Golang이 있고, 이들은 Cooperative하게 schedule하기 때문에 context switch시의 penalty가 매우 적다.
+> Kernel level thread는 OS가 스케쥴링을 담당하기 때문에 Go 프로그램이 뭐 어떻게 할 수 있는 게 아니지만 Goroutine은 프로그램이 실행되는 동안 Go 런타임이 스케쥴링을 담당한다. 같은 Kernel level thread에 속한 User level thread인 goroutine간의 switch는 cost가 거의 없다. 즉 goroutine이 많든 적든 Kernel level thread간의 context switch cost는 동일하다고 볼 수 있고, 해당 Kernel level thread에 속한 goroutine간의 context switch cost는 거의 없다. 
+
+> 참고: Kernel level thread에 대한 스케쥴링은 주로 Preemptive 방식을, User level thread에 대한 스케쥴링은 주로 Cooperative한 방식을 이용하지만 Goroutine은 User level thread임에도 Go 1.14 버전부터는 10ns를 기준으로 goroutine을 switch 할 수 있는 asynchronously preemptive한 스케쥴 방식을 지원한다고 한다. 하지만 Go 1.14가 릴리즈된 지 얼마되지 않아서인지, asynchorously preemptive scheduling에 대해서는 명확히 설명된 문서를 찾기 힘들었다. 
+> User level thread의 예로는 RxJava in Java, Coroutine in Kotlin, Goroutine in Golang이 있다.
 
 하지만 Throughput 적인 측면보다는 Machine의 Resource 소모 측면에서는 모든 Goroutine이 동시적으로 수행되는 구조보다는 **Semaphore을 바탕으로한 동시에 일정 개수의 워커만이 작업하는 Worker Pool 구조가 훨씬 Memory나 CPU 리소스를 적게 소모**하는 듯 했다. 또한 100개의 동시 요청을 수행하는데 동일한 Throughput으로 약 10초가 걸린다고 치면, 요청당 goroutine을 생성하는 경우는 첫 번째 요청도 거의 10초가 걸린 반면 Semaphore을 이용한 경우는 먼저 온 요청은 대체로 빠르게 먼저 처리되는 경향을 보였다. 이 차이는 **처음 요청을 보낸 사용자 마저 10초를 기다리게 할 것이냐, 0.1초만에 응답을 받도록 할 것이냐의 차이**이다. 또한 **전체 작업이 늘어지면 그 작업에 대한 메모리 점유가 지속**되기에 메모리 측면에서도 비효율적이다.
 
