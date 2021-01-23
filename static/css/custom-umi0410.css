@@ -1,3 +1,27 @@
+/* Font 설정*/
+@import url(https://fonts.googleapis.com/css?family=Do+Hyeon);
+@import url(https://fonts.googleapis.com/css?family=Nanum+Gothic);
+@import url(https://fonts.googleapis.com/css?family=Architects+Daughter);
+@import url(https://fonts.googleapis.com/css?family=Righteous);
+@import url(https://fonts.googleapis.com/css2?family=Nanum+Brush+Script);
+
+h1, h2, h3, h4, h5{
+    font-family: "Do Hyeon", sans-serif;
+}
+body{
+    font-family: "Nanum Gothic", sans-serif;
+}
+#logo span{
+    font-family: "Architects Daughter", sans-serif;
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+ul.topics > li > a, #shortcuts > ul > li > a{
+    font-family: "Nanum Gothic", "Tahoma", "Geneva", "Arial", sans-serif;
+    font-weight: bold;
+}
+
+
 blockquote {
     display: block;
     margin-block-start: 1em;
@@ -11,8 +35,8 @@ ul, ol{
   padding-inline-start: 8px;
 }
 h1{
-  font-size: 2rem;
-  font-weight: bold;
+  text-transform: none;
+    font-size: 2.5rem;
 }
 
 h2 {
