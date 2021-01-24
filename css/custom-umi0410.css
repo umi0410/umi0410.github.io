@@ -37,23 +37,24 @@ ul, ol{
 h1{
   text-transform: none;
     font-size: 2.5rem;
+    line-height: 150%;
 }
 
 h2 {
   font-size: 1.8rem;
-  line-height: 110% !important;
+  line-height: 150% !important;
   margin: 1.4rem 0 0.8rem 0;
 }
 
 h3 {
   font-size: 1.4rem;
-  line-height: 110% !important;
+  line-height: 150% !important;
   margin: 1.0rem 0 0.6rem 0;
 }
 
 h4 {
   font-size: 1.3rem;
-  line-height: 110% !important;
+  line-height: 130% !important;
   margin: 1.0rem 0 0.6rem 0;
 }
 
@@ -63,22 +64,14 @@ h5 {
   margin: 1.0rem 0 0.6rem 0;
 }
 
-/*h6 {*/
-/*  font-size: 0.9rem;*/
-/*  line-height: 110% !important;*/
-/*  margin: 0.5rem 0 0.2rem 0;*/
-/*}*/
 
-
-
-#body-inner p{
-  font-size: 18px;
-  margin-top: 5px;
-  margin-bottom: 10px;
+#body, #chapter, #body p, #chapter p, body, body p{
+    line-height: 180%;
+    font-size: .9rem !important;
 }
+
 #chapter p{
   text-align: left;
-  font-size: 18px;
 }
 
 #shortcuts h3{
@@ -96,20 +89,19 @@ h5 {
 
 blockquote {
   display: block;
-  margin-block-start: 0rem;
-  margin-block-end: 0rem;
+  margin-block-start: 0;
+  margin-block-end: 0;
   margin-inline-start: 5px;
   margin-inline-end: 5px;
   padding-left: 0.1rem;
   margin-bottom: 0.4rem;
 }
+
 blockquote p{
-    font-size: 14px;
+    font-size: .8rem;
+    margin: .8rem;
 }
 
-body{
-  font-size: 18px !important;
-}
 
 .topics>li>ul>li, .topics>li>ul>li[class="visited"] {
   padding: 0px !important;
