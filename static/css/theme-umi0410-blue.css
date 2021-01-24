@@ -116,3 +116,7 @@ a:hover {
 #body .tags a.tag-link:before {
     border-right-color: var(--MENU-HEADER-BG-color);
 }
+
+div.notices{
+    margin: 0.75rem 0;
+}
