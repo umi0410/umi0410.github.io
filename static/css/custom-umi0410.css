@@ -59,7 +59,7 @@ h4 {
 }
 
 h5 {
-  font-size: 0.8rem;
+  font-size: 1rem;
   line-height: 110% !important;
   margin: 1.0rem 0 0.6rem 0;
 }
@@ -67,7 +67,7 @@ h5 {
 
 #body, #chapter, #body p, #chapter p, body, body p{
     line-height: 180%;
-    font-size: .9rem !important;
+    font-size: 1rem !important;
 }
 
 #chapter p{
