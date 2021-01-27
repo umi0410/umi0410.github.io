@@ -11,6 +11,8 @@ description: |
   Computer Science의 주요 파트 중 하나인 운영체제에서 이론적으로는 흔히 접할 수 있는 Mutex와 Semaphore가
   실제로는 어떤 식으로 사용될 수 있을 지 Go 언어를 통해 직접 적용시키며 알아보았습니다.
 ---
+{{% toc %}}
+
 Go 언어로 적용해보는 Computer Science의 첫 번째 내용으로 OS 관련 내용 중 이론적으로는 흔하게 접할 수 있지만 실제 적용에 대한 내용은
 찾아보기 힘들었던 `Mutex`, `Semaphore`에 대해 알아보려한다.
 
