@@ -67,7 +67,7 @@ h5 {
 
 #body, #chapter, #body p, #chapter p, body, body p{
     line-height: 180%;
-    font-size: 1rem !important;
+    font-size: 18px !important;
 }
 
 #chapter p{
