@@ -123,7 +123,7 @@ inner에서 Lock/Unlock을 담당하는 게 옳을 지 outer에서 Lock/Unlock�
 
 Goroutine scheduler가 **Goroutine을 스케쥴링 하는 방식은 Go 1.14 이전까지는 Cooperative 방식이었으나, Go 1.14 부터는 Preemptive한 방식으로 바뀌었다**고 한다. OS가 Go process의 thread를 스케쥴 하는 방식은 OS 마다 다르겠지만 대체로 preemptive할 것이고 여기서 얘기하려는 스케쥴러는 Goroutine을 스케쥴링하는 Goroutine scheduler임을 주의하자.
 
-Goroutine은 syscall와 mutex, channel, 함수 콜 등으로 인해 switch 될 수 있는데, **cooperative 방식을 이용하는 경우에는 이러한 goroutine switch 조건에 해당하지 않는 경우 임의로 goroutine switch 함수를 호출하지 않는 한은 같은 스레드 내의 다른 goroutine은 절대로 실행될 수 없다**. preemption(선점) 즉 다른 goroutine을 block 상태로 만들어버리고 자신이 CPU를 선점하는 것이 불가능했기 때문이다. 하지만 Go 1.14부터는 약 10ns를 기준으로 preemption을 수행하고 있다. Asynchronous preemption이라고 부르는 것 같은데, 정확히 왜 asynchronous인지, 기존의 preemptive schedule과는 무엇이 다른지는 찾아봤으나 제대로 설명되어있는 곳을 찾지 못했다.
+Goroutine은 syscall와 mutex, channel, 함수 콜 등으로 인해 switch 될 수 있는데, **cooperative 방식을 이용하는 경우에는 이러한 goroutine switch 조건에 해당하지 않는 경우 임의로 goroutine switch 함수를 호출하지 않는 한은 같은 스레드 내의 다른 goroutine은 절대로 실행될 수 없다**. preemption(선점) 즉 다른 goroutine을 block 상태로 만들어버리고 자신이 CPU를 선점하는 것이 불가능했기 때문이다. 하지만 Go 1.14부터는 약 10ms를 기준으로 preemption을 수행하고 있다. Asynchronous preemption이라고 부르는 것 같은데, 정확히 왜 asynchronous인지, 기존의 preemptive schedule과는 무엇이 다른지는 찾아봤으나 제대로 설명되어있는 곳을 찾지 못했다.
 
 앞으로 이어지는 내용은 *데드락에 대한 예시라기 보다는 'cooperative 스케쥴링과 preemptive 스케쥴링의 차이로 인해 데드락이 발생할 수도 있고 발생하지 않을 수도 있구나'에 대해 알아보는 예시*이다.
 
@@ -166,7 +166,20 @@ $ GOMAXPROCS=1 go run main.go
 No Deadlock. 나도 실행될 수 있어!
 ```
 
-하지만 asyncpreemptoff 옵션을 생략하면 기본적으로 선점형 스케쥴링이 지원되므로 이 경우엔 Deadlock이 발생하지 않고 Foo() 함수가 실행되는 것을 Stdout을 통해 볼 수 있다.
+하지만 asyncpreemptoff 옵션을 생략하면 기본적으로 선점형 스케쥴링이 지원되므로 이 경우엔 Deadlock이 발생하지 않고 Foo() 함수가 실행되는 것을 "No Deadlock. 나도 실행될 수 있어!" 라는 Stdout을 통해 볼 수 있다.
+
+#### pprof를 이용한 goroutine schedule 시각화
+
+하지만 정말로 async preemption이 동작했기 때문에 데드락에 빠지지 않은 것인지 다른 이유 때문인지는 그닥 직관적으로 와닿지 않는다. 그래서 몇몇 외국 블로그의 글에서 봤던 `pprof`라는 도구를 사용해봤고, 처음엔 사용법이 다소 어려웠지만 조금 익숙해지니 너무나도 편리했다.
+`pprof`는 `net/http` 패키지 하위에 존재하고, Goroutine scheduling, syscall log, CPU 사용 등을 시각화해서 보여주는 간편한 디버깅 도구이다.
+요청을 날리면 요청 이후 N초 간의 goroutine scheduling에 대한 정보를 기록해 보여주는 기능을 이용해보았다.
+
+![pprof-debugging-1.png](pprof-debugging-1.png)
+
+End Stack Trace를 통해 어떤 작업으로 인해 goroutine이 잠시 중단되고 CPU를 다른 goroutine에게 양보하게 되는지 알 수 있다. 놀랍게도 dummy에 대한 무한 루프 진행 도중 처음으로 **async preemption이 발생한 뒤 이어서 Foo 함수를 실행하는 goroutine이 CPU를 점유**하게 된다는 것을 시각적으로 볼 수 있다.
+
+Wall Duration은 해당 고루틴 블럭을 수행한 시간으로 보여지고 약 10ms를 기준으로 preemptive하게 switch가 일어날 수 있다는 여러 블로그의 글들과 유사하게 15,021,904ns, 즉 약 15ms만에 asyncPreempt라는 이벤트로 인해 goroutine switch가 일어났다.
+cooperative 스케쥴링만을 이용하는 경우에는 데드락으로 인해 한 번도 Foo를 실행하는 goroutine이 수행되지 못한다는 것도 시각화해서 제공해보고싶었지만, 당연하게도 그 데드락으로 인해 일정 기간동안 runtime을 관찰한 뒤 그 정보를 저장하는 goroutine 조차 실행할 수 없어 그 정보를 얻을 수 없었다!
 
 ```dockerfile
 # Go의 버전을 1.13으로 제한해본다.
@@ -198,6 +211,9 @@ Go를 이용해 실제 프로그램을 짜보며 어떤 경우 Deadlock이 발�
 
 `Channel`이나 `Cooperative scheduling`의 경우는 어느 정도 Go에 한정적인 내용이고 특히나 스케쥴링은 런타임이나 고루틴 스케쥴 방식까지 내려가는 세부적인 내용이긴하지만 Go에 특히 관심 있으신 분들께는 나름 재미있는 내용이 되지 않았을까싶다.
 
+그리고 처음 컴퓨터 사이언스를 Golang으로 적용해보는 이 시리즈를 작성했을 때에 비해 이전 글에선 testing의 benchmark를 이용해 좀 더 정확하고 편리한 벤치마킹을 도입해봤다는 점과
+이번엔 추가적으로 pprof를 이용해 goroutine 스케쥴링을 시각화해봤다는 점에서 컴퓨터 사이언스 뿐만 아니라 디버깅 기술이나 스케쥴링 방식 등등 다양한 주제에 대해서도 공부해보고 적용해볼 수 있었던 것 같아 뿌듯하다.
+다소 Go만의 지엽적인 내용으로 생각될 수도 있겠지만 이후에 내가 어떤 언어를 공부하게 되던 어떤 기술을 공부하게 되던 이러한 경험들을 적절히 녹여낼 수 있을 것이라 생각한다!!   
 ## 참고
 
 * Go: How are Deadlocks Triggered? https://medium.com/a-journey-with-go/go-how-are-deadlocks-triggered-2305504ac019
