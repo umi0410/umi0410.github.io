@@ -16,11 +16,6 @@ body{
     font-weight: bold;
     font-size: 1.4rem;
 }
-ul.topics > li > a, #shortcuts > ul > li > a{
-    font-family: "Nanum Gothic", "Tahoma", "Geneva", "Arial", sans-serif;
-    font-weight: bold;
-}
-
 
 blockquote {
     display: block;
@@ -103,9 +98,7 @@ blockquote p{
 }
 
 
-.topics>li>ul>li, .topics>li>ul>li[class="visited"] {
-  padding: 0px !important;
-}
+
 
 nav#TableOfContents {
     font-size: 18px !important;
@@ -130,4 +123,22 @@ nav#TableOfContents {
 
 #TableOfContents > ul > li > a   {
   padding: 0px; 
+}
+
+/**
+ * learn theme 관련. 하지만 컬러랑은 무관
+ */
+
+ul.topics > li > a, #shortcuts > ul > li > a{
+    font-family: "Nanum Gothic", "Tahoma", "Geneva", "Arial", sans-serif;
+    font-weight: bold;
+}
+
+ul.topics>li>ul>li, ul.topics>li>ul>li[class="visited"] {
+  padding: 0px !important;
+}
+
+/* e.g Blog > Go > 이하로는 표시 안함.*/
+ul.topics>li>ul>li>ul{
+    display: none !important;
 }
