@@ -1,5 +1,5 @@
 ---
-title: "Go"
+title: "Go 언어"
 chapter: true
 date: 2021-01-09T11:27:30+09:00
 weight: 10
