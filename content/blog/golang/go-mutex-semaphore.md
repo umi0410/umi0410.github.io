@@ -4,7 +4,7 @@ menuTitle: Mutex와 Semaphore
 date: 2021-01-20T15:25:54+09:00
 chapter: false
 pre: "<b></b>"
-weight: 10
+weight: 50
 noDisqus: false
 draft: false
 description: |

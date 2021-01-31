@@ -4,7 +4,7 @@ menuTitle: Cache
 date: 2021-01-27T15:25:54+09:00
 chapter: false
 pre: "<b></b>"
-weight: 50
+weight: 70
 noDisqus: false
 draft: false
 description: |

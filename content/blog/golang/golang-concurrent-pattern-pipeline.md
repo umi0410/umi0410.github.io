@@ -4,7 +4,7 @@ menuTitle: Go의 Pipeline pattern. 언제 사용해야할까?
 date: 2021-01-11T12:46:54+09:00
 chapter: false
 pre: "<b></b>"
-weight: 90
+weight: 110
 noDisqus: false
 draft: false
 description: |

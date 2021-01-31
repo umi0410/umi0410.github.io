@@ -4,7 +4,7 @@ menuTitle: "개발 썰 - Go Memory Leak(메모리 누수) 관련 이슈"
 date: 2021-01-27T15:25:54+09:00
 chapter: false
 pre: "<b></b>"
-weight: 50
+weight: 100
 noDisqus: false
 draft: false
 description: |
