@@ -1,0 +1,253 @@
+<!doctype html><html lang=en class="js csstransforms3d"><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=generator content="Hugo 0.80.0"><meta name=description content="자세하게 의미는 모른 채 들어보기만 했던 소켓이란 녀석! 어떤 종류의 소켓이 존재하는지, 어떤 차이가 있는지
+성능은 어떠한지 실제 Go 프로그램을 통해 확인해보고 벤치마크해보며 비교해봤습니다."><meta name=author content="umi0410"><link rel=icon href=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png type=image/png><title>Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket) :: Jinsu Playground</title><link href=/css/nucleus.css?1613225757 rel=stylesheet><link href=/css/fontawesome-all.min.css?1613225757 rel=stylesheet><link href=/css/hybrid.css?1613225757 rel=stylesheet><link href=/css/featherlight.min.css?1613225757 rel=stylesheet><link href=/css/perfect-scrollbar.min.css?1613225757 rel=stylesheet><link href=/css/auto-complete.css?1613225757 rel=stylesheet><link href=/css/atom-one-dark-reasonable.css?1613225757 rel=stylesheet><link href=/css/theme.css?1613225757 rel=stylesheet><link href=/css/hugo-theme.css?1613225757 rel=stylesheet><link href=/css/theme-umi0410-blue.css?1613225757 rel=stylesheet><link href=/css/custom-umi0410.css?1613225757 rel=stylesheet><script src=/js/jquery-3.3.1.min.js?1613225757></script><style>:root #header+#content>#left>#rlblock_left{display:none!important}:not(pre)>code+span.copy-to-clipboard{display:none}</style></head><body data-url=/blog/golang/go-socket/><nav id=sidebar><div id=header-wrapper><div id=header><a id=logo href=https://umi0410.github.io><span>Jinsu Playground</span></a></div><div id=profile-wrapper><style>#sidebar-profile-message{text-align:left;word-break:keep-all}#sidebar-profile-message>p{margin-top:0;margin-bottom:0;margin-left:10px;font-size:16px}</style><a href=/><img src=/media/profile.png style=width:170px;margin-top:15px></a><div id=sidebar-profile-message><b>박진수 (umi0410)</b></br><p>Golang, Cloud services, MSA, 컨테이너와 자동화, 깔끔한 아키텍쳐에 관심이 많습니다.</p></div></div></div><div class=highlightable><ul class=topics><li data-nav-id=/portfolio/ title="About Jinsu Park (umi0410)" class=dd-item><a href=/portfolio/>About me</a></li><li data-nav-id=/experiences/ title=Experiences class=dd-item><a href=/experiences/>Experiences</a><ul><li data-nav-id=/experiences/megazone-cloud/ title="메가존 클라우드 데브옵스 인턴 후기" class=dd-item><a href=/experiences/megazone-cloud/><b></b>Megazone Cloud DevOps</a><ul><li data-nav-id=/experiences/megazone-cloud/stargate-infra/ title="Stargate라는 인프라 구축기" class=dd-item><a href=/experiences/megazone-cloud/stargate-infra/><b></b>인프라 구축기</a></li><li data-nav-id=/experiences/megazone-cloud/ci-cd-pipeline/ title="Github Action, Spinnaker을 이용한 CI/CD 파이프라인 구축기" class=dd-item><a href=/experiences/megazone-cloud/ci-cd-pipeline/><b></b>CI/CD 파이프라인</a></li><li data-nav-id=/experiences/megazone-cloud/argo-poc/ title="Argo Project들에 대한 PoC(개념 증명) 진행" class=dd-item><a href=/experiences/megazone-cloud/argo-poc/><b></b>Argo Project PoC</a></li><li data-nav-id=/experiences/megazone-cloud/spaceone-helm/ title="SpaceONE Helm Chart 개발" class=dd-item><a href=/experiences/megazone-cloud/spaceone-helm/><b></b>Helm Chart 개발</a></li><li data-nav-id=/experiences/megazone-cloud/spacectl/ title="SpaceONE CLI Client인 spacectl 설계 및 개발" class=dd-item><a href=/experiences/megazone-cloud/spacectl/><b></b>CLI Client 설계.개발</a></li></ul></li></ul></li><li data-nav-id=/blog/ title=Blog class="dd-item
+parent"><a href=/blog/>Blog</a><ul><li data-nav-id=/blog/golang/ title="Go 언어" class="dd-item
+parent"><a href=/blog/golang/>Go 언어</a><ul><li data-nav-id=/blog/golang/go-vs-java-oop/ title="Go vs Java - Go에서의 객체 지향" class=dd-item><a href=/blog/golang/go-vs-java-oop/><b></b>Go vs Java - Go에서의 객체 지향</a></li><li data-nav-id=/blog/golang/go-mutex-semaphore/ title="Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore" class=dd-item><a href=/blog/golang/go-mutex-semaphore/><b></b>Mutex와 Semaphore</a></li><li data-nav-id=/blog/golang/go-deadlock/ title="Go 언어로 적용해보는 Computer Science - Deadlock" class=dd-item><a href=/blog/golang/go-deadlock/><b></b>Deadlock</a></li><li data-nav-id=/blog/golang/go-cpu-cache/ title="Go 언어로 적용해보는 Computer Science - Cache" class=dd-item><a href=/blog/golang/go-cpu-cache/><b></b>Cache</a></li><li data-nav-id=/blog/golang/go-concurrency-vs-parallelism/ title="Go 언어로 적용해보는 Computer Science - Concurrency vs Parallelism" class=dd-item><a href=/blog/golang/go-concurrency-vs-parallelism/><b></b>Concurrency vs Parallelism</a></li><li data-nav-id=/blog/golang/go-socket/ title="Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket)" class="dd-item active"><a href=/blog/golang/go-socket/><b></b>Socket</a></li><li data-nav-id=/blog/golang/go-memory-leak-issue/ title="개발 썰 - Go Memory Leak(메모리 누수) 관련 이슈" class=dd-item><a href=/blog/golang/go-memory-leak-issue/><b></b>개발 썰 - Go Memory Leak(메모리 누수) 관련 이슈</a></li><li data-nav-id=/blog/golang/go-concurrent-pattern-pipeline/ title="Go의 Pipeline pattern. 언제 사용해야할까? - Golang concurrent patterns" class=dd-item><a href=/blog/golang/go-concurrent-pattern-pipeline/><b></b>Go의 Pipeline pattern. 언제 사용해야할까?</a></li></ul></li><li data-nav-id=/blog/aws/ title=AWS class=dd-item><a href=/blog/aws/>AWS</a><ul><li data-nav-id=/blog/aws/aws_eks_elb/ title="EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기" class=dd-item><a href=/blog/aws/aws_eks_elb/>EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기</a></li></ul></li></ul></li></ul><section id=shortcuts><h3>More</h3><ul><li><a class=padding href=https://github.com/umi0410><i class="fab fa-github"></i>Github</a></li></ul></section><section id=footer><p>Built with <a href=https://github.com/matcornic/hugo-theme-learn><i class="fas fa-heart"></i></a>from <a href=https://getgrav.org>Grav</a> and <a href=https://gohugo.io/>Hugo</a></p></section></div></nav><section id=body><div id=overlay></div><div class="padding highlightable"><div><div id=top-bar><div id=top-github-link><a class=github-link title="Edit this page" href=https://github.com/umi0410/umi0410.github.io/edit/master/content/blog/golang/go-socket.md target=blank><i class="fas fa-code-branch"></i><span id=top-github-link-text>Edit this page</span></a></div><div id=breadcrumbs itemscope itemtype=http://data-vocabulary.org/Breadcrumb><span id=sidebar-toggle-span><a href=# id=sidebar-toggle data-sidebar-toggle><i class="fas fa-bars"></i></a></span><span id=toc-menu><i class="fas fa-list-alt"></i></span><span class=links><a href=/>About Jinsu Park (umi0410)</a> > <a href=/blog/>Blog</a> > <a href=/blog/golang/>Go 언어</a> > Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket)</span></div><div class=progress><div class=wrapper><nav id=TableOfContents><ul><li><a href=#시작하며>시작하며</a></li><li><a href=#socket-이란>Socket 이란</a><ul><li><a href=#서버-소켓과-클라이언트-소켓>서버 소켓과 클라이언트 소켓</a></li><li><a href=#network-socket>Network Socket</a></li><li><a href=#unix-domain-socket>Unix Domain Socket</a></li></ul></li><li><a href=#벤치마킹-unix-domain-socket-vs-network-socket>벤치마킹 Unix domain socket vs Network socket</a></li><li><a href=#마치며>마치며</a></li><li><a href=#참고>참고</a></li></ul></nav></div></div></div></div><div id=head-tags></div><div id=body-inner><h1>Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket)</h1><h2 id=시작하며>시작하며</h2><p>개발 공부를 처음 시작한 지 언제 안 됐을 무렵, 의경 때 자바로 TCP Socket을 이용해 옆 컴퓨터와 채팅을 하는 프로그램을 만들어 보는 것을 시작으로 docker나 mysql과 같은 다양한 오픈소스들을 이용해보면서나 네트워크를 공부하면서 다양하게 들어왔던 <code>소켓</code>이지만 정확히 어떤 역할을 하는지 어떤 종류가 있는지 어떻게 동작하는지 알지 못했다.</p><p>그렇게 알쏭달쏭한 존재였던 소켓을 오늘은 크게 <strong><code>Unix Domain Socket</code>와 <code>Network Socket</code> 두 가지로 나눠 정리해보고 Unix Domain Socket과 TCP를 사용하는 Network Socket을 벤치마크해보고 어떤 차이가 있는지 확인</strong>해보도록 하겠다. 주로 내가 소켓을 접했던 자료나 이슈 상황 등등에서는 UDP보다는 TCP가 많이 등장했었기 때문에 <strong>UDP에 대한 내용은 거의 제외하고 TCP와 Unix Domain Socket을 위주로 비교, 정리</strong>해보겠다.</p><h2 id=socket-이란>Socket 이란</h2><p>소켓은 어떠한 통신에서의 Endpoint(끝점) 역할을 한다. 끝점이 없으면 어디와 어디가 통신하는지 어디에 데이터를 써야하는지 알 수 없다.</p><p>소켓을 마치 전구 소켓과 같이 소켓이라고 부르는 이유는 소켓에 올바르게 데이터를 적기만 하면 통신을 위한 세부적인 동작은 소켓이 알아서 수행하기 때문이다. 따라서 우리는 통신을 하기 위한 Socket을 올바르게 생성하고, 그 곳에 데이터를 올바르게 적거나 그곳의 데이터를 올바르게 읽기만 하면 된다. 실제 데이터 전송은 소켓이 알아서 수행해준다.</p><h3 id=서버-소켓과-클라이언트-소켓>서버 소켓과 클라이언트 소켓</h3><p><img src=server-client-socket.jpeg alt=server-client-socket.jpeg></p><p>소켓을 역할의 측면에서 분류한다면 서버 소켓과 클라이언트 소켓으로 나눌 수 있다. 동일한 구조의 소켓이지만 생성되는 시기나 역할이 다를 뿐이다.</p><ul><li><strong>서버 소켓</strong> - 클라이언트 소켓의 연결 요청을 받아들이기만 할 뿐. 실제 서버 측에서의 데이터의 송수신은 서버 소켓이 클라이언트 소켓의 연결 요청을 수락하면서 새로 만들어지는 소켓을 통해 수행.</li><li><strong>클라이언트 소켓</strong> - 클라이언트가 서버와 통신하고자 할 때 생성하는 소켓. 클라이언트는 실제 데이터 송수신도 이 소켓을 통해 수행.</li></ul><p>서버 소켓과 클라이언트 소켓이 단순한게 1:N으로만 통신하면 이렇게 서버 소켓이 클라이언트 소켓의 요청을 수락한 뒤 새로 소켓을 만들 필요 없지 않을까싶지만 그렇게 되면 서버가 각 클라이언트와 통신할 때 하나의 소켓을 이용하므로 올바르게 원하는 클라이언트와 통신할 수 없을테니 좋은 방식이 아닐 것이다.</p><p>그렇다면 과연 <strong>정말 서버에서는 연결을 accept 한 뒤 소켓을 새로 생성할까?</strong> 확인해보자.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+
+<span style=color:#f92672>import</span> (
+    <span style=color:#e6db74>&#34;log&#34;</span>
+    <span style=color:#e6db74>&#34;net&#34;</span>
+    <span style=color:#e6db74>&#34;os&#34;</span>
+    <span style=color:#e6db74>&#34;time&#34;</span>
+)
+
+<span style=color:#66d9ef>var</span> (
+    <span style=color:#a6e22e>network</span> = <span style=color:#e6db74>&#34;tcp&#34;</span>
+    <span style=color:#a6e22e>address</span> = <span style=color:#e6db74>&#34;0.0.0.0:8080&#34;</span>
+)
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+    <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Remove</span>(<span style=color:#a6e22e>address</span>)
+    <span style=color:#a6e22e>socket</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>net</span>.<span style=color:#a6e22e>Listen</span>(<span style=color:#a6e22e>network</span>, <span style=color:#a6e22e>address</span>)
+    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#a6e22e>err</span>)
+    }
+
+    <span style=color:#66d9ef>for</span> {
+        <span style=color:#a6e22e>connectedSocket</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>socket</span>.<span style=color:#a6e22e>Accept</span>()
+        <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>{
+            <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#a6e22e>err</span>)
+        }
+        <span style=color:#66d9ef>go</span> <span style=color:#66d9ef>func</span>() {
+            <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>i</span> <span style=color:#f92672>:=</span> <span style=color:#ae81ff>0</span>; <span style=color:#a6e22e>i</span> <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>10</span>; <span style=color:#a6e22e>i</span><span style=color:#f92672>++</span>{
+                <span style=color:#a6e22e>connectedSocket</span>.<span style=color:#a6e22e>Write</span>([]byte(<span style=color:#e6db74>&#34;pong\n&#34;</span>))
+                <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Sleep</span>(<span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Second</span>)
+            }
+            <span style=color:#a6e22e>connectedSocket</span>.<span style=color:#a6e22e>Close</span>()
+        }()
+    }
+}
+</code></pre></div><p>간단하게 TCP 통신프로그램을 하나 만들어봤다. 단순히 1초 간격으로 pong을 5번 출력한 뒤 연결을 끊는 프로그램이다.</p><p><strong>요청 전</strong></p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ netstat --tcp
+Active Internet connections <span style=color:#f92672>(</span>w/o servers<span style=color:#f92672>)</span>
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60082     ESTABLISHED
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60084     ESTABLISHED
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60078     ESTABLISHED
+</code></pre></div><p><strong>요청 수락 후 통신 중</strong> - 소켓이 하나 생성되어 ESTABLISHED 상태</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ netstat --tcp
+Active Internet connections <span style=color:#f92672>(</span>w/o servers<span style=color:#f92672>)</span>
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60082     ESTABLISHED
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60084     ESTABLISHED
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60078     ESTABLISHED
+tcp6       <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-1:http-alt 124.50.93.166:42434     ESTABLISHED
+</code></pre></div><p><strong>통신 종료</strong> - 생성되었던 소켓이 TIME_WAIT 상태. 잠시 후 사라진다.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ netstat --tcp
+Active Internet connections <span style=color:#f92672>(</span>w/o servers<span style=color:#f92672>)</span>
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60082     ESTABLISHED
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60084     ESTABLISHED
+tcp        <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60078     ESTABLISHED
+tcp6       <span style=color:#ae81ff>0</span>      <span style=color:#ae81ff>0</span> ip-172-31-34-1:http-alt 124.50.93.166:42434     TIME_WAIT
+</code></pre></div><blockquote><p>깔끔한 네트워크 정보를 보기 위해 순수한 AWS EC2 t2.micro 인스턴스에서 작업해보았다. 맨 위 3줄에 나온 소켓 정보는 ssh 접속으로 인한 소켓 정보이다.</p><p>또한 서버 소켓은 출력되지 않았는데 이는 우리는 평소에 listen 중인 포트나 서버 소켓을 보기 위해 netstat에 -l 옵션을 전달한 반면 이번엔 &ndash;tcp 옵션을 통해 listen 중인 서버 소켓이 아닌 클라이언트의 요청을 수락한 뒤 생성되는 소켓을 보려하고있기 때문이다.</p></blockquote><p>4번 째 줄의 소켓 정보가 바로 우리가 생각하는 서버 소켓이 client의 연결 요청을 accept 후 생성하는 socket이다. 클라이언트의 요청을 accept 후에 새로운 소켓이 생성되며 통신 종료 후 잠시 기다린 뒤 사라진다.</p><h3 id=network-socket>Network Socket</h3><p><code>Network socket</code>은 네트워크 통신이 필요한 작업을 수행할 때 이용하는 소켓의 한 종류로 TCP 프로토콜을 이용하는 stream socket와 UDP 프로토콜을 이용하는 datagram socket이 있다. 사용자는 socket에 데이터를 적기만 하면 네트워크와 관련된 작업은 socket이 알아서 수행해준다. 읽을 때에도 마찬가지이다.</p><p>TCP socket이라는 사람도 있고 stream socket이라는 사람도 있고 TCP/IP socket이라는 사람도 있는 것 같다. 정확한 명칭은 모르겠지만 어떤 존재인지는 분명히 알겠다. 중요한 것은 소켓을 분류할 때 주로 Unix Domain Socket과 TCP Socket으로 분류하는 경우를 많이 봤는데 이것이 아니라 <strong>Unix Domain Socket과 Network 소켓으로 분류하는 것이 맞는 것 같고, 각각의 경우에 모두 신뢰성있는 stream socket과 비신뢰성의 datagram socket을 이용할 수 있다</strong>는 것이다. 그렇기 때문에 stream 방식의 unix domain socket을 이용해 서버를 띄울 때와 tcp를 이용하는 network socket으로 서버를 띄울 때는 인자의 값만 조금 달라질 뿐 동일한 방식으로 동작한다. 이는 글의 하부의 코드에서 확인해볼 수 있다.</p><h4 id=socket과-port>Socket과 Port</h4><p>socket과 port의 구분이나 역할이 애매하게 느껴질 수 있다. 통신을 할 때 IP 주소를 이용해 목적지인 Host를 찾을 수는 있지만 그 Host의 어떤 프로세스과 통신하려는 것인지는 알 수 없다. 올바른 프로세스를 찾을 수 있도록 프로세스와 어떠한 숫자를 매핑시키는데 이 숫자를 Port 번호라고 한다. 예를 들어 123.123.123.123:8080으로 요청을 보내는 것은 123.123.123.123의 IP 주소를 갖는 Host의 8080번 포트에 맵핑된 프로세스에 요청을 보내는 것이다.</p><p>이 때 Port와 프로세스를 그냥 연결할 수는 없고 Socket이라는 녀석이 필요하다. Socket은 실질적으로 어떤 프로세스를 어떤 포트에 맵핑시킬지에 대한 정보가 필요하고 네트워크 작업을 알아서 수행한다.</p><p>조금 비유를 해보자면 회사내에 어떤 부서가 있고 외부에서 해당 부서와 작업하기 위해선 어떠한 고유한 부서 번호가 필요하고, 이때 외부와 해당 부서간에 오가는 통신을 담당하는 담당자가 있어야하는 경우에 비유해 볼 수 있다. &ldquo;어떤 부서"는 프로세스이고 &ldquo;고유한 부서 번호"는 포트 번호, 통신을 담당하는 담당자는 소켓에 해당한다.</p><h3 id=unix-domain-socket>Unix Domain Socket</h3><p>Unix Domain Socket은 IPC(Inter-Process Communication, 프로세스 간 통신)의 여러 방법 중 가장 자유로우면서 사용하는 데에 있어 제한이 별로 없는 방법이다. 네트워크 소켓과 달리 같은 호스트 내의 프로세스 간 통신을 담당하기 때문에 아무런 네트워크 작업이 필요 없다. 하지만 마치 TCP나 UDP와 동일한 방식으로 사용이 가능하다. 즉 네트워크 통신과 마찬가지로 Stream과 Datagram 두 가지 타입으로 이용이 가능하고, TCP와 UDP가 이용하는 syscall을 동일하게 이용할 수 있다고한다.</p><h4 id=-상상의-나래---우리가-알게-모르게-겪었던-unix-domain-socket의-permission오류에-대해>🌈 상상의 나래 - 우리가 알게 모르게 겪었던 Unix domain socket의 Permission오류에 대해</h4><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ mysql
+stat /var/lib/mysql/mysql.sock
+stat: cannot stat <span style=color:#e6db74>&#39;/var/lib/mysql/mysql.sock&#39;</span>: Permission denied
+</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ docker
+docker: Got permission denied <span style=color:#66d9ef>while</span> trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
+</code></pre></div><p>주로 우리가 <code>MySQL</code>이나 <code>Docker</code>를 <code>localhost</code>에서 사용할 때 <strong>unix socket에 대한 permission 에러</strong>를 겪은 적이 있을 것이다. MySQL이나 Docker를 비롯한 많은 오픈소스들이 아마 성능상의 이점을 위해 localhost에서 서비스를 이용할 경우 Network socket이 아닌 Unix domain socket을 많이들 이용하는 것으로 알고있다. 그렇기 때문에 주로 MySQL 설치 이후 Remote에서는 접속이 되는데 Localhost에서는 권한 문제로 접속이 안된다거나 Docker 설치 이후 사용자를 docker Group에 넣어주는 경우가 많이 있다.</p><p>아마도 네트워크 통신을 통해 서버 소켓에 접근하는 네트워크 소켓과 달리 unix domain socket은 client process가 직접 server의 socket file에 접근하기 때문에 이때 쓰기 권한 때문에 그런 권한 오류가 생기는 것이 아닐까 싶다.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># ubuntu 사용자로 unix domain socket server 프로세스를 띄운 경우</span>
+<span style=color:#75715e># ubuntu 사용자로는 잘 접속이 된다.</span>
+$ go test -v
+<span style=color:#f92672>===</span> RUN   TestSocket
+<span style=color:#f92672>===</span> RUN   TestSocket/tcp
+2021/02/13 12:59:06 pong
+<span style=color:#f92672>===</span> RUN   TestSocket/unix
+2021/02/13 12:59:06 pong
+--- PASS: TestSocket <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+    --- PASS: TestSocket/tcp <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+    --- PASS: TestSocket/unix <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+PASS
+ok  	uds	0.004s
+</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># server가 생성한 unix domain socket에 write 권한이 없는</span>
+<span style=color:#75715e># guest1이라는 사용자로는 server와 unix domain socket으로는 통신할 수 없고,</span>
+<span style=color:#75715e># 앞서 오픈소스를 이용하며 겪었던 에러와 마찬가지로 권한 이슈가 발생한다.</span>
+<span style=color:#75715e># 하지만 TCP 소켓을 이용한 경우는 원활히 ping-pong test가 성공한 것을 볼 수 있다.</span>
+$ go test -v
+<span style=color:#f92672>===</span> RUN   TestSocket
+<span style=color:#f92672>===</span> RUN   TestSocket/tcp
+2021/02/13 12:59:01 pong
+<span style=color:#f92672>===</span> RUN   TestSocket/unix
+    main_test.go:21: 
+        	Error Trace:	main_test.go:21
+        	Error:      	Received unexpected error:
+        	            	dial unix jinsu.sock: connect: permission denied
+        	Test:       	TestSocket/unix
+--- FAIL: TestSocket <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+    --- PASS: TestSocket/tcp <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+    --- FAIL: TestSocket/unix <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+
+<span style=color:#75715e># 하지만 재미있게도 guest1도 socket에 write할 수 있도록 권한을 수정해주니</span>
+<span style=color:#75715e># guest1도 unix domain socket으로 무리 없이 통신이 가능했다!</span>
+$ sudo chmod <span style=color:#ae81ff>777</span> jinsu.sock
+$ go test -v
+<span style=color:#f92672>===</span> RUN   TestSocket
+<span style=color:#f92672>===</span> RUN   TestSocket/tcp
+2021/02/13 12:59:06 pong
+<span style=color:#f92672>===</span> RUN   TestSocket/unix
+2021/02/13 12:59:06 pong
+--- PASS: TestSocket <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+    --- PASS: TestSocket/tcp <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+    --- PASS: TestSocket/unix <span style=color:#f92672>(</span>0.00s<span style=color:#f92672>)</span>
+PASS
+ok  	uds	0.004s
+</code></pre></div><p>따라서 ubuntu 사용자로 TCP socket과 Unix domain socket 두 가지 방법으로 서버 역할을 할 수 있는 프로세스를 띄운 뒤 ubuntu 사용자와 guest1 사용자로 통신 테스트를 진행해보았다.</p><p>서버가 생성한 unix domain socket은 <code>srwxrwxr-x</code> 의 형식과 권한을 갖고 있기 때문에 guest1은 이 소켓에 대해 read와 execute 권한 뿐이고, write는 불가능하기에 unix domain socket을 이용해서는 통신할 수 없다. 따라서 우리가 평소에 오픈소스를 localhost에서 이용하면서 종종 맞이했던 소켓에 대한 permission error을 만나볼 수 있었다! 반면 TCP로는 통신이 가능했고, 놀랍게도 guest1에게 소켓 파일에 대한 write 권한을 부여해주자 Unix domain socket으로도 통신이 가능해진 것을 볼 수 있다.</p><p><strong>상상의 나래 정리: unix domain socket을 통해 접속을 시도할 때에는 unix domain socket file에 대한 접근을 하는 프로세스가 해당 socket file에 대한 적절한 permission을 가져야한다.</strong></p><blockquote><p>또한 구글링 도중 보았던 재미있는 예시는 database를 통해 authentication/authorization을 수행하는 일반적인 서비스와 달리 Unix domain socket을 이용하는 경우에는 linux user 시스템을 이용해서도 권한/인증 관리를 수행하는 경우도 존재할 수 있다는 것이었다.</p></blockquote><h2 id=벤치마킹-unix-domain-socket-vs-network-socket>벤치마킹 Unix domain socket vs Network socket</h2><p>Unix domain socket과 Network socket의 성능을 비교하는 벤치마크를 작성했다.
+두 경우 모두 Stream type의 socket을 이용하도록 했고, Network socket의 경우는 특히나 이 경우 TCP 프로토콜을 이용하게 된다.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=color:#75715e>// main.go
+</span><span style=color:#75715e>// 한 프로세스 내에서 TCP Socket과 Unix Domain Socket 두 가지를 이용해
+</span><span style=color:#75715e>// 통신할 수 있는 프로그램
+</span><span style=color:#75715e></span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+
+<span style=color:#f92672>import</span> (
+    <span style=color:#e6db74>&#34;errors&#34;</span>
+    <span style=color:#e6db74>&#34;io&#34;</span>
+    <span style=color:#e6db74>&#34;log&#34;</span>
+    <span style=color:#e6db74>&#34;net&#34;</span>
+    <span style=color:#e6db74>&#34;os&#34;</span>
+    <span style=color:#e6db74>&#34;time&#34;</span>
+)
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+    <span style=color:#66d9ef>go</span> <span style=color:#a6e22e>RunTCPSocketServer</span>()
+    <span style=color:#66d9ef>go</span> <span style=color:#a6e22e>RunUnixDomainSocketServer</span>()
+
+    <span style=color:#66d9ef>for</span> {
+        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;Dummy waiting...&#34;</span>)
+        <span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Sleep</span>(<span style=color:#a6e22e>time</span>.<span style=color:#a6e22e>Minute</span>)
+    }
+}
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>RunTCPSocketServer</span>(){
+    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;Run TCPSocketServer...&#34;</span>)
+    <span style=color:#a6e22e>run</span>(<span style=color:#e6db74>&#34;tcp&#34;</span>, <span style=color:#e6db74>&#34;0.0.0.0:8080&#34;</span>)
+}
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>RunUnixDomainSocketServer</span>(){
+    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#e6db74>&#34;Run UnixDomainSocketServer...&#34;</span>)
+    <span style=color:#a6e22e>serverSocketName</span> <span style=color:#f92672>:=</span> <span style=color:#e6db74>&#34;jinsu.sock&#34;</span>
+    <span style=color:#a6e22e>os</span>.<span style=color:#a6e22e>Remove</span>(<span style=color:#a6e22e>serverSocketName</span>)
+    <span style=color:#a6e22e>run</span>(<span style=color:#e6db74>&#34;unix&#34;</span>, <span style=color:#a6e22e>serverSocketName</span>)
+}
+
+<span style=color:#75715e>// TCP socket을 이용해 서버를 띄우든 Unix Domain Socket을 이용해 서버를 띄우든
+</span><span style=color:#75715e>// 간단히 인자 값만 변경해서 이용할 수 있다!
+</span><span style=color:#75715e></span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>run</span>(<span style=color:#a6e22e>network</span>, <span style=color:#a6e22e>address</span> <span style=color:#66d9ef>string</span>){
+    <span style=color:#a6e22e>buf</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>byte</span>, <span style=color:#ae81ff>1024</span>)
+    <span style=color:#a6e22e>socket</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>net</span>.<span style=color:#a6e22e>Listen</span>(<span style=color:#a6e22e>network</span>, <span style=color:#a6e22e>address</span>)
+    <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span> {
+        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#a6e22e>err</span>)
+    }
+
+    <span style=color:#66d9ef>for</span> {
+        <span style=color:#a6e22e>connectedSocket</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>socket</span>.<span style=color:#a6e22e>Accept</span>()
+        <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>{
+            <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#a6e22e>err</span>)
+        }
+        <span style=color:#66d9ef>go</span> <span style=color:#66d9ef>func</span>() {
+            <span style=color:#66d9ef>for</span>{
+                <span style=color:#a6e22e>n</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>connectedSocket</span>.<span style=color:#a6e22e>Read</span>(<span style=color:#a6e22e>buf</span>)
+                <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>{
+                    <span style=color:#66d9ef>if</span> !<span style=color:#a6e22e>errors</span>.<span style=color:#a6e22e>Is</span>(<span style=color:#a6e22e>io</span>.<span style=color:#a6e22e>EOF</span>, <span style=color:#a6e22e>err</span>){
+                        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#a6e22e>err</span>)
+                    } <span style=color:#66d9ef>else</span>{
+                        <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Print</span>(<span style=color:#e6db74>&#34;[Error]&#34;</span>, <span style=color:#a6e22e>err</span>)
+                        <span style=color:#66d9ef>break</span>
+                    }
+                }
+                <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>network</span>, <span style=color:#e6db74>&#34;Client sent:&#34;</span>, <span style=color:#a6e22e>n</span>)
+                <span style=color:#a6e22e>connectedSocket</span>.<span style=color:#a6e22e>Write</span>([]byte(<span style=color:#e6db74>&#34;pong&#34;</span>))
+            }
+            <span style=color:#a6e22e>connectedSocket</span>.<span style=color:#a6e22e>Close</span>()
+        }()
+    }
+}
+</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=color:#75715e>// main_test.go
+</span><span style=color:#75715e>// tcp socket과 unix domain socket을 이용해 성공적으로 서버와 통신이
+</span><span style=color:#75715e>// 이루어지는지 테스트하는 테스트 코드
+</span><span style=color:#75715e>// tcp와 unix domain socket의 성능을 비교하는 벤치마크 코드
+</span><span style=color:#75715e></span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+
+<span style=color:#f92672>import</span> (
+    <span style=color:#e6db74>&#34;errors&#34;</span>
+    <span style=color:#e6db74>&#34;github.com/stretchr/testify/assert&#34;</span>
+    <span style=color:#e6db74>&#34;io&#34;</span>
+    <span style=color:#e6db74>&#34;log&#34;</span>
+    <span style=color:#e6db74>&#34;net&#34;</span>
+    <span style=color:#e6db74>&#34;testing&#34;</span>
+)
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>TestSocket</span>(<span style=color:#a6e22e>t</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>testing</span>.<span style=color:#a6e22e>T</span>){
+    <span style=color:#a6e22e>args</span> <span style=color:#f92672>:=</span> [][]<span style=color:#66d9ef>string</span>{
+        []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;tcp&#34;</span>, <span style=color:#e6db74>&#34;0.0.0.0:8080&#34;</span>},
+        []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;unix&#34;</span>, <span style=color:#e6db74>&#34;jinsu.sock&#34;</span>},
+    }
+
+    <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>arg</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>args</span>{
+        <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>Run</span>(<span style=color:#a6e22e>arg</span>[<span style=color:#ae81ff>0</span>], <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>t</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>testing</span>.<span style=color:#a6e22e>T</span>) {
+            <span style=color:#a6e22e>conn</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>net</span>.<span style=color:#a6e22e>Dial</span>(<span style=color:#a6e22e>arg</span>[<span style=color:#ae81ff>0</span>], <span style=color:#a6e22e>arg</span>[<span style=color:#ae81ff>1</span>])
+            <span style=color:#a6e22e>assert</span>.<span style=color:#a6e22e>NoError</span>(<span style=color:#a6e22e>t</span>, <span style=color:#a6e22e>err</span>)
+            <span style=color:#a6e22e>buf</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>byte</span>, <span style=color:#ae81ff>1024</span>)
+            <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>err</span> = <span style=color:#a6e22e>conn</span>.<span style=color:#a6e22e>Write</span>([]byte(<span style=color:#e6db74>&#34;ping&#34;</span>))
+            <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>{
+                <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Fatal</span>(<span style=color:#a6e22e>err</span>)
+            }
+            <span style=color:#a6e22e>n</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>conn</span>.<span style=color:#a6e22e>Read</span>(<span style=color:#a6e22e>buf</span>)
+            <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>{
+                <span style=color:#66d9ef>if</span> ! <span style=color:#a6e22e>errors</span>.<span style=color:#a6e22e>Is</span>(<span style=color:#a6e22e>io</span>.<span style=color:#a6e22e>EOF</span>, <span style=color:#a6e22e>err</span>){
+                    <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(<span style=color:#a6e22e>err</span>)
+                }
+            }
+            <span style=color:#a6e22e>log</span>.<span style=color:#a6e22e>Println</span>(string(<span style=color:#a6e22e>buf</span>[:<span style=color:#a6e22e>n</span>]))
+        })
+    }
+}
+
+<span style=color:#66d9ef>func</span> <span style=color:#a6e22e>BenchmarkSocket</span>(<span style=color:#a6e22e>b</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>testing</span>.<span style=color:#a6e22e>B</span>) {
+    <span style=color:#a6e22e>args</span> <span style=color:#f92672>:=</span> [][]<span style=color:#66d9ef>string</span>{
+        []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;tcp&#34;</span>, <span style=color:#e6db74>&#34;0.0.0.0:8080&#34;</span>},
+        []<span style=color:#66d9ef>string</span>{<span style=color:#e6db74>&#34;unix&#34;</span>, <span style=color:#e6db74>&#34;jinsu.sock&#34;</span>},
+    }
+    <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>arg</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>args</span>{
+        <span style=color:#a6e22e>b</span>.<span style=color:#a6e22e>Run</span>(<span style=color:#a6e22e>arg</span>[<span style=color:#ae81ff>0</span>], <span style=color:#66d9ef>func</span>(<span style=color:#a6e22e>b</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>testing</span>.<span style=color:#a6e22e>B</span>) {
+            <span style=color:#75715e>//log.Println(&#34;Out&#34;) // b.N과 상관 없이 args의 길이에 따라 출력됨.
+</span><span style=color:#75715e></span>            <span style=color:#a6e22e>conn</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>net</span>.<span style=color:#a6e22e>Dial</span>(<span style=color:#a6e22e>arg</span>[<span style=color:#ae81ff>0</span>], <span style=color:#a6e22e>arg</span>[<span style=color:#ae81ff>1</span>])
+            <span style=color:#a6e22e>assert</span>.<span style=color:#a6e22e>NoError</span>(<span style=color:#a6e22e>b</span>, <span style=color:#a6e22e>err</span>)
+            <span style=color:#a6e22e>buf</span> <span style=color:#f92672>:=</span> make([]<span style=color:#66d9ef>byte</span>, <span style=color:#ae81ff>1024</span>)
+            <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>i</span> <span style=color:#f92672>:=</span> <span style=color:#ae81ff>0</span>; <span style=color:#a6e22e>i</span> &lt; <span style=color:#a6e22e>b</span>.<span style=color:#a6e22e>N</span>; <span style=color:#a6e22e>i</span><span style=color:#f92672>++</span>{
+                <span style=color:#75715e>//log.Println(&#34;In&#34;) // b.N만큼 수행됨
+</span><span style=color:#75715e></span>                <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>err</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>conn</span>.<span style=color:#a6e22e>Write</span>([]byte(<span style=color:#e6db74>&#34;ping&#34;</span>))
+                <span style=color:#a6e22e>assert</span>.<span style=color:#a6e22e>NoError</span>(<span style=color:#a6e22e>b</span>, <span style=color:#a6e22e>err</span>)
+                <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>err</span> = <span style=color:#a6e22e>conn</span>.<span style=color:#a6e22e>Read</span>(<span style=color:#a6e22e>buf</span>)
+                <span style=color:#66d9ef>if</span> <span style=color:#a6e22e>err</span> <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nil</span>{
+                    <span style=color:#66d9ef>if</span> !<span style=color:#a6e22e>errors</span>.<span style=color:#a6e22e>Is</span>(<span style=color:#a6e22e>io</span>.<span style=color:#a6e22e>EOF</span>, <span style=color:#a6e22e>err</span>){
+                        <span style=color:#a6e22e>b</span>.<span style=color:#a6e22e>Fail</span>()
+                    }
+                }
+            }
+        })
+    }
+}
+</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ go test -bench<span style=color:#f92672>=</span>. -benchtime<span style=color:#f92672>=</span>100000x
+goos: linux
+goarch: amd64
+pkg: uds
+BenchmarkSocket/tcp         	  100000	    <span style=color:#ae81ff>104537</span> ns/op
+BenchmarkSocket/unix        	  100000	     <span style=color:#ae81ff>83456</span> ns/op
+PASS
+ok  	uds	18.808s
+</code></pre></div><p>10000번의 ping-pong을 수행하는 벤치마크를 수행했다.
+그 결과 <strong>TCP socket을 이용할 경우는 한 번의 ping-pong에 약 104537ns, unix domain socket을 이용할 경우는 한 번의 ping-pong에 약 83456ns</strong>가 소요된 것을 보아 <strong>예상대로 네트워크 통신이 일절 필요하지 않은 unix domain socket이 좀 더 성능이 좋은 것으로 보여졌다</strong>. 사전에 자료 조사를 할 때에는 unix domain socket이 tcp socket을 이용할 때보다 약 2배가량 성능이 우월할 것이라고 들었는데, 그렇게 많은 차이가 나는 것 같지는 않다. 하지만 어느 정도 데이터의 크기나 버퍼의 크기에 따라 달라질 수도 있을 것 같고 더 깊은 원리들이 존재할 것 같아 더 자세히는 측정해보지 못했다.</p><h2 id=마치며>마치며</h2><p>사실 이번에 다룬 소켓이라는 주제는 Go로 적용해보는 Computer Science라는 이 시리즈를 정리해나가던 초기에 2번 째 글로 시도했던 주제였는데 당시엔 Go benchmark도 처음 사용해봤었고 내용이 어려웠던 터라 벤치마크도 제대로 되지 않고 정리도 하기 힘들어서 중단했던 주제이다. 하지만 이번엔 같은 내용에 대해 두 번째 정리해서인지 전보다 내용도 잘 이해됐고, 벤치마킹 코드와 결과도 깔끔하게 나왔던 것 같아 뿌듯하다.</p><p>그리고 그 동안 도커나 MySQL 같은 오픈소스들을 사용하면서 간혹 소켓에 대한 오류를 접할 때나 이런 저런 글에서 소켓 관련한 내용이 등장할 때 정확히 어떤 역할인지 이유가 뭔지 자세히 알지 못했는데 이번 기회덕에 앞으로는 좀 더 잘 이해해볼 수 있을 것 같다.</p><h2 id=참고>참고</h2><ul><li><p>소켓 <a href="http://www.ktword.co.kr/abbr_view.php?nav=&m_temp1=280&id=742">http://www.ktword.co.kr/abbr_view.php?nav=&m_temp1=280&id=742</a></p></li><li><p>네트워크 소켓 <a href=https://ko.wikipedia.org/wiki/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC_%EC%86%8C%EC%BC%93>https://ko.wikipedia.org/wiki/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC_%EC%86%8C%EC%BC%93</a></p></li><li><p>소켓 프로그래밍 <a href=https://recipes4dev.tistory.com/153>https://recipes4dev.tistory.com/153</a></p></li><li><p>UDS (Unix Domain Socket) <a href=http://www.dreamy.pe.kr/zbxe/CodeClip/119393>http://www.dreamy.pe.kr/zbxe/CodeClip/119393</a></p></li><li><p>[Linux/UDS/Unix Domain Socket] UDS <a href=https://yaaam.tistory.com/entry/LinuxUDSUnix-Domain-Socket-UDS>https://yaaam.tistory.com/entry/LinuxUDSUnix-Domain-Socket-UDS</a></p></li><li><p>Unix file type <a href=https://en.wikipedia.org/wiki/Unix_file_types>https://en.wikipedia.org/wiki/Unix_file_types</a></p></li><li><p>C# - .NET Core Unix Domain Socket 사용 예제 <a href=https://www.sysnet.pe.kr/2/0/11963>https://www.sysnet.pe.kr/2/0/11963</a></p></li><li><p>Unix Domain Socket <a href=https://www.joinc.co.kr/w/Site/system_programing/IPC/Unix_Domain_Socket>https://www.joinc.co.kr/w/Site/system_programing/IPC/Unix_Domain_Socket</a></p></li><li><p>Unix Domain Socket - UDP <a href=https://www.joinc.co.kr/w/Site/system_programing/IPC/Unix_Domain_Socket_UDP>https://www.joinc.co.kr/w/Site/system_programing/IPC/Unix_Domain_Socket_UDP</a></p></li><li><p>What is the difference between Unix sockets and TCP/IP sockets? <a href=https://serverfault.com/questions/124517/what-is-the-difference-between-unix-sockets-and-tcp-ip-sockets>https://serverfault.com/questions/124517/what-is-the-difference-between-unix-sockets-and-tcp-ip-sockets</a></p></li></ul><footer class=footline></footer></div><div id=disqus_thread></div><script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return;}
+var d=document,s=d.createElement('script');s.async=true;s.src='//'+"umi0410"+'.disqus.com/embed.js';s.setAttribute('data-timestamp',+new Date());(d.head||d.body).appendChild(s);})();</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div><div id=navigation><a class="nav nav-prev" href=/blog/golang/go-concurrency-vs-parallelism/ title="Go 언어로 적용해보는 Computer Science - Concurrency vs Parallelism"><i class="fa fa-chevron-left"></i></a><a class="nav nav-next" href=/blog/golang/go-memory-leak-issue/ title="개발 썰 - Go Memory Leak(메모리 누수) 관련 이슈" style=margin-right:0><i class="fa fa-chevron-right"></i></a></div></section><div style=left:-1000px;overflow:scroll;position:absolute;top:-1000px;border:none;box-sizing:content-box;height:200px;margin:0;padding:0;width:200px><div style=border:none;box-sizing:content-box;height:200px;margin:0;padding:0;width:200px></div></div><script src=/js/clipboard.min.js?1613225757></script><script src=/js/perfect-scrollbar.min.js?1613225757></script><script src=/js/perfect-scrollbar.jquery.min.js?1613225757></script><script src=/js/jquery.sticky.js?1613225757></script><script src=/js/featherlight.min.js?1613225757></script><script src=/js/highlight.pack.js?1613225757></script><script>hljs.initHighlightingOnLoad();</script><script src=/js/modernizr.custom-3.6.0.js?1613225757></script><script src=/js/learn.js?1613225757></script><script src=/js/hugo-learn.js?1613225757></script><script src=/mermaid/mermaid.js?1613225757></script><script>mermaid.initialize({startOnLoad:true});</script><script type=application/javascript>var doNotTrack=false;if(!doNotTrack){(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create','UA-177403492-1','auto');ga('send','pageview');}</script></body></html>
