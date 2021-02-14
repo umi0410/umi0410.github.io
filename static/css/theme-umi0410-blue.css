@@ -120,3 +120,7 @@ a:hover {
 div.notices{
     margin: 0.75rem 0;
 }
+
+#chapter #body-inner {
+    max-width: 95%;
+}

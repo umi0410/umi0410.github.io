@@ -8,20 +8,22 @@ weight: 90
 noDisqus: false
 draft: false
 description: |
-  자세하게 의미는 모른 채 들어보기만 했던 소켓이란 녀석! 어떤 종류의 소켓이 존재하는지, 어떤 차이가 있는지
+  자세한 의미는 모른 채 들어보기만 했던 소켓이란 녀석! 어떤 종류의 소켓이 존재하는지, 어떤 차이가 있는지
   성능은 어떠한지 실제 Go 프로그램을 통해 확인해보고 벤치마크해보며 비교해봤습니다.
 ---
 ## 시작하며
 
-개발 공부를 처음 시작한 지 언제 안 됐을 무렵, 의경 때 자바로 TCP Socket을 이용해 옆 컴퓨터와 채팅을 하는 프로그램을 만들어 보는 것을 시작으로 docker나 mysql과 같은 다양한 오픈소스들을 이용해보면서나 네트워크를 공부하면서 다양하게 들어왔던 `소켓`이지만 정확히 어떤 역할을 하는지 어떤 종류가 있는지 어떻게 동작하는지 알지 못했다.
+개발 공부를 처음 시작한 지 언제 안 됐을 무렵, 의경 복무를 하며 자바로 TCP Socket을 이용해 옆 컴퓨터와 채팅을 하는 프로그램을 만들어 보는 것을 시작으로 docker나 mysql과 같은 다양한 오픈소스들을 이용해보면서나 네트워크를 공부하면서 다양하게 들어왔던 `소켓`이지만 정확히 어떤 역할을 하는지 어떤 종류가 있는지 어떻게 동작하는지 알지 못했다.
 
-그렇게 알쏭달쏭한 존재였던 소켓을 오늘은 크게 **`Unix Domain Socket`와 `Network  Socket` 두 가지로 나눠 정리해보고 Unix Domain Socket과 TCP를 사용하는 Network Socket을 벤치마크해보고 어떤 차이가 있는지 확인**해보도록 하겠다. 주로 내가 소켓을 접했던 자료나 이슈 상황 등등에서는 UDP보다는 TCP가 많이 등장했었기 때문에 **UDP에 대한 내용은 거의 제외하고 TCP와 Unix Domain Socket을 위주로 비교, 정리**해보겠다.
+오늘은 그렇게 알쏭달쏭한 존재였던 소켓을 크게 **`Unix Domain Socket`와 `Network  Socket` 두 가지로 나눠 정리해보고 Unix Domain Socket과 TCP를 사용하는 Network Socket을 벤치마크해보고 어떤 차이가 있는지 확인**해보도록 하겠다. 주로 내가 소켓을 접했던 자료나 이슈 상황에서는 UDP보다는 TCP가 많이 등장했었기 때문에 **UDP에 대한 내용은 거의 제외할 것이므로 대부분이 Network socket과 Unix domain socket 각각의 stream(network socket에선 tcp를 이용하는 경우에 해당) type socket**에 관련한 내용일 것이다.
 
 ## Socket 이란
 
 소켓은 어떠한 통신에서의 Endpoint(끝점) 역할을 한다. 끝점이 없으면 어디와 어디가 통신하는지 어디에 데이터를 써야하는지 알 수 없다. 
 
 소켓을 마치 전구 소켓과 같이 소켓이라고 부르는 이유는 소켓에 올바르게 데이터를 적기만 하면 통신을 위한 세부적인 동작은 소켓이 알아서 수행하기 때문이다. 따라서 우리는 통신을 하기 위한 Socket을 올바르게 생성하고, 그 곳에 데이터를 올바르게 적거나 그곳의 데이터를 올바르게 읽기만 하면 된다. 실제 데이터 전송은 소켓이 알아서 수행해준다.
+
+소켓은 같은 호스트 내에서 IPC를 위해 사용되는 `Unix domain socket`과 네트워크 통신을 하기 위해 사용되는 `Network socket`으로 분류할 수 있다. 간혹 unix domain socket과 TCP를 이용하는 Network socket, UDP를 이용하는 Network socket 이렇게 세 가지로 분류하는 경우를 본 것 같은데 이는 잘못된 분류라고 생각한다. Network socket 뿐만 아니라 Unix domain socket 또한 stream(Network socket의 경우 TCP를 이용하는 경우에 해당) 타입과 datagram 타입(Network socket의 경우 UDP를 이용하는 경우에 해당)으로 사용될 수 있기 때문이다.
 
 ### 서버 소켓과 클라이언트 소켓
 
@@ -118,13 +120,14 @@ tcp6       0      0 ip-172-31-34-1:http-alt 124.50.93.166:42434     TIME_WAIT
 
 ### Network Socket
 
-`Network socket`은 네트워크 통신이 필요한 작업을 수행할 때 이용하는 소켓의 한 종류로 TCP 프로토콜을 이용하는 stream socket와 UDP 프로토콜을 이용하는 datagram socket이 있다. 사용자는 socket에 데이터를 적기만 하면 네트워크와 관련된 작업은 socket이 알아서 수행해준다. 읽을 때에도 마찬가지이다.
+`Network socket`은 네트워크 통신이 필요한 작업을 수행할 때 이용하는 소켓의 한 종류로 다시 동작 방식에 따라 TCP 프로토콜을 이용하는 stream socket과 UDP 프로토콜을 이용하는 datagram socket으로 구분할 수 있다. 사용자는 socket에 데이터를 적기만 하면 네트워크와 관련된 작업은 socket이 알아서 수행해준다. 읽을 때에도 마찬가지이다.
 
-TCP socket이라는 사람도 있고 stream socket이라는 사람도 있고 TCP/IP socket이라는 사람도 있는 것 같다. 정확한 명칭은 모르겠지만 어떤 존재인지는 분명히 알겠다. 중요한 것은 소켓을 분류할 때 주로 Unix Domain Socket과 TCP Socket으로 분류하는 경우를 많이 봤는데 이것이 아니라 **Unix Domain Socket과 Network 소켓으로 분류하는 것이 맞는 것 같고, 각각의 경우에 모두 신뢰성있는 stream socket과 비신뢰성의 datagram socket을 이용할 수 있다**는 것이다. 그렇기 때문에 stream 방식의 unix domain socket을 이용해 서버를 띄울 때와 tcp를 이용하는 network socket으로 서버를 띄울 때는 인자의 값만 조금 달라질 뿐 동일한 방식으로 동작한다. 이는 글의 하부의 코드에서 확인해볼 수 있다.
+TCP socket이라고 부르는 사람도 있고 stream socket, TCP/IP socket이라 부르는 사람도 있는 것 같다. 정확한 명칭은 모르겠지만 사용하거나 이해하는 데에는 무리가 없을 것 같다.
+TCP를 이용하는 stream type의 Network socket과 stream type의 Unix domain socket은 사용 방법이 매우 유사하다. 둘 다 stream type이고, 소켓에 데이터를 적은 뒤의 작업은 소켓이 알아서 수행해주기 때문이다. 각각의 소켓을 이용해 서버를 띄우는 작업은 인자의 값만 조금 달라질 뿐이다. 이는 글의 하부의 코드에서 확인해볼 수 있다.
 
 #### Socket과 Port
 
-socket과 port의 구분이나 역할이 애매하게 느껴질 수 있다. 통신을 할 때 IP 주소를 이용해 목적지인 Host를 찾을 수는 있지만 그 Host의 어떤 프로세스과 통신하려는 것인지는 알 수 없다. 올바른 프로세스를 찾을 수 있도록 프로세스와 어떠한 숫자를 매핑시키는데 이 숫자를 Port 번호라고 한다. 예를 들어 123.123.123.123:8080으로 요청을 보내는 것은 123.123.123.123의 IP 주소를 갖는 Host의 8080번 포트에 맵핑된 프로세스에 요청을 보내는 것이다.
+Network socket에 대해서는 socket과 port의 구분이나 역할이 애매하게 느껴질 수 있다. 통신을 할 때 IP 주소를 이용해 목적지인 Host를 찾을 수는 있지만 그 Host의 어떤 프로세스과 통신하려는 것인지는 알 수 없다. 올바른 프로세스를 찾을 수 있도록 프로세스와 어떠한 숫자를 매핑시키는데 이 숫자를 Port 번호라고 한다. 예를 들어 123.123.123.123:8080으로 요청을 보내는 것은 123.123.123.123의 IP 주소를 갖는 Host의 8080번 포트에 맵핑된 프로세스에 요청을 보내는 것이다.
 
 이 때 Port와 프로세스를 그냥 연결할 수는 없고 Socket이라는 녀석이 필요하다. Socket은 실질적으로 어떤 프로세스를 어떤 포트에 맵핑시킬지에 대한 정보가 필요하고 네트워크 작업을 알아서 수행한다.
 
@@ -132,7 +135,7 @@ socket과 port의 구분이나 역할이 애매하게 느껴질 수 있다. 통�
 
 ### Unix Domain Socket
 
-Unix Domain Socket은 IPC(Inter-Process Communication, 프로세스 간 통신)의 여러 방법 중 가장 자유로우면서 사용하는 데에 있어 제한이 별로 없는 방법이다. 네트워크 소켓과 달리 같은 호스트 내의 프로세스 간 통신을 담당하기 때문에 아무런 네트워크 작업이 필요 없다. 하지만 마치 TCP나 UDP와 동일한 방식으로 사용이 가능하다. 즉 네트워크 통신과 마찬가지로 Stream과  Datagram 두 가지 타입으로 이용이 가능하고, TCP와 UDP가 이용하는 syscall을 동일하게 이용할 수 있다고한다.
+Unix Domain Socket은 IPC(Inter-Process Communication, 프로세스 간 통신)의 여러 방법 중 가장 자유로우면서 사용하는 데에 있어 제한이 별로 없는 방법이다. 네트워크 소켓과 달리 같은 호스트 내의 프로세스 간 통신을 담당하기 때문에 아무런 네트워크 작업이 필요 없다. 하지만 TCP나 UDP를 이용하는 Network socket을 이용할 때와 인자 값만 조금 바꾸어 동일한 방식으로 사용이 가능하다.
 
 #### 🌈 상상의 나래 - 우리가 알게 모르게 겪었던 Unix domain socket의 Permission오류에 대해
 
@@ -147,14 +150,14 @@ $ docker
 docker: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
 ```
 
-주로 우리가 `MySQL`이나 `Docker`를 `localhost`에서 사용할 때 **unix socket에 대한 permission 에러**를 겪은 적이 있을 것이다. MySQL이나 Docker를 비롯한 많은 오픈소스들이 아마 성능상의 이점을 위해 localhost에서 서비스를 이용할 경우 Network socket이 아닌 Unix domain socket을 많이들 이용하는 것으로 알고있다. 그렇기 때문에 주로 MySQL 설치 이후 Remote에서는 접속이 되는데 Localhost에서는 권한 문제로 접속이 안된다거나 Docker 설치 이후 사용자를 docker Group에 넣어주는 경우가 많이 있다.
+주로 우리가 `MySQL`이나 `Docker`를 `localhost`에서 사용할 때 **unix socket에 대한 permission 에러**를 겪은 적이 있을 것이다. MySQL이나 Docker를 비롯한 많은 오픈소스들이 아마 성능상의 이점을 위해 localhost에서 서비스를 이용할 경우 Network socket이 아닌 Unix domain socket을 많이들 이용하는 것으로 알고있다. 그렇기 때문에 주로 MySQL 설치 이후 Remote에서는 접속이 되는데 **localhost에서는 권한 문제로 접속이 안된다거나 Docker 설치 이후 사용자를 docker group에 넣어주는 경우**가 많이 있다.
 
-아마도 네트워크 통신을 통해 서버 소켓에 접근하는 네트워크 소켓과 달리 unix domain socket은 client process가 직접 server의 socket file에 접근하기 때문에 이때 쓰기 권한 때문에 그런 권한 오류가 생기는 것이 아닐까 싶다.
+아마도 네트워크 통신을 통해 서버 소켓에 접근하는 네트워크 소켓과 달리 unix domain socket은 client process가 직접 server의 socket file에 접근하기 때문에 이때 쓰기 권한 때문에 그런 권한 오류가 생기는 것이 아닐까라는 상상의 나래를 펼쳐본다.
 
 ```bash
 # ubuntu 사용자로 unix domain socket server 프로세스를 띄운 경우
 # ubuntu 사용자로는 잘 접속이 된다.
-$ go test -v
+ubuntu@ec2 $ go test -v
 === RUN   TestSocket
 === RUN   TestSocket/tcp
 2021/02/13 12:59:06 pong
@@ -172,7 +175,7 @@ ok  	uds	0.004s
 # guest1이라는 사용자로는 server와 unix domain socket으로는 통신할 수 없고,
 # 앞서 오픈소스를 이용하며 겪었던 에러와 마찬가지로 권한 이슈가 발생한다.
 # 하지만 TCP 소켓을 이용한 경우는 원활히 ping-pong test가 성공한 것을 볼 수 있다.
-$ go test -v
+guest1@ec2 $ go test -v
 === RUN   TestSocket
 === RUN   TestSocket/tcp
 2021/02/13 12:59:01 pong
@@ -188,8 +191,8 @@ $ go test -v
 
 # 하지만 재미있게도 guest1도 socket에 write할 수 있도록 권한을 수정해주니
 # guest1도 unix domain socket으로 무리 없이 통신이 가능했다!
-$ sudo chmod 777 jinsu.sock
-$ go test -v
+guest1@ec2 $ sudo chmod 777 jinsu.sock
+guest1@ec2 $ go test -v
 === RUN   TestSocket
 === RUN   TestSocket/tcp
 2021/02/13 12:59:06 pong
@@ -204,11 +207,11 @@ ok  	uds	0.004s
 
 따라서 ubuntu 사용자로 TCP socket과 Unix domain socket 두 가지 방법으로 서버 역할을 할 수 있는 프로세스를 띄운 뒤 ubuntu 사용자와 guest1 사용자로 통신 테스트를 진행해보았다. 
 
-서버가 생성한 unix domain socket은 `srwxrwxr-x` 의 형식과 권한을 갖고 있기 때문에 guest1은 이 소켓에 대해 read와 execute 권한 뿐이고, write는 불가능하기에 unix domain socket을 이용해서는 통신할 수 없다. 따라서 우리가 평소에 오픈소스를 localhost에서 이용하면서 종종 맞이했던 소켓에 대한 permission error을 만나볼 수 있었다! 반면 TCP로는 통신이 가능했고, 놀랍게도 guest1에게 소켓 파일에 대한 write 권한을 부여해주자 Unix domain socket으로도 통신이 가능해진 것을 볼 수 있다.
+서버가 생성한 unix domain socket은 `srwxrwxr-x` 의 형식과 권한을 갖고 있기 때문에 guest1은 이 소켓에 대해 read와 execute 권한 뿐이고, write는 불가능하기에 unix domain socket을 이용해서는 통신할 수 없다. 따라서 우리가 평소에 오픈소스를 localhost에서 이용하면서 종종 맞이했던 소켓에 대한 permission error을 만나볼 수 있었다! 반면 socket에 대한 접근 권한이 필요 없는 TCP로는 통신이 가능했고, 놀랍게도 guest1에게 소켓 파일에 대한 write 권한을 부여해주자 Unix domain socket으로도 통신이 가능해진 것을 볼 수 있다.
 
 
 
-**상상의 나래 정리: unix domain socket을 통해 접속을 시도할 때에는 unix domain socket file에 대한 접근을 하는 프로세스가 해당 socket file에 대한 적절한 permission을 가져야한다.**
+**상상의 나래 정리: unix domain socket을 통해 접속을 시도할 때에는 unix domain socket file에 대한 접근을 하는 프로세스가 해당 socket file에 대한 적절한 permission을 갖고 있어야한다.**
 
 > 또한 구글링 도중 보았던 재미있는 예시는 database를 통해 authentication/authorization을 수행하는 일반적인 서비스와 달리 Unix domain socket을 이용하는 경우에는 linux user 시스템을 이용해서도 권한/인증 관리를 수행하는 경우도 존재할 수 있다는 것이었다.
 
