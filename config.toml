@@ -17,7 +17,7 @@ home = [ "HTML", "RSS", "JSON"]
   # Author of the site, will be used in meta information
   author = "umi0410"
   # Description of the site, will be used in meta information
-  description = "Backend 개발자, DevOps 엔지니어 경희대학교 박진수의 개인 블로그 및 웹 포트폴리오"
+  description = "Backend 개발자, DevOps 엔지니어 박진수. Go와 Spring, AWS, 컨테이너에 관심이 많습니다. 개발 관련 생각이나 경험에 대해 적어나가고 있습니다."
   # Shows a checkmark for visited pages on the menu
   showVisitedLinks = false
   # Disable search function. It will hide search bar
