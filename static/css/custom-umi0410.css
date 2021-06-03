@@ -5,6 +5,25 @@
 @import url(https://fonts.googleapis.com/css?family=Righteous);
 @import url(https://fonts.googleapis.com/css2?family=Nanum+Brush+Script);
 
+/* 데스크탑에서 사용될 스타일을 먼저 작성합니다. */
+#body-inner{
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+@media screen and (max-width: 768px) {
+    /* 모바일에 사용될 스트일 시트를 여기에 작성합니다. */
+    #body-inner{
+        padding-left: 3%;
+        padding-right: 3%;
+    }
+}
+
+
+/*
+출처: https://offbyone.tistory.com/121 [쉬고 싶은 개발자]
+ */
+
 h1, h2, h3, h4, h5{
     font-family: "Do Hyeon", sans-serif;
 }
