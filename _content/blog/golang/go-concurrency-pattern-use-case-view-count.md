@@ -14,8 +14,6 @@ description: |
   channel을 통해 동시성을 제어하면서 조회(Read) 작업과는 비동기적으로 수행하도록 했다.
 ---
 
-{{% toc %}}
-
 ## 시작하며
 
 얼마 전 [Channel use case](https://go101.org/article/channel-use-cases.html) 라는 Go에서의 채널 사용에 관한 글을 하나 읽었다. 한 동안 스프링 업무 보느라 잊고  지냈던 Go의 `concurrency pattern`이나 `channel`의 쓰임에 대해 다시 한 번 고민해볼 기회가 되었다. **항상 어떤 기술이 왜 좋은지, 언제 써야할지**를 많이 고민하는 편이라 그 **실제적인 유즈 케이스**에도 굉장히 관심이 많은 편이다. 해당 글의 아쉬움은 제목은 use case였음에도 구체적인 use case라기 보다는 코드 예시 같은 느낌이 컸다.

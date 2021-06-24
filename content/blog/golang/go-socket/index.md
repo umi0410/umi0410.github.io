@@ -7,6 +7,9 @@ pre: "<b></b>"
 weight: 90
 noDisqus: false
 draft: false
+categories:
+  - Golang
+  - cs-with-golang
 image: server-client-socket.jpeg
 description: |
   자세한 의미는 모른 채 들어보기만 했던 소켓이란 녀석! 어떤 종류의 소켓이 존재하는지, 어떤 차이가 있는지

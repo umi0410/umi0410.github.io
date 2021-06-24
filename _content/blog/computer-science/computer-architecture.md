@@ -12,6 +12,4 @@ noDisqus: false
 draft: true
 ---
 
-{{% toc %}}
-
 노션에 정리한 게 있긴한데, 내용이 너무 많아서 어떻게 해야할지...

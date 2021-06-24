@@ -8,6 +8,9 @@ weight: 60
 noDisqus: false
 draft: false
 image: pprof-debugging-1.png
+categories:
+  - Golang
+  - cs-with-golang
 description: |
   주로 이론상으로 접했던 Deadlock. 
   

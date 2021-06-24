@@ -5,17 +5,16 @@ date: 2021-05-08T12:46:54+09:00
 chapter: false
 pre: "<b></b>"
 weight: 19
-noDisqus: false
 draft: false
 image: node-example.jpg
+categories:
+  - Golang
 description: |
   실질적으로 concurrency pattern과 channel을 어떻게 사용할 지 고민하던 중
   게시물 조회 시 조회수를 증가시키는 작업을 수행할 때 적용해보면 좋을 것 같았다.
   게시물 조회 요청 시 조회 작업만 수행한 뒤 바로 응답을 주고, 조회수 증가 작업은
   channel을 통해 동시성을 제어하면서 조회(Read) 작업과는 비동기적으로 수행하도록 했다.
 ---
-
-{{% toc %}}
 
 ## 시작하며
 
@@ -133,4 +132,4 @@ func GetPostScalable(id int) *Post{
 
 * [Channel use case](https://go101.org/article/channel-use-cases.html)
 
-거의 없습니다. 이번엔 그냥 저의 Go에 대한 고뇌를 바탕으로 작성했습니다.
+이번엔 특별히 참고한 자료가 많이 없습니다. 이번엔 그냥 저의 Go에 대한 고뇌를 바탕으로 작성했습니다.

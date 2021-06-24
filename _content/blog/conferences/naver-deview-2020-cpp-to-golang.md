@@ -12,8 +12,6 @@ description: |
   반가운 마음도 들었습니다.
 ---
 
-{{% toc %}}
-
 ![preview.png](preview.png)
 *사진 출처: [https://tv.naver.com/v/16972079](https://tv.naver.com/v/16972079)*
 

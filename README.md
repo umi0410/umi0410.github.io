@@ -14,8 +14,8 @@
   * branch:master에서 게시글 작성
   * branch:**에 push할 경우 Github Action을 통해 빌드
   * 빌드된 파일은 branch:gh-pages에 배포~! (Github Page가 gh-pages 브랜치를 바라보기 때문.)
-* 재미삼아 개발 중~!
-
+* `/content/page/` 의 `.md` 글들은 weight에 따라 사이드바에 표시된다.
+* 좀 헷갈리긴 하는데 Archives 페이지의 제목을 Categories로 변경해서 사용 중이다. Archives가 더 예쁘게 나와서...?
 
 ## Customization
 themes/hugo-theme-learn 을 바탕으로 몇몇 부분을 수정해서 운영하고있다.
@@ -23,6 +23,8 @@ submodule을 통해 원본 theme은 유지하고 `layout` directory를 수정함
 
 * 아이콘 추가
   * https://tablericons.com/ 에서 아이콘 검색 후 `/assets/icons` 에 `stroke=currentColor`만 변경한 뒤 붙여넣는다.
+* .gitignore
+  * `/resources/_gen`에 자꾸 임시 생성 파일들이 생기는 것 같다. gitignore해줬다.
 
 
 ## Refs and Tips

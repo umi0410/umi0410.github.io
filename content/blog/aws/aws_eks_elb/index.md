@@ -1,10 +1,16 @@
 ---
 title: EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기
 date: 2020-09-06T19:11:07+09:00
-weight: 5
+weight: 1000
 chapter: false
 pre: ""
 noDisqus: false
+categories:
+  - aws
+image: preview.png
+description: |
+  `데브옵스` 인턴으로 근무한 지가 벌써 두 달이 되어갑니다. 이것 저것 배운 것이 많았던 시간이었는데, 그 중 꽤나 삽질을 했던 `Kubernetes` 와 `ELB`를 이용하는 부분에 대해 정리를 해볼까합니다. `jenkins`, `spinnaker`, `argo`, `terraform`, `ansible`, `github action`, ... 등등 다양한 내용을 경험할 수 있던 시간이었지만, 그 중 kubernetes에서 무슨 작업을 하던 빼놓을 수 없으면서 어딘가 깔끔히 그 흐름이 정리된 곳을 보기 힘들었던 **service를 ELB에 연결**하기에 대한 내용을 정리해보겠습니다.
+  *본 포스트는 EKS를 통해 K8s를 이용할 때를 기준으로 설명합니다.*
 ---
 ## 🐶 시작하며
 

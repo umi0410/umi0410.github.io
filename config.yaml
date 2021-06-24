@@ -137,7 +137,12 @@ menu:
           url: /
           weight: -100
           pre: home
-        - identifier: github
+        - identifier: categories
+          name: Categories
+          url: /categories
+          weight: -88
+          pre: github
+        - identifier: archives
           name: Github
           url: https://github.com/umi0410/
           weight: 10

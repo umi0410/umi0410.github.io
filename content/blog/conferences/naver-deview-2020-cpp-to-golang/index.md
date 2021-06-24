@@ -6,13 +6,14 @@ pre: "<b></b>"
 weight: 100
 noDisqus: false
 draft: false
+categories:
+  - conferences
+image: preview.png
 description: |
   Naver Deview 2020에서 C++에서 Golang으로 넘어간 이야기를 다룬 발표 영상에 대해 리뷰해보며 제 생각을 적어봤습니다.
   주로 협업에서의 생산성이나 목표 설정의 중요성 등을 느낄 수 있었던 것 같습니다. 추가적으로 Naver에서도 Golang을 점차 사용해나가는 것 같아
   반가운 마음도 들었습니다.
 ---
-
-{{% toc %}}
 
 ![preview.png](preview.png)
 *사진 출처: [https://tv.naver.com/v/16972079](https://tv.naver.com/v/16972079)*
