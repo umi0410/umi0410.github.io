@@ -1,5 +1,6 @@
 ---
 title: About me
+slug: /about
 description: 안녕하세요. Jinsu Park(umi0410)에 대해 소개합니다!
 weight: 1
 chapter: false
