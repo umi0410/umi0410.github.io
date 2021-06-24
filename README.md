@@ -14,35 +14,17 @@
   * branch:master에서 게시글 작성
   * branch:**에 push할 경우 Github Action을 통해 빌드
   * 빌드된 파일은 branch:gh-pages에 배포~! (Github Page가 gh-pages 브랜치를 바라보기 때문.)
-* 재미삼아 개발 중~!
-
+* `/content/page/` 의 `.md` 글들은 weight에 따라 사이드바에 표시된다.
+* 좀 헷갈리긴 하는데 Archives 페이지의 제목을 Categories로 변경해서 사용 중이다. Archives가 더 예쁘게 나와서...?
 
 ## Customization
 themes/hugo-theme-learn 을 바탕으로 몇몇 부분을 수정해서 운영하고있다.
 submodule을 통해 원본 theme은 유지하고 `layout` directory를 수정함으로써 오버라이드하거나 커스터마이징 중이다.
 
-* `layouts/partials/` 에서 몇몇 html 추가 및 오버라이드
-  * `custom-sidebar-profile.html` 에 프로필을 추가.
-  * `menu.html` 에서 `custom-sidebar-profile` 을 import
-  * `custom-comments.html` 에 disqus 관련 설정 추가
-    ```html
-    {{ if not .Params.noDisqus }}
-    {{ template "_internal/disqus.html" . }}
-    {{ end }}
-    ```
-    각각의 페이지에서 parameter로 disqus를 비활성화하려면 .Page.Params로 `noDisqus: true`를 정의해준다.
-  * `favicon.html`에서 favicon을 `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png` 로 설정
-  * `custom-footer.html`에 Google Analytics 설정 추가
-
-* `layouts/shortcodes/` 을 변경
-  * `toc.html`을 이용해 각 페이지에서 내용을 요약하기 위한 Table of Contents 기능을 추가함.
-
-* `statics/css/` 에서 몇몇 css 추가 및 오버라이
-  * `theme-umi0410-blue.css` 를 통해 `learn theme` 의 css를 수정한 Custom theme 정의
-    * 기본적인 테마의 색상 변경
-    * \<code\>에 대한 색상 변경
-  * `custom-umi0410.css` 에서 부가적이고 잡다한 css 변경. 테마 자체에 대한 것 외의 css 수정사항은 거의 이곳에 위치.
-    * 페이지 헤더의 브레드크럼의 토글되는 Table of Contents 부분인 `.progress` 에대한 수정
+* 아이콘 추가
+  * https://tablericons.com/ 에서 아이콘 검색 후 `/assets/icons` 에 `stroke=currentColor`만 변경한 뒤 붙여넣는다.
+* .gitignore
+  * `/resources/_gen`에 자꾸 임시 생성 파일들이 생기는 것 같다. gitignore해줬다.
 
 
 ## Refs and Tips
