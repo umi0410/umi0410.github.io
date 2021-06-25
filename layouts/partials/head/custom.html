@@ -17,13 +17,23 @@
 <!--            document.head.appendChild(customFont);-->
 <!--        }());-->
 <!--</script>-->
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
 <style>
         /// Overwrite CSS variable
 
         :root{
             --body-background: #fafeff;
+            --base-font-family: 'Noto Sans KR', sans-serif;
         }
+        .site-name{
+            --site-name-font-family: 'East Sea Dokdo', cursive;
+            font-family: var(--site-name-font-family);
+            font-size: 3.2rem !important;
+        }
+
+
     .left-sidebar {
         --sidebar-avatar-size: 200px;
     }
