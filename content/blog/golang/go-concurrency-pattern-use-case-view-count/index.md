@@ -7,6 +7,8 @@ pre: "<b></b>"
 weight: 19
 draft: false
 image: node-example.jpg
+hidden: true
+# 별로인 거 같아서 숨김 글로 해놓음
 categories:
   - Golang
 description: |
