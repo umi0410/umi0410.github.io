@@ -82,8 +82,7 @@ Input 작업을 모두 수행하는 데에 오래 걸리고, 작업 내용을 �
 
 Docker를 이용해 간단하게 MySQL 서버를 띄웠고, Gorm을 이용해 DB Query와 update를 수행했다.
 
-@@@expand "예시 프로그램 코드" %}}
-
+**예시 프로그램 코드**
 ```go
 package main
 
@@ -235,8 +234,6 @@ func main() {
 	}()
 }
 ```
-
-@@% /expand %}}
 
 ### 📉 벤치마크 결과 비교
 

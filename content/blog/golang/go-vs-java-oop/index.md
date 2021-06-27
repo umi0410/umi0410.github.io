@@ -24,7 +24,7 @@ Go 언어를 좋아하는 입장에서 개인적으로 이런 객체지향적인
 
 Go에서 객체 지향을 적용한 간단한 계산기 프로그램을 예시로 작성해보았다. 전체 소스코드를 다 볼 필요는 없겠지만 필요에 따라 참고할 수 있도록 아래와 같이 첨부한다.
 
-@@@ expand "main 패키지 - /main.go" %}}
+**main 패키지 - /main.go**
 
 ```go
 package main
@@ -91,9 +91,7 @@ Please input an int for your desired operation.
 }
 ```
 
-@@@ /expand %}}
-
-@@@ expand "calc 패키지 - /calc/calc.go" %}}
+**calc 패키지 - /calc/calc.go**
 
 ```go
 package calc
@@ -178,8 +176,6 @@ func (unit *SquareOperationUnit) Operate(args ...float64) (float64, error){
     return reduced, err
 }
 ```
-
-@@@ /expand %}}
 
 ![preview.png](preview.png)
 

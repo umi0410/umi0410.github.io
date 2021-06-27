@@ -58,18 +58,18 @@ AWS, Azure, GCP, IDC에 대한 다양한 관리, 모니터링을 지원하는 �
 
 > 링크 형식이므로 링크를 눌러 읽어주시면 됩니다.
 
-* [2020.04: Stargate 라는 개발 인프라를 구축](stargate-infra)
+* [2020.04: Stargate 라는 개발 인프라를 구축](../stargate-infra)
   * terraform 을 통한 개발 인프라 구축
   * EKS 클러스터에 jenkins, spinnaker, grafana 등등의 개발 도구들을 배포함
   * 종종 발생하는 장애 상황을 멘토님과 트러블슈팅함
-* [2020.05: 개발 CI/CD 파이프라인 구축](ci-cd-pipeline)
+* [2020.05: 개발 CI/CD 파이프라인 구축](../ci-cd-pipeline)
   * Experiment 환경에 배포 => Test, CI => Development 환경에 배포를 자동화
   * Spinnaker와 Jenkins, Github Action을 이용한 자동화 파이프라인 구축
-* [2020.06: Argo Project들을 PoC](argo-poc)
+* [2020.06: Argo Project들을 PoC](../argo-poc)
   * argo cd, argo(workflow), argo-event 등의 다양한 프로젝트에 대한 PoC를 진행
-* [2020.07: spaceone-helm Helm3 Chart 개발](spaceone-helm)
+* [2020.07: spaceone-helm Helm3 Chart 개발](../spaceone-helm)
   * 개별로 배포되고 운영되던 우리 팀의 서비스인 SpaceONE을 패키지로 배포할 수 있게해주는 Helm Chart를 개발
-* [2020.08: spacectl 설계, 개발 참여](spacectl)
+* [2020.08: spacectl 설계, 개발 참여](../spacectl)
   * 우리 팀의 서비스인 SpaceONE에 대한 API 작업을 수행하는 CLI 도구에 대한 설계와 개발에 참여함.
 
 ## 느낀 점

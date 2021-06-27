@@ -23,8 +23,6 @@ description: |
 
 ## Argo Project 구조
 
-@@@expand "눌러서 참고용 Argo Draw.io Chart들 보기" %}}
-
 > Argo가 워낙 빠르게 변화하는 서비스다보니 지금은 구조가 많이 변경되었을 수도 있습니다!
 
 ![argo_1](argo_1.png)
@@ -32,8 +30,6 @@ description: |
 ![argo_2](argo_2.png)
 
 <p align="center">chart by Jinsu Park</p>
-
-@@% /expand%}}
 
 간편하게 사용할 수 있는 순서는 `argo`, `argo`(workflow), `argo event` 순이라고 생각되는데,
 실질적인 파이프라인 구축은 `argo event`, `argo` (workflow), `argo` 순으로 이뤄지는 셈이라 후자의
