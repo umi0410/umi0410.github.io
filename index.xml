@@ -4,7 +4,7 @@
 &lt;p>❗&lt;strong>Go에 대한 기본적인 내용을 정리해보는 것이 아니라 객체 지향 관점에서 바라본 Go에 대한 내용을 정리해보는 것이므로 Go의 기초 내용에 대한 설명은 생략할 것이므로 Go에 대한 기초 이해가 없다면, 그 부분을 먼저 알아보는 것을 추천한다!&lt;/strong>&lt;/p>
 &lt;h3 id="예시-코드">예시 코드&lt;/h3>
 &lt;p>Go에서 객체 지향을 적용한 간단한 계산기 프로그램을 예시로 작성해보았다. 전체 소스코드를 다 볼 필요는 없겠지만 필요에 따라 참고할 수 있도록 아래와 같이 첨부한다.&lt;/p>
-&lt;p>@@@ expand &amp;ldquo;main 패키지 - /main.go&amp;rdquo; %}}&lt;/p>
+&lt;p>&lt;strong>main 패키지 - /main.go&lt;/strong>&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
 &lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
 &lt;span class="s">&amp;#34;bufio&amp;#34;&lt;/span>
@@ -62,8 +62,7 @@
 &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Result:&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">operationResult&lt;/span>&lt;span class="p">)&lt;/span>
 &lt;span class="p">}&lt;/span>
 &lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>@@@ /expand %}}&lt;/p>
-&lt;p>@@@ expand &amp;ldquo;calc 패키지 - /calc/calc.go&amp;rdquo; %}}&lt;/p>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>calc 패키지 - /calc/calc.go&lt;/strong>&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kn">package&lt;/span> &lt;span class="nx">calc&lt;/span>
 &lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
 &lt;span class="s">&amp;#34;errors&amp;#34;&lt;/span>
@@ -129,8 +128,7 @@
 &lt;span class="p">}&lt;/span>
 &lt;span class="k">return&lt;/span> &lt;span class="nx">reduced&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>
 &lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>@@@ /expand %}}&lt;/p>
-&lt;p>&lt;figure style="flex-grow: 181; flex-basis: 435px">
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure style="flex-grow: 181; flex-basis: 435px">
 &lt;a href="https://umi0410.github.io/blog/golang/go-vs-java-oop/preview.png" data-size="557x307">&lt;img src="https://umi0410.github.io/blog/golang/go-vs-java-oop/preview.png"
 srcset="https://umi0410.github.io/blog/golang/go-vs-java-oop/preview_hu606630559448eebea4de9d8c902ece24_23429_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-vs-java-oop/preview_hu606630559448eebea4de9d8c902ece24_23429_1024x0_resize_box_2.png 1024w"
 width="557"
@@ -1756,7 +1754,7 @@ alt="python-generator.png">
 &lt;li>Sequential pattern: 딱히 Pattern이라기엔 좀 그렇지만 그냥 일반적으로 Sequential하게 진행하는 경우를 의미. 이 예시에선 전체 Query 완료 후 전체 Update하는 방식.&lt;/li>
 &lt;/ul>
 &lt;p>Docker를 이용해 간단하게 MySQL 서버를 띄웠고, Gorm을 이용해 DB Query와 update를 수행했다.&lt;/p>
-&lt;p>@@@expand &amp;ldquo;예시 프로그램 코드&amp;rdquo; %}}&lt;/p>
+&lt;p>&lt;strong>예시 프로그램 코드&lt;/strong>&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
 &lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
 &lt;span class="s">&amp;#34;fmt&amp;#34;&lt;/span>
@@ -1889,8 +1887,7 @@ alt="python-generator.png">
 &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;==============================&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
 &lt;span class="p">}()&lt;/span>
 &lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>@@% /expand %}}&lt;/p>
-&lt;h3 id="-벤치마크-결과-비교">📉 벤치마크 결과 비교&lt;/h3>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="-벤치마크-결과-비교">📉 벤치마크 결과 비교&lt;/h3>
 &lt;p>&lt;figure style="flex-grow: 150; flex-basis: 361px">
 &lt;a href="https://umi0410.github.io/blog/golang/go-concurrent-pattern-pipeline/line-chart-1.png" data-size="690x458">&lt;img src="https://umi0410.github.io/blog/golang/go-concurrent-pattern-pipeline/line-chart-1.png"
 srcset="https://umi0410.github.io/blog/golang/go-concurrent-pattern-pipeline/line-chart-1_hu33251dd256e214e8cf3a54828b73b849_33941_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-concurrent-pattern-pipeline/line-chart-1_hu33251dd256e214e8cf3a54828b73b849_33941_1024x0_resize_box_2.png 1024w"
@@ -1998,30 +1995,30 @@ alt="spaceone_preview_2">
 &lt;p>링크 형식이므로 링크를 눌러 읽어주시면 됩니다.&lt;/p>
 &lt;/blockquote>
 &lt;ul>
-&lt;li>&lt;a class="link" href="stargate-infra" >2020.04: Stargate 라는 개발 인프라를 구축&lt;/a>
+&lt;li>&lt;a class="link" href="../stargate-infra" >2020.04: Stargate 라는 개발 인프라를 구축&lt;/a>
 &lt;ul>
 &lt;li>terraform 을 통한 개발 인프라 구축&lt;/li>
 &lt;li>EKS 클러스터에 jenkins, spinnaker, grafana 등등의 개발 도구들을 배포함&lt;/li>
 &lt;li>종종 발생하는 장애 상황을 멘토님과 트러블슈팅함&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>&lt;a class="link" href="ci-cd-pipeline" >2020.05: 개발 CI/CD 파이프라인 구축&lt;/a>
+&lt;li>&lt;a class="link" href="../ci-cd-pipeline" >2020.05: 개발 CI/CD 파이프라인 구축&lt;/a>
 &lt;ul>
 &lt;li>Experiment 환경에 배포 =&amp;gt; Test, CI =&amp;gt; Development 환경에 배포를 자동화&lt;/li>
 &lt;li>Spinnaker와 Jenkins, Github Action을 이용한 자동화 파이프라인 구축&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>&lt;a class="link" href="argo-poc" >2020.06: Argo Project들을 PoC&lt;/a>
+&lt;li>&lt;a class="link" href="../argo-poc" >2020.06: Argo Project들을 PoC&lt;/a>
 &lt;ul>
 &lt;li>argo cd, argo(workflow), argo-event 등의 다양한 프로젝트에 대한 PoC를 진행&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>&lt;a class="link" href="spaceone-helm" >2020.07: spaceone-helm Helm3 Chart 개발&lt;/a>
+&lt;li>&lt;a class="link" href="../spaceone-helm" >2020.07: spaceone-helm Helm3 Chart 개발&lt;/a>
 &lt;ul>
 &lt;li>개별로 배포되고 운영되던 우리 팀의 서비스인 SpaceONE을 패키지로 배포할 수 있게해주는 Helm Chart를 개발&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>&lt;a class="link" href="spacectl" >2020.08: spacectl 설계, 개발 참여&lt;/a>
+&lt;li>&lt;a class="link" href="../spacectl" >2020.08: spacectl 설계, 개발 참여&lt;/a>
 &lt;ul>
 &lt;li>우리 팀의 서비스인 SpaceONE에 대한 API 작업을 수행하는 CLI 도구에 대한 설계와 개발에 참여함.&lt;/li>
 &lt;/ul>
@@ -2259,7 +2256,6 @@ Manual Trigger도 등장하게 되면서 꽤나 만족도가 높아졌습니다.
 결과적으로 &lt;code>Argo&lt;/code> 도입은 적합하지 않다고 판단이 되었고 따라서 충분히 써볼 수는 없었기에 기록용으로만
 간단히 적어보겠습니다.&lt;/p>
 &lt;h2 id="argo-project-구조">Argo Project 구조&lt;/h2>
-&lt;p>@@@expand &amp;ldquo;눌러서 참고용 Argo Draw.io Chart들 보기&amp;rdquo; %}}&lt;/p>
 &lt;blockquote>
 &lt;p>Argo가 워낙 빠르게 변화하는 서비스다보니 지금은 구조가 많이 변경되었을 수도 있습니다!&lt;/p>
 &lt;/blockquote>
@@ -2284,7 +2280,6 @@ alt="argo_2">
 &lt;figcaption>argo_2&lt;/figcaption>
 &lt;/figure>&lt;/p>
 &lt;!-- raw HTML omitted -->
-&lt;p>@@% /expand%}}&lt;/p>
 &lt;p>간편하게 사용할 수 있는 순서는 &lt;code>argo&lt;/code>, &lt;code>argo&lt;/code>(workflow), &lt;code>argo event&lt;/code> 순이라고 생각되는데,
 실질적인 파이프라인 구축은 &lt;code>argo event&lt;/code>, &lt;code>argo&lt;/code> (workflow), &lt;code>argo&lt;/code> 순으로 이뤄지는 셈이라 후자의
 순서에 맞춰 설명해보겠습니다.&lt;/p>
@@ -2559,11 +2554,9 @@ server-abc123abc | foo | aws ...
 제가 설계하고, 개발한 내용을 짧게나마 발표한 뒤 리뷰를 받고 수정을 하면 한층 더 코드의
 구조와 사용이 간결하고 직관적으로 보인다는 느낌을 받을 수 있었습니다. 이렇게 다양한
 가르침을 주신 &lt;strong>저희 팀의 선배 개발자분들께 항상 감사드립니다.&lt;/strong>&lt;/p>
-&lt;p>@@@ notice info %}}
-Megazone CloudOne 팀의 DevOps 인턴으로서 근무했던 내용에 대한 후기가 거의 끝났습니다.
-끝으로 인턴 활동에 대한 종합적인 느낀점을 이어서 보시거나 다시 목차를 보고싶으신 분은 &lt;a class="link" href="../" >여기&lt;/a>를
-클릭해주세요.
-@@@ /notice %}}&lt;/p></description></item><item><title>EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기</title><link>https://umi0410.github.io/blog/aws/aws_eks_elb/</link><pubDate>Sun, 06 Sep 2020 19:11:07 +0900</pubDate><guid>https://umi0410.github.io/blog/aws/aws_eks_elb/</guid><description>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/preview.png" alt="Featured image of post EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기" />&lt;h2 id="-시작하며">🐶 시작하며&lt;/h2>
+&lt;p>Megazone CloudOne 팀의 DevOps 인턴으로서 근무했던 내용에 대한 후기가 거의 끝났습니다.
+끝으로 인턴 활동에 대한 종합적인 느낀점을 이어서 보시거나 다시 목차를 보고싶으신 분은 &lt;a class="link" href="../index" >&lt;strong>여기&lt;/strong>&lt;/a>를
+클릭해주세요.&lt;/p></description></item><item><title>EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기</title><link>https://umi0410.github.io/blog/aws/aws_eks_elb/</link><pubDate>Sun, 06 Sep 2020 19:11:07 +0900</pubDate><guid>https://umi0410.github.io/blog/aws/aws_eks_elb/</guid><description>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/preview.png" alt="Featured image of post EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기" />&lt;h2 id="-시작하며">🐶 시작하며&lt;/h2>
 &lt;blockquote>
 &lt;p>본 게시글은 AWS 대학생 유저그룹인 &lt;a class="link" href="https://velog.io/@ausg" target="_blank" rel="noopener"
 >AUSG&lt;/a>의 활동 중
