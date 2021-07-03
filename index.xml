@@ -1,4 +1,445 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Thu, 03 Jun 2021 15:46:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Go vs Java - Go에서의 객체 지향</title><link>https://umi0410.github.io/blog/golang/go-vs-java-oop/</link><pubDate>Sat, 09 Jan 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-vs-java-oop/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-vs-java-oop/declaration.png" alt="Featured image of post Go vs Java - Go에서의 객체 지향" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sat, 03 Jul 2021 12:46:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Golang으로 백엔드 개발하기 - 1. 데이터베이스 작업하기 (Ent 프레임워크 이용)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/</link><pubDate>Sat, 03 Jul 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/o2m-relation.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 1. 데이터베이스 작업하기 (Ent 프레임워크 이용)" />&lt;h1 id="golang으로-백엔드-개발하기---1-데이터베이스-작업하기-ent-프레임워크-이용">Golang으로 백엔드 개발하기 - 1. 데이터베이스 작업하기 (Ent 프레임워크 이용)&lt;/h1>
+&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>Go 언어를 처음 시작한 지 벌써 1년이 지났다니 시간이 참 빠른 것 같습니다! Java는 Spring이라고하는 거대한 프레임워크가 자리 잡고 있어 딱히 어떤 프레임워크나 라이브러리를 사용할지에 대한 고민이 별로 필요 없었던 것 같습니다. 반면 Go 언어는 정형화된 아키텍쳐에 대한 내용이 별로 없고 프레임워크나 라이브러리의 대세도 참 빠르게 변하다보니 그게 장점이라면 장점이겠지만 이래저래 고생도 했네요.&lt;/p>
+&lt;p>게다가 Go 언어는 개발 입문자들이 많이 사용하지 않는 언어라 그런지 아직 웹 백엔드 개발에 익숙하지 않은 (저처럼) 사람들을 위한 자료들은 많이 없었던 것 같습니다. 예를 들면 Java의 스프링이나 Node.js의 express, Python의 django 같은 프레임워크들은 인프런만 가봐도 A to Z로 알려주는 강의가 많죠. 하지만 Go 언어는 보통 언어 입문 내용들이 많고,
+&lt;em>&lt;del>&amp;ldquo;자~! 여러분들은 어차피 개발 초보자들이 아니시잖아요? 이쯤하면 Golang을 맛보셨으니 알아서들 입맛대로 쓰십시오~!&amp;quot;&lt;/del>&lt;/em> 식으로 입문 이후의 내용은 보통 동시성 패턴에 대한 내용들일 뿐
+백엔드 개발을 위한 아키텍쳐나 Unit test를 어떻게 실제로 적용하는지 같은 예시는 많이 없었습니다. 그래서 이번엔 Golang으로 웹 백엔드 개발을 하는 과정에 대해 좀 적어볼까합니다!&lt;/p>
+&lt;p>이번 글은 그런 내용을 다룰 시리즈 중 첫 번째로 Golang으로 데이터베이스 작업하는 것과 관련한 내용을 담아봤습니다. 데이터베이스를 어떻게 사용하는지에 대한 세세한 내용보단 어떤 프레임워크를 추천드리고, 그 프레임워크를 사용하는 모습이 어떠한지
+가볍게 쓰윽 보시면 좋을 것 같습니다.&lt;/p>
+&lt;h2 id="3-layered-architecture에-대해-간단히-짚고-넘어가겠습니다">3 layered architecture에 대해 간단히 짚고 넘어가겠습니다&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>Presentation layer&lt;/code> - 어떻게 데이터가 클라이언트에게 보여줄 지에 대한 작업을 담당. 클라이언트는 이 계층을 통해 상호작용한다.&lt;/li>
+&lt;li>&lt;code>Business/Domain layer&lt;/code> - Presentation layer와 Data access layer의 사이에 위치해 비즈니스 룰과 그 룰을 따르는 비즈니스 로직을 구현. 보통 이 계층에 Service라고 하는 클래스(혹은 타입 등등)가 위치한다.&lt;/li>
+&lt;li>&lt;code>Data Access Layer&lt;/code> - DB에 접근하는 작업을 담당. DAO(Data Access Object, repository)가 위치한다.&lt;/li>
+&lt;/ul>
+&lt;p>대부분의 웹 애플리케이션은 3 layered architecture라고하는 구조로 개발됩니다. 편리하고 유지 보수하기 쉬운 개발을 위해서는 프레임워크나 라이브러리가 제공하는 기능들을 영리하게 사용할 수 있어야할 것입니다.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/users/:id&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">ctx&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Ctx&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">error&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">userId&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Params&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// ... 기타 작업 생략
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">JSON&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">map&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="s">&amp;#34;userId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nx">userId&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="p">})&lt;/span>
+&lt;span class="p">})&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure style="flex-grow: 196; flex-basis: 472px">
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/presentation-layer-output.png" data-size="323x164">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/presentation-layer-output.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/presentation-layer-output_hu82c0e5805551b09a7aaeabc91ba76592_7927_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/presentation-layer-output_hu82c0e5805551b09a7aaeabc91ba76592_7927_1024x0_resize_box_2.png 1024w"
+width="323"
+height="164"
+loading="lazy"
+alt="presentation-layer-output.png">
+&lt;/a>
+&lt;figcaption>presentation-layer-output.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;em>url path variable은 어떻게 인식할 것인지, Golang의 map을 어떻게 JSON으로 직렬화할 지와 같은 로직들이 모두 프레임워크에서 제공됨.&lt;/em>&lt;/p>
+&lt;p>저는 Presentation layer는 대부분 웹 프레임워크 자체나 그것에 대해 구현된 핸들러 단에서 제공이 된다고 생각하고 있습니다. 예를 들어 어떻게 응답을 JSON 형태로 제공할지 HTML, XML, 이진 데이터(gRPC)와 같은 내용들 말이죠. 즉 우리가 그닥 개발할 것이 많지는 않습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// Service layer 코드 예시 - 우리 도메인 특정 코드들이 많아 남(우리 팀 혹은 기업이 아닌 사람들)이 만든 오픈소스로 대체하기 힘듦.
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">svc&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">UserService&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">updateProfileImage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">requestUser&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">User&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">imageFile&lt;/span> &lt;span class="nx">Image&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nx">UserResponse&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;span class="nx">requestUser가&lt;/span> &lt;span class="nx">인증된&lt;/span> &lt;span class="nx">유저인가&lt;/span>
+&lt;span class="nx">인증된&lt;/span> &lt;span class="nx">유저가&lt;/span> &lt;span class="nx">아니라면&lt;/span> &lt;span class="nx">어떤&lt;/span> &lt;span class="nx">에러를&lt;/span> &lt;span class="nx">리턴할&lt;/span> &lt;span class="nx">것인가&lt;/span>
+&lt;span class="nx">imageFile이&lt;/span> &lt;span class="nx">제대로&lt;/span> &lt;span class="nx">된&lt;/span> &lt;span class="nx">Image인가&lt;/span>
+&lt;span class="nx">제대로&lt;/span> &lt;span class="nx">된&lt;/span> &lt;span class="nx">Image가&lt;/span> &lt;span class="nx">아니라면&lt;/span> &lt;span class="nx">어떤&lt;/span> &lt;span class="nx">에러를&lt;/span> &lt;span class="nx">리턴할&lt;/span> &lt;span class="nx">것인가&lt;/span>
+&lt;span class="nx">imageFile을&lt;/span> &lt;span class="nx">업로드&lt;/span>
+&lt;span class="nx">업로드&lt;/span> &lt;span class="nx">과정&lt;/span> &lt;span class="nx">중&lt;/span> &lt;span class="nx">에러&lt;/span> &lt;span class="nx">발생&lt;/span> &lt;span class="nx">시&lt;/span> &lt;span class="nx">어떤&lt;/span> &lt;span class="nx">에러를&lt;/span> &lt;span class="nx">리턴할&lt;/span> &lt;span class="nx">것인가&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="nx">등등&lt;/span> &lt;span class="nx">생략&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">생략&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>반면 Business layer에서는 비즈니스 룰과 로직이라고 하는 우리 애플리케이션의 핵심적인 기능에 대한 구현이나 조합이 이루어지게 되는데 이 부분 타 오픈소스들로 대체되기는 힘든 부분이 많아 당연히 직접 개발하는 경우가 많습니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 190; flex-basis: 456px">
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/jpa-method.png" data-size="582x306">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/jpa-method.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/jpa-method_hu755e2c0222938f117e5959a368d53523_41512_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/jpa-method_hu755e2c0222938f117e5959a368d53523_41512_1024x0_resize_box_2.png 1024w"
+width="582"
+height="306"
+loading="lazy"
+alt="jpa-method.png">
+&lt;/a>
+&lt;figcaption>jpa-method.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;em>Java의 JPA 프레임워크의 경우 기본적으로 CRUD 메소드를 제공해준다.&lt;/em>&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 267; flex-basis: 642px">
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/django-method.png" data-size="717x268">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/django-method.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/django-method_hu35af591f1da6148e3aa53a5e144defd6_38902_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/django-method_hu35af591f1da6148e3aa53a5e144defd6_38902_1024x0_resize_box_2.png 1024w"
+width="717"
+height="268"
+loading="lazy"
+alt="django-method.png">
+&lt;/a>
+&lt;figcaption>django-method.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;em>Python의 django의 경우 Join 기능도 기본적으로 제공해준다.&lt;/em>&lt;/p>
+&lt;p>이제 Data Access Layer만이 남았습니다. 이 계층 또한 대부분의 객체지향 언어들에선 ORM이라는 개념을 통해 대부분의 프레임워크들이 많은 기능을 제공합니다. 그래서 필요한 경우에만 추가적으로 정의하는 형태로 편리하게 이용할 수 있습니다.&lt;/p>
+&lt;p>이번 글에서는 &lt;strong>Golang은 이 Data Access Layer(Repository)에서 어떤 DB framework을 사용하면 좋을지 어떤 식으로 사용해나갈 수 있을지에 대해&lt;/strong> 다뤄보려 합니다.&lt;/p>
+&lt;h2 id="golang의-좋은-db-framework-좀-추천해주세요">Golang의 좋은 DB framework 좀 추천해주세요.&lt;/h2>
+&lt;p>&lt;figure style="flex-grow: 154; flex-basis: 371px">
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/ent-gorm-stars.png" data-size="797x515">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/ent-gorm-stars.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/ent-gorm-stars_hu93b57724131d9ce35065e9adedba8094_34328_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/ent-gorm-stars_hu93b57724131d9ce35065e9adedba8094_34328_1024x0_resize_box_2.png 1024w"
+width="797"
+height="515"
+loading="lazy"
+alt="ent-gorm-stars.png">
+&lt;/a>
+&lt;figcaption>ent-gorm-stars.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;em>차트 출처: &lt;a href="https://star-history.t9t.io/">https://star-history.t9t.io/&lt;/a>&lt;/em>&lt;/p>
+&lt;p>Golang에는 Django나 JPA와 같은 강력한 데이터베이스 관리 프레임워크가 몇 년 전까지 존재하지 않았던 것 같습니다. 생 쿼리문을 직접 짤 게 아닌 경우라면 얼마 전까지는 &lt;code>gorm&lt;/code> 이라고하는 프레임워크가 거의 유일한 선택지였던 것 같습니다. 하지만 요즘 추세를 보면 무섭게 &lt;code>ent&lt;/code>라는 패키지가 쫓아오고 있는 모습을 보실 수 있습니다.&lt;/p>
+&lt;h3 id="-gorm-프레임워크-사용-후기">👎 gorm 프레임워크 사용 후기&lt;/h3>
+&lt;p>제가 golang 개발을 막 시작했던 때가 2020년 여름쯤이었기에 저도 &lt;code>gorm&lt;/code>을 첫 데이터베이스 프레임워크로 사용했었지만 몇 가지 단점들이 존재했습니다.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>문서의 내용이 빈약했고, 에러에 대한 설명이나 디버깅이 쉽지 않았다.&lt;/strong>&lt;/p>
+&lt;p>문서의 내용들이 실질적인 다양한 케이스에 대한 예시나 설명이 부족했다고 느껴졌습니다. 또한 에러가 발생한 경우 왜 에러가 발생한 것인지 정확한 위치나 이유가 제공되지 않아 디버깅하기도 힘들었던 것 같습니다.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>불편한 struct tag 기반의 테이블, 컬럼 설정&lt;/strong>&lt;/p>
+&lt;p>Go가 강력히 type을 강제하면서 높은 안정성과 편의성을 제공하는 반면 gorm은 struct tag를 기반으로 여러 설정들을 관리하도록 개발되었습니다. Go 언어를 좋아하지만 struct tag에 대해서는 가뜩이나 조금의 불만을 갖고 있었는데 이런 저런 컬럼 설정들마저 struct tag로 이용하니 정확히 이 tag가 동작하는 태그인지, 왜 에러가 나거나 적용이 안되는지도 안전하게 확인할 수 없었고 무엇보다 가독성이 너무 너무~! 좋지 않았습니다.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>제공되는 메소드가 별로 없다.&lt;/strong>&lt;/p>
+&lt;p>gorm은 아주 가벼운 느낌이었습니다. 하지만 데이터베이스 프레임워크를 사용함에도 불구하고 너무나 제공되는 메소드가 없다고 느껴졌습니다. JPA나 Django는 조금의 설정만 해주면 CRUD와 Join까지 제공해주는데 gorm은 거의 정말 정말 기본적인 기능을 하는 메소드에 적절한 인자를 전달함으로써 동작시켜야합니다. 예를 들어 메소드가 어떤 매개변수를 왜 필요로 하는지에 내용이 그닥 없고 그냥 통으로 Create메소드에 알아서 적절한 inteface{}인자를 전달해야하는 형태라 Go의 장점인 강력한 type을 바탕으로한 안정성, 편의성을 누릴 수도 없었고 이럴꺼면 파이썬 쓰지&amp;hellip; 싶은 생각이 자주 들었습니다.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="-추천하는-프레임워크---ent">👍 추천하는 프레임워크 - ent&lt;/h3>
+&lt;p>물론 위의 Github star history만 봐도 아실 수 있겠지만 ent는 매우 무섭게 성장 중인 Golang의 데이터베이스 관리 프레임워크입니다. 게다가 아마 Facebook에서 내부적으로 사용하다가 오픈소스화한 프로젝트인 걸로 알고 있는데 따라서 어느 정도의 완성도나 편의성이 보장되겠죠. ㅎㅎ 저는 사이드 프로젝트에서 gorm을 사용하다가 많은 불편을 느꼈고, Go 개발 커뮤니티에서 ent가 그렇게나 핫하다길래 ent로 data access layer를 마이그레이션했고 만족 중입니다. ㅎㅎ&lt;/p>
+&lt;p>&lt;strong>ent의 사용 후기 및 특징&lt;/strong>은 아래와 같습니다.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>타입을 바탕으로 안전하고 편리하게 테이블을 설계할 수 있다.&lt;/strong>&lt;/p>
+&lt;p>테이블, 컬럼 정의들이 모두 ent 패키지의 컬럼 type 혹은 테이블 type, 관계 type 등등을 이용해서 정의할 수 있기 때문에 너무 너무 편리하죠. 게다가 복잡한 struct tag도 안녕~! &lt;code>ent&lt;/code>는 미리 정의된 타입과 메소드들로 다양한 설정을 할 수 있습니다.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>다양한 메소드 제공&lt;/strong>&lt;/p>
+&lt;p>go generate라고 하는 기능을 통해 우리가 정의한 스키마(테이블 및 필드 설정)을 바탕으로 다양한 타입과 메소드들을 만들어줍니다. 이 부분으로 인해 꽤 빌드 시간이 늘어나는 느낌이긴한데 그래봤자 2초 정도인데 ent가 제공해주는 메소드들로 인해 개발적 편의와 안정성이 훨씬 크다고 느끼기 때문에 만족하고 있습니다.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>별 다른 문서가 필요 없다..?&lt;/strong>&lt;/p>
+&lt;p>그냥 메소드를 기반으로 이용할 수 있다보니 그 사용 방법이 직관적인 편이고, 경우에 따라서는 코드 자체를 까보면 이해되는 별 다른 문서 없이도 이용할 수 있었던 것 같습니다.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>참조 관계 설정이 좀 헷갈린다&lt;/strong> (몇 안 되는 단점 중 하나)&lt;/p>
+&lt;p>뭔가 From이나 To등을 통해 참조 관계를 정의하는데 이 From이 어떤 테이블을 From으로 생각하는건지 뭔가 많이 애매합니다. 커뮤니티를 보면 이로 인해 많은 분들도 혼란을 겪고 있는 현황입니다.&lt;/p>
+&lt;p>하지만 너무 걱정은 마세요~! 이번 글에서 정리해드리려하니까요~! ㅎㅎ&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="ent-패키지를-통해-database-작업해보기">Ent 패키지를 통해 Database 작업해보기&lt;/h2>
+&lt;p>&amp;ldquo;&lt;strong>시작하며&lt;/strong>&amp;ldquo;에서도 말씀드렸다시피 사실 Go 언어로 개발하시는 분들 중에 정말 개발 자체가 익숙하지 않은 분들은 정말 정말 적으리라 생각합니다&amp;hellip;ㅎㅎ 따라서 너무 디테일한 내용을 직접 알려드리기 보다는 커다란 흐름이나 헷갈리는 요소들을 짚어드리는 방향으로 글을 작성해 보겠습니다.&lt;/p>
+&lt;h3 id="예시-application---여행-상품-관리-crud-서비스">예시 Application - 여행 상품 관리 CRUD 서비스&lt;/h3>
+&lt;ul>
+&lt;li>1:N의 여행 상품 담당자 관계 - 담당자(일종의 유저)는 여행 상품과 1:N 관계&lt;/li>
+&lt;/ul>
+&lt;p>위의 관계를 갖는 여행 상품 관리 CRUD 서비스를 만들어보겠습니다. 본 글에서는 코드를 짧게 짧게 잘라서 올릴테니 원본 코드를 보고싶으신 분들은 제 깃헙을 참고해주세요.&lt;/p>
+&lt;p>원본 코드 - &lt;a href="https://github.com/umi0410/how-to-backend-in-go">https://github.com/umi0410/how-to-backend-in-go&lt;/a>&lt;/p>
+&lt;h3 id="1-ent-package-설치">1. ent package 설치&lt;/h3>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="c1"># 참고: https://entgo.io/docs/tutorial-setup/#installation&lt;/span>
+$ go get entgo.io/ent/cmd/ent
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>우선 ent는 다양한 명령 기능도 제공하고 저희는 그걸 필요로 하기 때문에 ent를 설치해주어야합니다. 스키마 정의 코드 또한 ent 를 이용해 자동으로 기본 형태를 제공 받을 수 있습니다. ent 패키지를 설치한 이후 저희는 다음과 같은 명령을 수행하게 될 것입니다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>$ go run entgo.io/ent/cmd/ent init {{엔티티 이름}}&lt;/code> - 엔티티 이름을 바탕으로한 초기 스키마 코드 생성&lt;/li>
+&lt;li>&lt;code>$ go generate ./ent&lt;/code> - 정의했던 스키마를 바탕으로 한 많은 boilerplate 코드를 자동으로 생성&lt;/li>
+&lt;/ol>
+&lt;h3 id="2-스키마-설정">2. 스키마 설정&lt;/h3>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-shell" data-lang="shell">$ go run entgo.io/ent/cmd/ent init User &lt;span class="c1"># or shortly $ ent init User&lt;/span>
+$ go run entgo.io/ent/cmd/ent init TourProduct &lt;span class="c1"># or shortly $ ent init TourProduct&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>위의 명령어들을 통해 User와 User가 관리하는 TourProduct라는 엔티티들의 스키마를 작성할 것입니다. 정확한 스키마 작성에 대한 설명은 생략하겠습니다. &lt;a class="link" href="https://entgo.io/docs/schema-def" target="_blank" rel="noopener"
+>ent 공식 문서&lt;/a>에 매우 잘 설명되어있고, &lt;a class="link" href="https://github.com/ent/ent/tree/master/examples" target="_blank" rel="noopener"
+>examples in ent github&lt;/a>에서 대부분의 예시 코드도 확인해볼 수 있기 때문입니다.&lt;/p>
+&lt;h4 id="-참조-관계-설정-시의-from과-to">⭐ 참조 관계 설정 시의 From과 To&lt;/h4>
+&lt;p>다만 한 가지. Edge를 이용해 &lt;strong>참조 관계를 설정할 때 &lt;code>From&lt;/code>과 &lt;code>To&lt;/code>의 사용에 대해&lt;/strong> 한 가지만 짚고 넘어가려 합니다. 저를 포함해 많은 ent 사용자분들께서 Edge 설정 시에 많은 혼란을 겪습니다. 그 이유는 일반적으로 우리는 1:N 관계에서 N쪽이 From, 1쪽이 To가 되며 N쪽 테이블에서 1을 참조하는 내용을 정의하는 반면 ent는 그 반대로 동작하기 때문입니다.&lt;/p>
+&lt;p>&lt;em>(ent에서의 참조 관계 정의 방식에 대해 궁금하지 않으신 분들은 넘어가셔도 됩니다.)&lt;/em>&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 296; flex-basis: 711px">
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/o2m-relation.png" data-size="560x189">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/o2m-relation.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/o2m-relation_huda98d5d877ff5063fa9c786910881686_21160_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-db/o2m-relation_huda98d5d877ff5063fa9c786910881686_21160_1024x0_resize_box_2.png 1024w"
+width="560"
+height="189"
+loading="lazy"
+alt="o2m-relation.png">
+&lt;/a>
+&lt;figcaption>o2m-relation.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;em>출처: &lt;a href="https://entgo.io/docs/schema-edges">https://entgo.io/docs/schema-edges&lt;/a>&lt;/em>&lt;/p>
+&lt;p>위와 같은 경우 데이터베이스상으로는 &lt;code>Pet&lt;/code> 테이블이 자신의 &lt;code>owner_id&lt;/code> 컬럼을 통해 &lt;code>User&lt;/code>을 참조하므로 &lt;code>Pet&lt;/code>이 &lt;code>From&lt;/code>, &lt;code>User&lt;/code>가 &lt;code>To&lt;/code>가 되며 이를 통해 owner라는 관계를 나타낼 수 있습니다.
+하지만 &lt;code>ent&lt;/code>는 그 반대로 &lt;code>User&lt;/code>가 &lt;code>Pet&lt;/code>을 관리(참조)한다는 의미로 &lt;code>User&lt;/code>가 &lt;code>From&lt;/code>, &lt;code>Pet&lt;/code>이 &lt;code>To&lt;/code>가 되어 &lt;code>pets&lt;/code>라는 관계를 나타내는 식으로 정의합니다. 이러한 대조적인 방식으로 인해 많은 사람들이 혼란을 겪는 것 같습니다.&lt;/p>
+&lt;p>저는 이러한 ent가 이런 식으로 관계를 정의하는 이유가 collection의 아이템 관리 방식과 유사하게 관계를 정의하고 싶어서가 아니었을까 싶습니다.&lt;/p>
+&lt;p>예를 들어 일반적으로 우리는 collection에 아이템을 추가할 때 다음과 같이 코드를 작성하지 데이터베이스처럼 아이템이 자신이 속하는 컬렉션을 설정하지 않습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// Go에서의 예시
+&lt;/span>&lt;span class="c1">// 1. 컬렉션 방식
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Pets&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nb">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Pets&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">newPet&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 2. 데이터베이스와 유사한 참조 방식
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="nx">newPet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Owner&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">user&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="c1">// Java에서의 예시
+&lt;/span>&lt;span class="c1">// 1. 컬렉션 방식
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">pets&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">append&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">newPet&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;span class="c1">// 2. 데이터베이스와 유사한 참조 방식
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">newPet&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">setOwner&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>아무튼 그래서 저는 ent에서는 &lt;strong>1:N 방식에서 1이 연관 관계의 주인처럼 동작/정의한다&lt;/strong>고 생각하고 작업하고 있습니다. 사실 굳이 저렇게 정의하는 이유가 뭘까 나름의 이유를 붙여본 것이고, 그냥 &lt;strong>예시를 참고하시면서 테이블의 참조 관계랑 반대라고 외우시길 추천&lt;/strong>(ㅎㅎ&amp;hellip;.;;)합니다!&lt;/p>
+&lt;h4 id="스키마-정의-및-적용">스키마 정의 및 적용&lt;/h4>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// ent/schema/user.go
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kn">package&lt;/span> &lt;span class="nx">schema&lt;/span>
+&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;span class="s">&amp;#34;entgo.io/ent&amp;#34;&lt;/span>
+&lt;span class="s">&amp;#34;entgo.io/ent/schema/edge&amp;#34;&lt;/span>
+&lt;span class="s">&amp;#34;entgo.io/ent/schema/field&amp;#34;&lt;/span>
+&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// User holds the schema definition for the User entity.
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">type&lt;/span> &lt;span class="nx">User&lt;/span> &lt;span class="kd">struct&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">ent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Schema&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// Fields of the User.
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">User&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">Fields&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">[]&lt;/span>&lt;span class="nx">ent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Field&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">[]&lt;/span>&lt;span class="nx">ent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Field&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="c1">// 타입을 기반으로 안전하고 편리하게 컬럼을 정의할 수 있습니다.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">field&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">String&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="nx">field&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">String&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="nx">field&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Bool&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;isActivated&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nf">Default&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// Edges of the User.
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">User&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">Edges&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">[]&lt;/span>&lt;span class="nx">ent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Edge&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">[]&lt;/span>&lt;span class="nx">ent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Edge&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="c1">// ent에서는 To를 정의하는 스키마, 즉 여기선 User
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// 가 참조 관계의 주인이라고 정의합니다.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// 일반적인 JPA의 방식과는 반대입니다.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">edge&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">To&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;products&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">TourProduct&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Type&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-shell" data-lang="shell">$ go generate ./ent
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>아무튼 저는 User 스키마를 이렇게 설정했고 이 스키마들을 적용해 ent가 generate해준 코드들을 이용해보겠습니다.&lt;/p>
+&lt;p>(TourProduct 스키마는 생략했습니다. 원본 코드를 참고해주세요.)&lt;/p>
+&lt;h3 id="3-repository-정의">3. repository 정의&lt;/h3>
+&lt;p>ent가 데이터베이스 관련 작업을 위한 다양한 메소드를 지원해줍니다. 하지만 ent는 간단 간단한 메소드들을 조합해서 사용해야하기 때문에 비즈니스 로직을 구현하는 계층에서 매번 ent의 메소드를 조합하며 사용하는 것은 계층의 관심사와 책임을 흐리게 할 수 있습니다. 따라서 몇 가지 메소드들을 &lt;code>data access layer&lt;/code>인 &lt;code>repository&lt;/code>에 정의하겠습니다.&lt;/p>
+&lt;p>예를 들면 특정 user가 관리하는 여행 상품을 모두 조회하는 &lt;code>FindAllByManager(managerID string)&lt;/code>와 같은 메소드 말이죠. 이 작업을 위해서는 User 테이블과 TourProduct 테이블을 조인해야하는데 ent가 역시 이 기능을 제공합니다.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// repository.go
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="o">...&lt;/span>
+&lt;span class="kd">type&lt;/span> &lt;span class="nx">TourProductRepository&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="nx">Client&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">ent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">TourProductClient&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">repo&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">TourProductRepository&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">FindAllByManager&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">managerID&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">[]&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nx">ent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">TourProduct&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="nx">result&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">repo&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Client&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Query&lt;/span>&lt;span class="p">().&lt;/span>
+&lt;span class="c1">// 특정 manager_id의 TourProduct를 조회하도록 조인
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nf">Where&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">tourproduct&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">HasManagerWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ID&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">managerID&lt;/span>&lt;span class="p">))).&lt;/span>
+&lt;span class="nf">WithManager&lt;/span>&lt;span class="p">().&lt;/span>
+&lt;span class="nf">AllX&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">TODO&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">result&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="4-실행">4. 실행&lt;/h3>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// main.go
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;전체 유저 조회&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">user&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">userRepository&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">FindAll&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;User(id=%s, name=%s)\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Name&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;--------------------------------------------------------------------------&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;전체 여행 상품 조회&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">tourProductRepository&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">FindAll&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;TourProduct(id=%d, name=%s, manager=%s)\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Edges&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Manager&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;--------------------------------------------------------------------------&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">user1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s">&amp;#34;가 관리하는 전체 여행 상품 조회&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">tourProductRepository&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">FindAllByManager&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">user1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;TourProduct(id=%d, name=%s, manager=%s)\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Edges&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Manager&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;pre>&lt;code>전체 유저 조회
+User(id=umi0410, name=박진수)
+User(id=devumi, name=개발자)
+--------------------------------------------------------------------------
+전체 여행 상품 조회
+TourProduct(id=1, name=미국 뉴욕 여행, manager=umi0410)
+TourProduct(id=2, name=유럽 여행, manager=devumi)
+--------------------------------------------------------------------------
+umi0410가 관리하는 전체 여행 상품 조회
+TourProduct(id=1, name=미국 뉴욕 여행, manager=umi0410)
+&lt;/code>&lt;/pre>&lt;p>간단한 테스트용으로 2명의 유저를 만들었고, 각각의 유저가 관리하는 2개의 여행 상품을 만들어서 조회하는 프로그램을 만들어보았습니다. repository 계층에서 만든 FindAll()이나 FindAllByManager()와 같은 메소드들을 통해 편리하게 작업할 수 있네요!&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>글을 쓰다보니 백엔드 개발에서 데이터베이스가 왜 필요하고 어떤 식으로 사용되는지를 다루는 글도 아니고, Golang에서 ent 프레임워크를 사용하는 방법을 자세히 알려주는 글도 아닌 이도 저도 아닌 글이 된 건 아닌가 싶기도 합니다.&lt;/p>
+&lt;p>그래도 앞으로 Golang으로 백엔드 개발하는 것에 대해 천천히 한 5~6편 정도의 글을 써나가볼까하는데 이때 DB 관련된 내용을 우선 짚고는 넘어가야할 것 같기도 했고, 무엇보다 한글로 된 ent 자료를 하나도 찾을 수 없다는 점에서 데이터베이스 관련 프레임워크인 ent를 소개해보고자 했습니다! ㅎㅎ&lt;/p>
+&lt;p>지면 사정 상 코드들을 잘라서 올렸는데 원본 코드는 &lt;a href="https://github.com/umi0410/how-to-backend-in-go">https://github.com/umi0410/how-to-backend-in-go&lt;/a> 에 올려놓을테니 참고해주시면 감사하겠습니다.&lt;/p>
+&lt;h2 id="참고">참고&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://entgo.io/">https://entgo.io/&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/ent/ent">https://github.com/ent/ent&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore</title><link>https://umi0410.github.io/blog/golang/go-mutex-semaphore/</link><pubDate>Wed, 20 Jan 2021 15:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-mutex-semaphore/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2.png" alt="Featured image of post Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore" />&lt;p>Go 언어로 적용해보는 Computer Science의 첫 번째 내용으로 OS 관련 내용 중 이론적으로는 흔하게 접할 수 있지만 실제 적용에 대한 내용은
+찾아보기 힘들었던 &lt;code>Mutex&lt;/code>, &lt;code>Semaphore&lt;/code>에 대해 알아보려한다.&lt;/p>
+&lt;p>Mutex와 Semaphore은 각각의 추상적인 개념을 바탕으로 OS나 Go 등에서 사용될 수 있기에 세부적인 내용은 문맥에 따라 달라질 수 있다고 생각한다. 예를 들어 Go에서의 Mutex는 주로 &lt;code>sync.Mutex&lt;/code>를 이용한 서로 다른 Goroutine의 동시 접근에 대한 제어를 의미하는 반면, 다른 프로그래밍 언어나 OS에서는 주로 서로 다른 Kernel thread나 Process에 대한 동시 접근 제어를 의미할 수 있다.&lt;/p>
+&lt;h2 id="mutex">Mutex&lt;/h2>
+&lt;p>&lt;code>Mutex&lt;/code>는 &lt;strong>Mutual Exclusion&lt;/strong>의 줄임말로 &lt;strong>상호 배제&lt;/strong>를 의미한다. 즉 &lt;strong>서로 다른 워커가 공유 자원에 접근하는 것을 제한&lt;/strong>한다는 말이다. &lt;code>Go&lt;/code>에서는 이 &amp;ldquo;&lt;strong>워커&lt;/strong>&amp;ldquo;가 &lt;code>Goroutine&lt;/code>이 되고, 컨텍스트에 따라 프로세스가 될 수도, 스레드가 될 수도 그 외의 다른 존재가 될 수도 있다. &lt;code>공유 자원&lt;/code>이란 여러 워커가 동시에 접근하는 자원을 말하고 이 &lt;strong>공유 자원에 대한 동시 접근을 제한해 thread-safe하게 작업하고자 하는 영역&lt;/strong>을 &lt;code>Critical section&lt;/code>이라고 한다. Cricical section은 Mutex가 Lock을 수행한 뒤 Unlock되기 전까지의 영역이며, Lock과 Unlock은 Atomic한 작업이기때문에 어떠한 경우에도 동시적으로 수행될 수 없다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 149; flex-basis: 358px">
+&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1.png" data-size="817x547">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1.png"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1_hu76213fc7fff91be05fb9c7f7e7037656_79471_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1_hu76213fc7fff91be05fb9c7f7e7037656_79471_1024x0_resize_box_2.png 1024w"
+width="817"
+height="547"
+loading="lazy"
+alt="mutex-1.png">
+&lt;/a>
+&lt;figcaption>mutex-1.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>이해하기 쉽게 예시를 통해 접근해보겠다. 원래 화장실 예제를 보고 굉장히 와닿았는데, 화장실보다는 피팅룸이 좀 더 청결한 것 같아서 피팅룸으로 예를 들어보겠다. 우리 귀여운 고퍼가 &lt;strong>피팅룸을 한 개만 운영하는 옷가게에 방문&lt;/strong>했다고 가정해보자.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 251; flex-basis: 602px">
+&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2.png" data-size="831x331">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2.png"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2_hu253887d6f424b5a6c4c14b3309becda5_68035_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2_hu253887d6f424b5a6c4c14b3309becda5_68035_1024x0_resize_box_2.png 1024w"
+width="831"
+height="331"
+loading="lazy"
+alt="mutex-2.png">
+&lt;/a>
+&lt;figcaption>mutex-2.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;ul>
+&lt;li>피팅룸 - Critical section&lt;/li>
+&lt;li>고퍼가 피팅룸에 들어가서 옷을 입는 작업은 하나의 Goroutine&lt;/li>
+&lt;/ul>
+&lt;p>동시에 여러 고퍼가 하나의 피팅룸에서 옷을 갈아입으려한다면 😟 난처한 상황이 발생할 것이다. 그렇기때문에 피팅룸에는 Lock, Unlock 기능이 존재해야하는데, 이 기능을 구현한다해도 &lt;strong>Atomic&lt;/strong>하게 동작할 수 있도록 제대로 구현하지 않는다면 &lt;strong>한 워커가 Lock을 하는 사이에 다른 워커가 동시에 Lock&lt;/strong>을 걸려할 수 있고, 그 경우 두 워커가 동시에 한 피팅룸(Critical Section)에서 작업을 하려할 것이다. 그렇기때문에 &lt;strong>Lock, Unlock은 Atomic해야하며 이렇게 각 워커를 상호 배제시켜 동시에 작업할 수 없도록 하는 것&lt;/strong>이 바로 &lt;code>Mutex&lt;/code>이다.&lt;/p>
+&lt;h3 id="mutex를-이용한-go-program---counter">Mutex를 이용한 Go program - Counter&lt;/h3>
+&lt;p>&lt;strong>Count = 0에서 시작해 동시적으로 +1을 10만 번, -1을 10만 번 수행하는 카운터 프로그램&lt;/strong>&lt;/p>
+&lt;p>그럼 실생활에 비유한 Mutex는 이 정도로 마치고, Mutex가 어떻게 사용되는지 Go로 짠 간단한 Counter 프로그램을 통해 알아보자.&lt;/p>
+&lt;ul>
+&lt;li>Mutex를 잘 적용한 경우 - 몇 번을 수행하든 결과는 0.&lt;/li>
+&lt;li>Mutex가 적용되지 않은 safe하지 않은 경우 - 결과가 0이 나오지 않을 수 있다.&lt;/li>
+&lt;/ul>
+&lt;p>특히 &lt;code>Go&lt;/code>에서는 &lt;code>sync&lt;/code> 패키지의 &lt;code>Mutex&lt;/code>라는 type을 통해 간단하게 Mutex 기능을 이용할 수 있다. &lt;strong>동일한 Mutex struct를 참조한다면 같은 Key를 이용한다는 개념&lt;/strong>이고, &lt;code>mutex.Lock()&lt;/code>을 호출한 뒤 &lt;code>mutex.Unlock()&lt;/code>이 호출되기 이전까지가 Critical section이 되며 다른 goroutine들은 같은 Mutex(즉 키)에 의한 Critical section에 진입할 수 없다.&lt;/p>
+&lt;p>&lt;em>내가 처음 Mutex를 처음 접했을 때 한 가지 헷갈렸던 것&lt;/em>은 당시 Critical section이라는 개념이 없었기 때문에 Lock을 호출하기만 하면 런타임에 &lt;del>알아서 스마트하게 Lock과 Unlock사이의 변수들에 대한 접근 중 동시적인 접근만을 잠시 블락해주는 줄&lt;/del> 알았는데, 사실 그 사이 변수들중 동시적으로 접근하려는 변수에 대해서만 잠시 블락해주는 게 아니라 &lt;strong>Lock과 Unlock 사이를 Critical section으로 만드는 것&lt;/strong>이었다.&lt;/p>
+&lt;p>자 그럼 Count라는 하나의 int형 변수에 동시적으로 접근을 하는 상황을 극대화하기 위해 여러 고루틴으로 작업해보겠다. +1을 1만 번하는 고루틴을 10개, -1을 1만 번하는 고루틴을 마찬가지로 10개 이용하겠다.&lt;/p>
+&lt;p>전체 코드 참고: &lt;a class="link" href="https://play.golang.org/p/xaLE1YkAdvd" target="_blank" rel="noopener"
+>https://play.golang.org/p/xaLE1YkAdvd&lt;/a>&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 116; flex-basis: 279px">
+&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1.png" data-size="516x443">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1.png"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1_hu6e22a3f3f203a0242d8843396eefee7b_63957_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1_hu6e22a3f3f203a0242d8843396eefee7b_63957_1024x0_resize_box_2.png 1024w"
+width="516"
+height="443"
+loading="lazy"
+alt="output-1.png">
+&lt;/a>
+&lt;figcaption>output-1.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;ul>
+&lt;li>우리가 일반적으로 익숙한 Sync 즉 동기적인 순차적 진행 시에는 당연히 10만번 +1, 10만번 -1 후에 결과가 0이었다.&lt;/li>
+&lt;li>동시적 접근을 수행하자 10만번 +1, 10만번 -1을 했지만 &lt;code>Count += 1&lt;/code> 을 수행하던 중 또 다른 &lt;code>Count += 1&lt;/code>이 수행되는 등의 원치않던 상황이 야기될 수 있기에 결과값이 0인 경우를 찾기 힘들다.&lt;/li>
+&lt;li>여러 Goroutine이 concurrent하게 진행하되 &lt;code>Count += 1&lt;/code>, &lt;code>Count -= 1&lt;/code> 과 같은 &lt;strong>동시적 접근이 수행되어서는 안되는 영역은 Critical Area&lt;/strong>로 설정해 상호 배제적으로 작업되게 하기 위해 Critical section의 전/후에 &lt;code>sync.Mutex&lt;/code>를 이용해 Lock, Unlock 기능을 넣어주자 &lt;strong>기대했던 대로 0의 결과&lt;/strong>를 얻을 수 있었다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="-mutex-그래서-언제-써요">💡 Mutex.. 그래서 언제 써요?&lt;/h3>
+&lt;p>사실 Mutex라는 개념이 그렇게 어려운 것도 아니고, 사용법 자체가 어려운 것도 아니다. 나는 하지만 항상 &lt;strong>&amp;ldquo;언제&amp;rdquo;&lt;/strong>, &lt;strong>&amp;ldquo;왜&amp;rdquo;&lt;/strong> 써야하는지를 궁금해하는 편이다.&lt;/p>
+&lt;ol>
+&lt;li>Critical section에서 많은 시간이 소요되는 경우? ⇒ ❌
+위의 counter와 같은 작업은 대부분의 작업이 critical section 속에 있다고 볼 수 있다. 이 경우 동시적인 작업과 함께 Lock, Unlock을 하며 critical section을 관리하는 것보다 애초에 작업 자체를 동기적으로 수행하는 게 나을 수 있다. 왜냐하면 동시적 작업 속에서 Mutex를 통해 동기적으로 작업할 수 있도록 하는 것에서 오는 오버헤드는 분명히 존재하고, Critical section 밖에서 효율적으로 동시적으로 작업을 진행했다하더라도 critical section에서 병목이 발생해버려 전체적인 Throughput이 안 좋아질 것이다.&lt;/li>
+&lt;li>&lt;strong>Critical section에서는 적은 시간이 소요되고, 대부분은 동시적으로 작업이 가능한 경우&lt;/strong>? ⇒ ⭕
+예를 들어 어떤 API를 여러 번 호출한 뒤 그 응답 중 일부를 계속해서 더해 결과를 내는 Reduce 작업을 수행한다고 치자. 순차적으로 수행할 시 오랜 시간이 소요될 API 호출은 동시적으로 진행하고, 결과에 대한 Reduce 작업만 잠시 Critical section내에서 작업한다면 아주 좋은 성능과 함께 안전하게 작업할 수 있을 것이다!&lt;/li>
+&lt;/ol>
+&lt;h2 id="semaphore">Semaphore&lt;/h2>
+&lt;p>&lt;figure style="flex-grow: 142; flex-basis: 342px">
+&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore.png" data-size="884x619">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore.png"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore_hu1456e527b7729559b12f99ce1b9bda34_227201_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore_hu1456e527b7729559b12f99ce1b9bda34_227201_1024x0_resize_box_2.png 1024w"
+width="884"
+height="619"
+loading="lazy"
+alt="semaphore.png">
+&lt;/a>
+&lt;figcaption>semaphore.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>Mutex에서 대부분의 Lock이나 Critical section에 대한 내용을 설명했기 때문에 Semaphore에서 더 설명할 내용이 많지는 않다. Semaphore의 동작에 대한 간단한 예시는 위의 그림과 같은데, 5마리의 고퍼가 존재한다해도 동시에 접근할 수 있게하는 고퍼를 3개로 제한한다면 2마리의 고퍼는 피팅룸에 들어가지 못하고 블락된다. Locked와 Unlocked 상태 뿐인 &lt;code>Mutex&lt;/code>와 달리 &lt;code>Semaphore&lt;/code>는 &lt;strong>임의의 개수를 세는 Counter처럼 동작해 임의의 개수의 워커만이 Critical section에 동시적으로 접근&lt;/strong>할 수 있도록 한다.&lt;/p>
+&lt;p>Counter를 예로 들자면 10개의 워커가 존재한다해도 &amp;ldquo;5&amp;quot;를 세는 Semaphore는 한 워커가 Critical section에 진입할 때마다 Counter 값을 1씩 낮추고, Critical section을 탈출할 때마다 Counter 값을 다시 1씩 높인다. 만약 어떤 워커가 Critical section에 진입하려는데 Count 값이 0이라면 초기에 계획했던 대로 5개의 워커가 이미 동시적으로 작업중이라는 의미이므로 이 워커는 한 워커가 Critical section을 나오면서 Counter 값을 다시 1 증가시킬 때까지 Block된다.&lt;/p>
+&lt;p>Mutex의 Lock과 Unlock이 Atomic하기에 어떠한 경우에도 동시적으로 수행될 수 없었듯이 Semaphore의 Counting 작업 또한 Atomic해야하고 그래야만 Thread-safe한 counter로 동작할 수 있다. Semaphore가 수행하는 Counting 작업은 주로 try를 뜻하는 네덜란드어 Proberen의 앞 글자를 딴 &lt;code>P&lt;/code>와 increment를 뜻하는 Verhogen의 앞 글자를 딴 &lt;code>V&lt;/code>로 두 가지가 표현하는 듯하다. &lt;code>P&lt;/code>는 Count 값이 0이 아니면 작업을 수행하겠다는 의미하며 만약 Count 값이 0이라면 0이 아닌 값이 될 때까지 wait했다가 0 아닌 값이 되면 count 값을 1 감소시키며 작업을 시작한다. &lt;code>V&lt;/code>는 작업을 마치며 count 값을 다시 1 증가시키겠다는 의미이다.&lt;/p>
+&lt;h3 id="mutex와-binary-semaphore의-유사한-점">Mutex와 Binary semaphore의 유사한 점&lt;/h3>
+&lt;p>동시 접근 워커를 1개로 제한하는 Semaphore의 경우 Count 값이 0과 1 두 개로만 존재할 수 있는데 이를 Binary semaphore라고한다. 특히 이는 Locked와 Unlocked라는 두 가지의 상태만을 갖는 Mutex와 유사하다. 하지만 Binary semaphore는 mutex가 유사한 기능을 할 뿐 동일하지는 않다는 의견이 많다. 그 이유는 &lt;strong>Mutex는 Lock 방식을 이용하고 Semaphore는 Signal(신호) 방식을 이용&lt;/strong>하기 때문이다. Lock 방식의 경우 Lock을 수행한 워커만이 Unlock을 할 수 있는 반면 Signal 방식은 try(작업 시도)를 수행한 워커가 아니더라도 increment(작업 완료) 신호를 보낼 수 있기에 서로 명백히 동작 방식이 다르다는 것이다. (하지만 이 부분에 대해서는 직접 실습해보지는 못했다.)&lt;/p>
+&lt;p>*Semaphore를 이해하는 데에 있어 내가 착각해서 헤맸던 부분은 바로 &lt;del>Semaphore의 요점이 thread-safe한 count라고 착각&lt;/del>*했던 것이다. 하지만 semaphore의 요점은 여러 워커에 대해서 thread safe한 count 기능을 제공하는 것이 아니라 임의의 숫자만큼의 동시적 접근을 허용하고, 그 이상은 Block 상태로 대기시킨다는 것이다.&lt;/p>
+&lt;h3 id="semaphore를-이용한-go-program-1---counter">Semaphore를 이용한 Go Program 1 - Counter&lt;/h3>
+&lt;p>go에서 Semaphore를 이용하는 방법은 크게 2가지가 있는 것 같다. 아래 두 가지 방법 중 좀 더 Go스러운 &lt;code>channel&lt;/code>을 이용해보겠다.&lt;/p>
+&lt;ol>
+&lt;li>Go 특유의 자료형인 &lt;code>channel&lt;/code>을 이용하기 - channel은 여러 goroutine의 concurrent한 작업간 데이터 전송은 물론이고 동시적인 작업 중 데이터를 편리하게 동기화해주는 녀석이다. 따라서 동기적인 count와 유사한 기능을 내재하고있다.&lt;/li>
+&lt;li>&lt;a class="link" href="http://golang.org/x/sync/semaphore" target="_blank" rel="noopener"
+>golang.org/x/sync/semaphore&lt;/a>의 Weighted를 이용하기 - Semaphore의 P를 Acquire, V를 Release로 구현해 이용할 수 있게 했다.&lt;/li>
+&lt;/ol>
+&lt;p>전체 코드는 Mutex와 동일하며 마찬가지로 다음 링크로 참고해볼 수 있다: &lt;a class="link" href="https://play.golang.org/p/xaLE1YkAdvd" target="_blank" rel="noopener"
+>https://play.golang.org/p/xaLE1YkAdvd&lt;/a>&lt;/p>
+&lt;h3 id="buffered-channel을-이용한-semaphore-in-go">Buffered channel을 이용한 Semaphore in Go&lt;/h3>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">func&lt;/span> &lt;span class="nf">DoSemaphore&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">maxConcurrent&lt;/span> &lt;span class="kt">int64&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="nx">Count&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;span class="nx">wg&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">sync&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">WaitGroup&lt;/span>&lt;span class="p">{}&lt;/span>
+&lt;span class="nx">sem&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">chan&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{},&lt;/span> &lt;span class="nx">maxConcurrent&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="k">go&lt;/span> &lt;span class="nf">Add1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">go&lt;/span> &lt;span class="nf">Sub1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Wait&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Concurrent goroutines + Semaphore&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">maxConcurrent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Result(Desired 0):&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Count&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;=====================================&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="nf">Sub1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">sync&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">WaitGroup&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span> &lt;span class="kd">chan&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{}){&lt;/span>
+&lt;span class="k">defer&lt;/span> &lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Done&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">10000&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="nx">sem&lt;/span> &lt;span class="o">&amp;lt;-&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{}{}&lt;/span>
+&lt;span class="nx">Count&lt;/span> &lt;span class="o">-=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;span class="o">&amp;lt;-&lt;/span>&lt;span class="nx">sem&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>channel을 이용한 Semaphore 코드를 설명하기 위해 전체 코드 중 일부를 가져와보았다. Semaphore를 이용하기 위해 &lt;code>Unbuffered channel&lt;/code>이 아닌 &lt;code>Buffered channel&lt;/code>을 이용하는 이유는 다음과 같은 Unbuffered channel의 동작 방식이 Semaphore의 동작 방식과 동일하기 때문이다.&lt;/p>
+&lt;ul>
+&lt;li>Buffer의 크기만큼은 동시적으로 channel에 값을 넣으려는 시도가 허용됨.&lt;/li>
+&lt;li>buffered channel이 꽉 찬 경우 채널에서 값을 꺼내지 않는 이상은 추가적으로 Channel에 값을 넣으려시도하는 goroutine은 Block됨.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;figure style="flex-grow: 170; flex-basis: 409px">
+&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2.png" data-size="534x313">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2.png"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2_hu5c9eb1f96e3e02a52a6b354b1459125f_26935_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2_hu5c9eb1f96e3e02a52a6b354b1459125f_26935_1024x0_resize_box_2.png 1024w"
+width="534"
+height="313"
+loading="lazy"
+alt="output-2.png">
+&lt;/a>
+&lt;figcaption>output-2.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>(앞서 코드를 링크한 go playground에서 코드를 바로 실행해볼 수 있다.)&lt;/p>
+&lt;p>동시 접근 워커를 1개로 제한하는 Semaphore는 &lt;strong>Binary Semaphore로서 Mutex를 이용했을 때와 유사하다고 말했듯이 thread-safe하게 count 작업이 이루어져 예상되는 값이었던 0이 출력됨&lt;/strong>을 확인할 수 있다. 하지만 동시접근이 가능한 워커가 1개 이상이 되면 thread-safe하지 않게 되고, 동시접근 워커 개수가 많아질수록 결과가 더 부정확한 경향이 있는 것으로 나타났다.&lt;/p>
+&lt;h3 id="-semaphore-그래서-언제-쓰나요">💡 Semaphore.. 그래서 언제 쓰나요?&lt;/h3>
+&lt;blockquote>
+&lt;p>Mutex는 thread-safe한 작업을 할 때 사용하면 되는 것 같은데 Semaphore는 개념은 알겠는데 언제 써야할 지를 잘 모르겠네요. 일정 개수만큼만 동시 접근을 허용하려는 경우가 있을까요?&lt;/p>
+&lt;/blockquote>
+&lt;p>Semaphore을 사용하기 좋은 케이스는 &lt;strong>동시에 접근할 수 있는 워커 수를 제한하는 경우&lt;/strong>이고, 이는 주로 &lt;strong>전체 작업이 늘어지는 것을 방지하고자 하는 경우&lt;/strong>에 이용된다. 많은 작업을 동시에 수행하려하면 먼저 수행될 수 있는 작업은 먼저 수행되도록 하기보다는 전체적으로 모든 작업이 늘어지게 되고 CPU나 Memory 리소스를 많이 소모하게 되고 이는 서버의 안정성에도 좋지 않다. Semaphore를 이용해 동시 접근 워커 수를 제한하고자하는 케이스는 Go의 Worker pool 패턴을 이용하는 경우나 Pipeline pattern을 이용하는 경우와 유사하다.(&lt;em>처음엔 Go의 모든 Concurrent pattern들을 개별적으로 구별지으려했었는데, 공부하다보니 일정한 개수의 Worker를 이용하는 Worker Pool pattern, Channel을 기반으로 작업 내역을 쪼개어 실시간 처리하는 Pipeline, 한 채널, 여러 Goroutine을 이용하는 Fan-in Fan-out pattern 등등 다들 유사하고 연관이 되어있더라.&lt;/em>)&lt;/p>
+&lt;p>&lt;strong>Semaphore로 동시 접근 Worker 수를 제한하지 않고 모든 Goroutine을 동시적으로 수행하는 경우엔 어떻게 될까?&lt;/strong>&lt;/p>
+&lt;p>Logical Processor 개수를 훨씬 넘는 모든 Goroutine 동시적으로 작업을 진행할 경우 아무리 Goroutine이 concurrent한 작업 수행에 뛰어난 성능을 보인다할지라도 과하게 많은 수의 Goroutine은 성능 저하를 야기하지 않을까 예상했다. 하지만 user-level thread 혹은 green level thread의 일종인 Goroutine은 OS(혹은 Kernel) thread와 달리 Context switch로 인한 penalty가 거의 없어서인지 거의 Throughput 면에서의 성능 차이가 없었다.&lt;/p>
+&lt;blockquote>
+&lt;p>Kernel level thread는 OS가 스케쥴링을 담당하기 때문에 Go 프로그램이 뭐 어떻게 할 수 있는 게 아니지만 Goroutine은 프로그램이 실행되는 동안 Go 런타임이 스케쥴링을 담당한다. 같은 Kernel level thread에 속한 User level thread인 goroutine간의 switch는 cost가 거의 없다. 즉 goroutine이 많든 적든 Kernel level thread간의 context switch cost는 동일하다고 볼 수 있고, 해당 Kernel level thread에 속한 goroutine간의 context switch cost는 거의 없다.&lt;/p>
+&lt;/blockquote>
+&lt;blockquote>
+&lt;p>참고: Kernel level thread에 대한 스케쥴링은 주로 Preemptive 방식을, User level thread에 대한 스케쥴링은 주로 Cooperative한 방식을 이용하지만 Goroutine은 User level thread임에도 Go 1.14 버전부터는 10ns를 기준으로 goroutine을 switch 할 수 있는 asynchronously preemptive한 스케쥴 방식을 지원한다고 한다. 하지만 Go 1.14가 릴리즈된 지 얼마되지 않아서인지, asynchorously preemptive scheduling에 대해서는 명확히 설명된 문서를 찾기 힘들었다.
+User level thread의 예로는 RxJava in Java, Coroutine in Kotlin, Goroutine in Golang이 있다.&lt;/p>
+&lt;/blockquote>
+&lt;p>하지만 Throughput 적인 측면보다는 Machine의 Resource 소모 측면에서는 모든 Goroutine이 동시적으로 수행되는 구조보다는 &lt;strong>Semaphore을 바탕으로한 동시에 일정 개수의 워커만이 작업하는 Worker Pool 구조가 훨씬 Memory나 CPU 리소스를 적게 소모&lt;/strong>하는 듯 했다. 또한 100개의 동시 요청을 수행하는데 동일한 Throughput으로 약 10초가 걸린다고 치면, 요청당 goroutine을 생성하는 경우는 첫 번째 요청도 거의 10초가 걸린 반면 Semaphore을 이용한 경우는 먼저 온 요청은 대체로 빠르게 먼저 처리되는 경향을 보였다. 이 차이는 &lt;strong>처음 요청을 보낸 사용자 마저 10초를 기다리게 할 것이냐, 0.1초만에 응답을 받도록 할 것이냐의 차이&lt;/strong>이다. 또한 &lt;strong>전체 작업이 늘어지면 그 작업에 대한 메모리 점유가 지속&lt;/strong>되기에 메모리 측면에서도 비효율적이다.&lt;/p>
+&lt;h3 id="semaphore을-이용한-go-program-2---이미지-크기-변환기">Semaphore을 이용한 Go Program 2 - 이미지 크기 변환기&lt;/h3>
+&lt;p>마침 이번에 프로젝트에서 thumbnail 생성, image 크기 변환, hashed uri 생성 작업 등을 담당하는 &lt;code>image processing 서버&lt;/code>를 개발하려했는데, image를 불러오는 I/O 작업 이후의 image processing은 CPU Bound 한 작업이기 때문에 동시적으로 동작하는 Goroutine이 일정 숫자(대게 Logical Processor 개수) 이상으로는 많아져봤자 크게 효율이 없을 것이라 예상했고, 그와 관련해 간단하게 이미지 크기 변환 프로그램을 하나 만들어 테스트 해보았다.&lt;/p>
+&lt;p>약 2MB의 이미지에 대한 크기 변환 작업 요청이 동시에 30개 들어왔다는 가정을 했고, semaphore을 이용한 경우 동시적으로 최대 4개의 worker(goroutine)이 작업을 수행할 수 있게, concurrent를 이용한 경우는 30개의 요청 모두 동시적으로 작업을 하는 경우이다.&lt;/p>
+&lt;p>(코드 참고(인터넷 액세스를 하는 경우 Playground에서 동작하지는 않는듯하다): &lt;a class="link" href="https://play.golang.org/p/Vfyw6uCOIuL" target="_blank" rel="noopener"
+>https://play.golang.org/p/Vfyw6uCOIuL&lt;/a>)&lt;/p>
+&lt;blockquote>
+&lt;p>사실 Logical Processor 8개, RAM 16GB의 개인 노트북으로는 그 차이가 많이 나지는 않아서 AWS EC2 t2.micro instance에서 성능을 테스트해봤다.&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="nx">ubuntu&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="nx">ip&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">172&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">31&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="err">~$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">sem&lt;/span> &lt;span class="nx">semaphore&lt;/span>
+&lt;span class="nx">변환하고자하는&lt;/span> &lt;span class="nx">Image들을&lt;/span> &lt;span class="nx">메모리에&lt;/span> &lt;span class="nx">Load했습니다&lt;/span>&lt;span class="p">.&lt;/span>
+&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">13&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.974380959&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="nx">생략&lt;/span>
+&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.159552779&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.016627316&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Total&lt;/span> &lt;span class="nx">elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">14.959516003&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;span class="nx">ubuntu&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="nx">ip&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">172&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">31&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="err">~$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">sem&lt;/span> &lt;span class="nx">concurrent&lt;/span>
+&lt;span class="nx">변환하고자하는&lt;/span> &lt;span class="nx">Image들을&lt;/span> &lt;span class="nx">메모리에&lt;/span> &lt;span class="nx">Load했습니다&lt;/span>&lt;span class="p">.&lt;/span>
+&lt;span class="nx">Killed&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>놀랍게도 동시적으로 30개의 요청을 보내는 경우에 30개의 모든 goroutine이 동시에 작업을 시도할 때에는 과도한 리소스 사용으로 인해 아예 OS가 프로세스를 Kill해버렸다. 즉 &lt;strong>Semaphore로 동시 접근 Worker 수를 제한하지 않는 경우 t2.micro 인스턴스로 돌리는 image 서버에 동시에 30개의 image resizing 요청이 들어오면 process가 죽어버린다&lt;/strong>는 말이다&amp;hellip;!&lt;/p>
+&lt;p>또한 앞서 말했듯이 동시에 요청하는 사용자가 많아지더라도 Semaphore을 이용한 경우는 나중에 들어온 요청일 수록 처리가 늘어지지만, Semaphore를 통해 동시 작업을 제한하지 않는 경우는 전체 작업이 늘어진다.&lt;/p>
+&lt;p>이렇게 Semaphore는 동시 접근 워커 수를 제한하여 전체적인 Throughput 측면보다는 리소스 소모적인 측면과 먼저 처리될 수 있는 작업은 먼저 처리되도록 할 수 있다는 면에서 장점이 있음을 확인할 수 있었다.&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>Mutex나 Semaphore의 개념이나 설명과 같은 이론적인 내용은 구글링을 통해 어렵지 않게 얻을 수 있는 흔한 지식인 반면, 정확히 언제 쓰면 좋을지, 언제 쓰일 수 있을지와 같은 실용적인 내용은 찾아보기 어려웠기때문에 Go를 통해 Mutex와 Semaphore을 이용해보는 간단한 프로그램을 만들어 실습해보았다.&lt;/p>
+&lt;p>예제 프로그램으로서 코드를 간결하고 읽기 쉽게 깔끔하게 제공해보고자했는데, 그러기 쉽지 않았던 것 같아 아쉽다. 다음엔 기회가 되면 go의 benchmark test를 이용해보면 어떨까싶다.&lt;/p>
+&lt;h2 id="참고">참고&lt;/h2>
+&lt;p>&lt;strong>Goroutine과 Goroutine scheduling에 대해&lt;/strong> - &lt;a class="link" href="https://thegopher.tistory.com/3" target="_blank" rel="noopener"
+>https://thegopher.tistory.com/3&lt;/a>&lt;/p>
+&lt;p>화장실에 비유한 뮤텍스와 세마포어 - &lt;a class="link" href="https://worthpreading.tistory.com/90" target="_blank" rel="noopener"
+>https://worthpreading.tistory.com/90&lt;/a>&lt;/p>
+&lt;p>semaphore in Go &lt;a class="link" href="https://medium.com/@deckarep/gos-extended-concurrency-semaphores-part-1-5eeabfa351ce" target="_blank" rel="noopener"
+>https://medium.com/@deckarep/gos-extended-concurrency-semaphores-part-1-5eeabfa351ce&lt;/a>&lt;/p>
+&lt;p>cooperative vs preemptive - &lt;a class="link" href="https://medium.com/traveloka-engineering/cooperative-vs-preemptive-a-quest-to-maximize-concurrency-power-3b10c5a920fe" target="_blank" rel="noopener"
+>https://medium.com/traveloka-engineering/cooperative-vs-preemptive-a-quest-to-maximize-concurrency-power-3b10c5a920fe&lt;/a>&lt;/p>
+&lt;p>preemptive scheduling in go - &lt;a class="link" href="https://blog.puppyloper.com/menus/Golang/articles/Goroutine%EA%B3%BC%20Go%20scheduler" target="_blank" rel="noopener"
+>https://blog.puppyloper.com/menus/Golang/articles/Goroutine과 Go scheduler&lt;/a>&lt;/p></description></item><item><title>Go vs Java - Go에서의 객체 지향</title><link>https://umi0410.github.io/blog/golang/go-vs-java-oop/</link><pubDate>Sat, 09 Jan 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-vs-java-oop/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-vs-java-oop/declaration.png" alt="Featured image of post Go vs Java - Go에서의 객체 지향" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>요즘 &lt;code>Go&lt;/code>와 &lt;code>Java&lt;/code> 모두를 이용해 개발을 하다보니 각각의 장단점에 대해 느껴볼 수 있었다. &lt;code>Go&lt;/code>는 리소스를 적게 먹으며 코드가 간결하고 라이브러리나 프레임워크 또한 심플해서 적용하기 편하다. &lt;code>Java&lt;/code>는 이런 저런 기능이 많은 반면 그런 기능을 이용하기 위해 이해해야하는 내용들이 많고, 코드가 투명하지는 않다(다양한 Annotation을 이용하게 되면서 코드가 투명하게 그 동작을 나타내지 않음). Java의 장점 중에서는 특히나 &lt;strong>객체지향의 대표적인 언어답게 상속과 다형성을 능력에 따라 자유자재로 이용&lt;/strong>할 수 있다는 점이 매력적이었다.&lt;/p>
 &lt;p>Go 언어를 좋아하는 입장에서 개인적으로 이런 객체지향적인 특징이나 예외 처리를 제외하고는 딱히 Java가 Go에 비해 갖는 장점이 크게 느껴지지 않았다. 예외 처리는 Go가 바라보는 방향이 일반적인 예외 처리와 다르기에 어쩔 수 없지만, 객체지향적의 특징들은 어떻게 적용해볼 수 있을까하는 생각에 공부를 좀 해봤고 그 내용을 정리해본다. (&lt;em>기회가 된다면 Go에서 error를 다루는 철학에 대해 추가적으로 공부해보고싶다.&lt;/em>)&lt;/p>
 &lt;p>❗&lt;strong>Go에 대한 기본적인 내용을 정리해보는 것이 아니라 객체 지향 관점에서 바라본 Go에 대한 내용을 정리해보는 것이므로 Go의 기초 내용에 대한 설명은 생략할 것이므로 Go에 대한 기초 이해가 없다면, 그 부분을 먼저 알아보는 것을 추천한다!&lt;/strong>&lt;/p>
@@ -334,189 +775,7 @@ calculator *calc.Calculator &lt;span class="o">=&lt;/span> calc.NewCalculator&lt
 >https://www.toptal.com/go/golang-oop-tutorial&lt;/a>&lt;/li>
 &lt;li>go object-oriented - &lt;a class="link" href="https://golangkorea.github.io/post/go-start/object-oriented/" target="_blank" rel="noopener"
 >https://golangkorea.github.io/post/go-start/object-oriented/&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore</title><link>https://umi0410.github.io/blog/golang/go-mutex-semaphore/</link><pubDate>Wed, 20 Jan 2021 15:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-mutex-semaphore/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2.png" alt="Featured image of post Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore" />&lt;p>Go 언어로 적용해보는 Computer Science의 첫 번째 내용으로 OS 관련 내용 중 이론적으로는 흔하게 접할 수 있지만 실제 적용에 대한 내용은
-찾아보기 힘들었던 &lt;code>Mutex&lt;/code>, &lt;code>Semaphore&lt;/code>에 대해 알아보려한다.&lt;/p>
-&lt;p>Mutex와 Semaphore은 각각의 추상적인 개념을 바탕으로 OS나 Go 등에서 사용될 수 있기에 세부적인 내용은 문맥에 따라 달라질 수 있다고 생각한다. 예를 들어 Go에서의 Mutex는 주로 &lt;code>sync.Mutex&lt;/code>를 이용한 서로 다른 Goroutine의 동시 접근에 대한 제어를 의미하는 반면, 다른 프로그래밍 언어나 OS에서는 주로 서로 다른 Kernel thread나 Process에 대한 동시 접근 제어를 의미할 수 있다.&lt;/p>
-&lt;h2 id="mutex">Mutex&lt;/h2>
-&lt;p>&lt;code>Mutex&lt;/code>는 &lt;strong>Mutual Exclusion&lt;/strong>의 줄임말로 &lt;strong>상호 배제&lt;/strong>를 의미한다. 즉 &lt;strong>서로 다른 워커가 공유 자원에 접근하는 것을 제한&lt;/strong>한다는 말이다. &lt;code>Go&lt;/code>에서는 이 &amp;ldquo;&lt;strong>워커&lt;/strong>&amp;ldquo;가 &lt;code>Goroutine&lt;/code>이 되고, 컨텍스트에 따라 프로세스가 될 수도, 스레드가 될 수도 그 외의 다른 존재가 될 수도 있다. &lt;code>공유 자원&lt;/code>이란 여러 워커가 동시에 접근하는 자원을 말하고 이 &lt;strong>공유 자원에 대한 동시 접근을 제한해 thread-safe하게 작업하고자 하는 영역&lt;/strong>을 &lt;code>Critical section&lt;/code>이라고 한다. Cricical section은 Mutex가 Lock을 수행한 뒤 Unlock되기 전까지의 영역이며, Lock과 Unlock은 Atomic한 작업이기때문에 어떠한 경우에도 동시적으로 수행될 수 없다.&lt;/p>
-&lt;p>&lt;figure style="flex-grow: 149; flex-basis: 358px">
-&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1.png" data-size="817x547">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1.png"
-srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1_hu76213fc7fff91be05fb9c7f7e7037656_79471_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1_hu76213fc7fff91be05fb9c7f7e7037656_79471_1024x0_resize_box_2.png 1024w"
-width="817"
-height="547"
-loading="lazy"
-alt="mutex-1.png">
-&lt;/a>
-&lt;figcaption>mutex-1.png&lt;/figcaption>
-&lt;/figure>&lt;/p>
-&lt;p>이해하기 쉽게 예시를 통해 접근해보겠다. 원래 화장실 예제를 보고 굉장히 와닿았는데, 화장실보다는 피팅룸이 좀 더 청결한 것 같아서 피팅룸으로 예를 들어보겠다. 우리 귀여운 고퍼가 &lt;strong>피팅룸을 한 개만 운영하는 옷가게에 방문&lt;/strong>했다고 가정해보자.&lt;/p>
-&lt;p>&lt;figure style="flex-grow: 251; flex-basis: 602px">
-&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2.png" data-size="831x331">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2.png"
-srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2_hu253887d6f424b5a6c4c14b3309becda5_68035_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2_hu253887d6f424b5a6c4c14b3309becda5_68035_1024x0_resize_box_2.png 1024w"
-width="831"
-height="331"
-loading="lazy"
-alt="mutex-2.png">
-&lt;/a>
-&lt;figcaption>mutex-2.png&lt;/figcaption>
-&lt;/figure>&lt;/p>
-&lt;ul>
-&lt;li>피팅룸 - Critical section&lt;/li>
-&lt;li>고퍼가 피팅룸에 들어가서 옷을 입는 작업은 하나의 Goroutine&lt;/li>
-&lt;/ul>
-&lt;p>동시에 여러 고퍼가 하나의 피팅룸에서 옷을 갈아입으려한다면 😟 난처한 상황이 발생할 것이다. 그렇기때문에 피팅룸에는 Lock, Unlock 기능이 존재해야하는데, 이 기능을 구현한다해도 &lt;strong>Atomic&lt;/strong>하게 동작할 수 있도록 제대로 구현하지 않는다면 &lt;strong>한 워커가 Lock을 하는 사이에 다른 워커가 동시에 Lock&lt;/strong>을 걸려할 수 있고, 그 경우 두 워커가 동시에 한 피팅룸(Critical Section)에서 작업을 하려할 것이다. 그렇기때문에 &lt;strong>Lock, Unlock은 Atomic해야하며 이렇게 각 워커를 상호 배제시켜 동시에 작업할 수 없도록 하는 것&lt;/strong>이 바로 &lt;code>Mutex&lt;/code>이다.&lt;/p>
-&lt;h3 id="mutex를-이용한-go-program---counter">Mutex를 이용한 Go program - Counter&lt;/h3>
-&lt;p>&lt;strong>Count = 0에서 시작해 동시적으로 +1을 10만 번, -1을 10만 번 수행하는 카운터 프로그램&lt;/strong>&lt;/p>
-&lt;p>그럼 실생활에 비유한 Mutex는 이 정도로 마치고, Mutex가 어떻게 사용되는지 Go로 짠 간단한 Counter 프로그램을 통해 알아보자.&lt;/p>
-&lt;ul>
-&lt;li>Mutex를 잘 적용한 경우 - 몇 번을 수행하든 결과는 0.&lt;/li>
-&lt;li>Mutex가 적용되지 않은 safe하지 않은 경우 - 결과가 0이 나오지 않을 수 있다.&lt;/li>
-&lt;/ul>
-&lt;p>특히 &lt;code>Go&lt;/code>에서는 &lt;code>sync&lt;/code> 패키지의 &lt;code>Mutex&lt;/code>라는 type을 통해 간단하게 Mutex 기능을 이용할 수 있다. &lt;strong>동일한 Mutex struct를 참조한다면 같은 Key를 이용한다는 개념&lt;/strong>이고, &lt;code>mutex.Lock()&lt;/code>을 호출한 뒤 &lt;code>mutex.Unlock()&lt;/code>이 호출되기 이전까지가 Critical section이 되며 다른 goroutine들은 같은 Mutex(즉 키)에 의한 Critical section에 진입할 수 없다.&lt;/p>
-&lt;p>&lt;em>내가 처음 Mutex를 처음 접했을 때 한 가지 헷갈렸던 것&lt;/em>은 당시 Critical section이라는 개념이 없었기 때문에 Lock을 호출하기만 하면 런타임에 &lt;del>알아서 스마트하게 Lock과 Unlock사이의 변수들에 대한 접근 중 동시적인 접근만을 잠시 블락해주는 줄&lt;/del> 알았는데, 사실 그 사이 변수들중 동시적으로 접근하려는 변수에 대해서만 잠시 블락해주는 게 아니라 &lt;strong>Lock과 Unlock 사이를 Critical section으로 만드는 것&lt;/strong>이었다.&lt;/p>
-&lt;p>자 그럼 Count라는 하나의 int형 변수에 동시적으로 접근을 하는 상황을 극대화하기 위해 여러 고루틴으로 작업해보겠다. +1을 1만 번하는 고루틴을 10개, -1을 1만 번하는 고루틴을 마찬가지로 10개 이용하겠다.&lt;/p>
-&lt;p>전체 코드 참고: &lt;a class="link" href="https://play.golang.org/p/xaLE1YkAdvd" target="_blank" rel="noopener"
->https://play.golang.org/p/xaLE1YkAdvd&lt;/a>&lt;/p>
-&lt;p>&lt;figure style="flex-grow: 116; flex-basis: 279px">
-&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1.png" data-size="516x443">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1.png"
-srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1_hu6e22a3f3f203a0242d8843396eefee7b_63957_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1_hu6e22a3f3f203a0242d8843396eefee7b_63957_1024x0_resize_box_2.png 1024w"
-width="516"
-height="443"
-loading="lazy"
-alt="output-1.png">
-&lt;/a>
-&lt;figcaption>output-1.png&lt;/figcaption>
-&lt;/figure>&lt;/p>
-&lt;ul>
-&lt;li>우리가 일반적으로 익숙한 Sync 즉 동기적인 순차적 진행 시에는 당연히 10만번 +1, 10만번 -1 후에 결과가 0이었다.&lt;/li>
-&lt;li>동시적 접근을 수행하자 10만번 +1, 10만번 -1을 했지만 &lt;code>Count += 1&lt;/code> 을 수행하던 중 또 다른 &lt;code>Count += 1&lt;/code>이 수행되는 등의 원치않던 상황이 야기될 수 있기에 결과값이 0인 경우를 찾기 힘들다.&lt;/li>
-&lt;li>여러 Goroutine이 concurrent하게 진행하되 &lt;code>Count += 1&lt;/code>, &lt;code>Count -= 1&lt;/code> 과 같은 &lt;strong>동시적 접근이 수행되어서는 안되는 영역은 Critical Area&lt;/strong>로 설정해 상호 배제적으로 작업되게 하기 위해 Critical section의 전/후에 &lt;code>sync.Mutex&lt;/code>를 이용해 Lock, Unlock 기능을 넣어주자 &lt;strong>기대했던 대로 0의 결과&lt;/strong>를 얻을 수 있었다.&lt;/li>
-&lt;/ul>
-&lt;h3 id="-mutex-그래서-언제-써요">💡 Mutex.. 그래서 언제 써요?&lt;/h3>
-&lt;p>사실 Mutex라는 개념이 그렇게 어려운 것도 아니고, 사용법 자체가 어려운 것도 아니다. 나는 하지만 항상 &lt;strong>&amp;ldquo;언제&amp;rdquo;&lt;/strong>, &lt;strong>&amp;ldquo;왜&amp;rdquo;&lt;/strong> 써야하는지를 궁금해하는 편이다.&lt;/p>
-&lt;ol>
-&lt;li>Critical section에서 많은 시간이 소요되는 경우? ⇒ ❌
-위의 counter와 같은 작업은 대부분의 작업이 critical section 속에 있다고 볼 수 있다. 이 경우 동시적인 작업과 함께 Lock, Unlock을 하며 critical section을 관리하는 것보다 애초에 작업 자체를 동기적으로 수행하는 게 나을 수 있다. 왜냐하면 동시적 작업 속에서 Mutex를 통해 동기적으로 작업할 수 있도록 하는 것에서 오는 오버헤드는 분명히 존재하고, Critical section 밖에서 효율적으로 동시적으로 작업을 진행했다하더라도 critical section에서 병목이 발생해버려 전체적인 Throughput이 안 좋아질 것이다.&lt;/li>
-&lt;li>&lt;strong>Critical section에서는 적은 시간이 소요되고, 대부분은 동시적으로 작업이 가능한 경우&lt;/strong>? ⇒ ⭕
-예를 들어 어떤 API를 여러 번 호출한 뒤 그 응답 중 일부를 계속해서 더해 결과를 내는 Reduce 작업을 수행한다고 치자. 순차적으로 수행할 시 오랜 시간이 소요될 API 호출은 동시적으로 진행하고, 결과에 대한 Reduce 작업만 잠시 Critical section내에서 작업한다면 아주 좋은 성능과 함께 안전하게 작업할 수 있을 것이다!&lt;/li>
-&lt;/ol>
-&lt;h2 id="semaphore">Semaphore&lt;/h2>
-&lt;p>&lt;figure style="flex-grow: 142; flex-basis: 342px">
-&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore.png" data-size="884x619">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore.png"
-srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore_hu1456e527b7729559b12f99ce1b9bda34_227201_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore_hu1456e527b7729559b12f99ce1b9bda34_227201_1024x0_resize_box_2.png 1024w"
-width="884"
-height="619"
-loading="lazy"
-alt="semaphore.png">
-&lt;/a>
-&lt;figcaption>semaphore.png&lt;/figcaption>
-&lt;/figure>&lt;/p>
-&lt;p>Mutex에서 대부분의 Lock이나 Critical section에 대한 내용을 설명했기 때문에 Semaphore에서 더 설명할 내용이 많지는 않다. Semaphore의 동작에 대한 간단한 예시는 위의 그림과 같은데, 5마리의 고퍼가 존재한다해도 동시에 접근할 수 있게하는 고퍼를 3개로 제한한다면 2마리의 고퍼는 피팅룸에 들어가지 못하고 블락된다. Locked와 Unlocked 상태 뿐인 &lt;code>Mutex&lt;/code>와 달리 &lt;code>Semaphore&lt;/code>는 &lt;strong>임의의 개수를 세는 Counter처럼 동작해 임의의 개수의 워커만이 Critical section에 동시적으로 접근&lt;/strong>할 수 있도록 한다.&lt;/p>
-&lt;p>Counter를 예로 들자면 10개의 워커가 존재한다해도 &amp;ldquo;5&amp;quot;를 세는 Semaphore는 한 워커가 Critical section에 진입할 때마다 Counter 값을 1씩 낮추고, Critical section을 탈출할 때마다 Counter 값을 다시 1씩 높인다. 만약 어떤 워커가 Critical section에 진입하려는데 Count 값이 0이라면 초기에 계획했던 대로 5개의 워커가 이미 동시적으로 작업중이라는 의미이므로 이 워커는 한 워커가 Critical section을 나오면서 Counter 값을 다시 1 증가시킬 때까지 Block된다.&lt;/p>
-&lt;p>Mutex의 Lock과 Unlock이 Atomic하기에 어떠한 경우에도 동시적으로 수행될 수 없었듯이 Semaphore의 Counting 작업 또한 Atomic해야하고 그래야만 Thread-safe한 counter로 동작할 수 있다. Semaphore가 수행하는 Counting 작업은 주로 try를 뜻하는 네덜란드어 Proberen의 앞 글자를 딴 &lt;code>P&lt;/code>와 increment를 뜻하는 Verhogen의 앞 글자를 딴 &lt;code>V&lt;/code>로 두 가지가 표현하는 듯하다. &lt;code>P&lt;/code>는 Count 값이 0이 아니면 작업을 수행하겠다는 의미하며 만약 Count 값이 0이라면 0이 아닌 값이 될 때까지 wait했다가 0 아닌 값이 되면 count 값을 1 감소시키며 작업을 시작한다. &lt;code>V&lt;/code>는 작업을 마치며 count 값을 다시 1 증가시키겠다는 의미이다.&lt;/p>
-&lt;h3 id="mutex와-binary-semaphore의-유사한-점">Mutex와 Binary semaphore의 유사한 점&lt;/h3>
-&lt;p>동시 접근 워커를 1개로 제한하는 Semaphore의 경우 Count 값이 0과 1 두 개로만 존재할 수 있는데 이를 Binary semaphore라고한다. 특히 이는 Locked와 Unlocked라는 두 가지의 상태만을 갖는 Mutex와 유사하다. 하지만 Binary semaphore는 mutex가 유사한 기능을 할 뿐 동일하지는 않다는 의견이 많다. 그 이유는 &lt;strong>Mutex는 Lock 방식을 이용하고 Semaphore는 Signal(신호) 방식을 이용&lt;/strong>하기 때문이다. Lock 방식의 경우 Lock을 수행한 워커만이 Unlock을 할 수 있는 반면 Signal 방식은 try(작업 시도)를 수행한 워커가 아니더라도 increment(작업 완료) 신호를 보낼 수 있기에 서로 명백히 동작 방식이 다르다는 것이다. (하지만 이 부분에 대해서는 직접 실습해보지는 못했다.)&lt;/p>
-&lt;p>*Semaphore를 이해하는 데에 있어 내가 착각해서 헤맸던 부분은 바로 &lt;del>Semaphore의 요점이 thread-safe한 count라고 착각&lt;/del>*했던 것이다. 하지만 semaphore의 요점은 여러 워커에 대해서 thread safe한 count 기능을 제공하는 것이 아니라 임의의 숫자만큼의 동시적 접근을 허용하고, 그 이상은 Block 상태로 대기시킨다는 것이다.&lt;/p>
-&lt;h3 id="semaphore를-이용한-go-program-1---counter">Semaphore를 이용한 Go Program 1 - Counter&lt;/h3>
-&lt;p>go에서 Semaphore를 이용하는 방법은 크게 2가지가 있는 것 같다. 아래 두 가지 방법 중 좀 더 Go스러운 &lt;code>channel&lt;/code>을 이용해보겠다.&lt;/p>
-&lt;ol>
-&lt;li>Go 특유의 자료형인 &lt;code>channel&lt;/code>을 이용하기 - channel은 여러 goroutine의 concurrent한 작업간 데이터 전송은 물론이고 동시적인 작업 중 데이터를 편리하게 동기화해주는 녀석이다. 따라서 동기적인 count와 유사한 기능을 내재하고있다.&lt;/li>
-&lt;li>&lt;a class="link" href="http://golang.org/x/sync/semaphore" target="_blank" rel="noopener"
->golang.org/x/sync/semaphore&lt;/a>의 Weighted를 이용하기 - Semaphore의 P를 Acquire, V를 Release로 구현해 이용할 수 있게 했다.&lt;/li>
-&lt;/ol>
-&lt;p>전체 코드는 Mutex와 동일하며 마찬가지로 다음 링크로 참고해볼 수 있다: &lt;a class="link" href="https://play.golang.org/p/xaLE1YkAdvd" target="_blank" rel="noopener"
->https://play.golang.org/p/xaLE1YkAdvd&lt;/a>&lt;/p>
-&lt;h3 id="buffered-channel을-이용한-semaphore-in-go">Buffered channel을 이용한 Semaphore in Go&lt;/h3>
-&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">func&lt;/span> &lt;span class="nf">DoSemaphore&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">maxConcurrent&lt;/span> &lt;span class="kt">int64&lt;/span>&lt;span class="p">){&lt;/span>
-&lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
-&lt;span class="nx">Count&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mi">0&lt;/span>
-&lt;span class="nx">wg&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">sync&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">WaitGroup&lt;/span>&lt;span class="p">{}&lt;/span>
-&lt;span class="nx">sem&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">chan&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{},&lt;/span> &lt;span class="nx">maxConcurrent&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
-&lt;span class="k">go&lt;/span> &lt;span class="nf">Add1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;span class="k">go&lt;/span> &lt;span class="nf">Sub1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;span class="p">}&lt;/span>
-&lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Wait&lt;/span>&lt;span class="p">()&lt;/span>
-&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Concurrent goroutines + Semaphore&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">maxConcurrent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Result(Desired 0):&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Count&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;span class="p">}&lt;/span>
-&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;=====================================&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;span class="p">}&lt;/span>
-&lt;span class="kd">func&lt;/span> &lt;span class="nf">Sub1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">sync&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">WaitGroup&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span> &lt;span class="kd">chan&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{}){&lt;/span>
-&lt;span class="k">defer&lt;/span> &lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Done&lt;/span>&lt;span class="p">()&lt;/span>
-&lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">10000&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
-&lt;span class="nx">sem&lt;/span> &lt;span class="o">&amp;lt;-&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{}{}&lt;/span>
-&lt;span class="nx">Count&lt;/span> &lt;span class="o">-=&lt;/span> &lt;span class="mi">1&lt;/span>
-&lt;span class="o">&amp;lt;-&lt;/span>&lt;span class="nx">sem&lt;/span>
-&lt;span class="p">}&lt;/span>
-&lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>channel을 이용한 Semaphore 코드를 설명하기 위해 전체 코드 중 일부를 가져와보았다. Semaphore를 이용하기 위해 &lt;code>Unbuffered channel&lt;/code>이 아닌 &lt;code>Buffered channel&lt;/code>을 이용하는 이유는 다음과 같은 Unbuffered channel의 동작 방식이 Semaphore의 동작 방식과 동일하기 때문이다.&lt;/p>
-&lt;ul>
-&lt;li>Buffer의 크기만큼은 동시적으로 channel에 값을 넣으려는 시도가 허용됨.&lt;/li>
-&lt;li>buffered channel이 꽉 찬 경우 채널에서 값을 꺼내지 않는 이상은 추가적으로 Channel에 값을 넣으려시도하는 goroutine은 Block됨.&lt;/li>
-&lt;/ul>
-&lt;p>&lt;figure style="flex-grow: 170; flex-basis: 409px">
-&lt;a href="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2.png" data-size="534x313">&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2.png"
-srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2_hu5c9eb1f96e3e02a52a6b354b1459125f_26935_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2_hu5c9eb1f96e3e02a52a6b354b1459125f_26935_1024x0_resize_box_2.png 1024w"
-width="534"
-height="313"
-loading="lazy"
-alt="output-2.png">
-&lt;/a>
-&lt;figcaption>output-2.png&lt;/figcaption>
-&lt;/figure>&lt;/p>
-&lt;p>(앞서 코드를 링크한 go playground에서 코드를 바로 실행해볼 수 있다.)&lt;/p>
-&lt;p>동시 접근 워커를 1개로 제한하는 Semaphore는 &lt;strong>Binary Semaphore로서 Mutex를 이용했을 때와 유사하다고 말했듯이 thread-safe하게 count 작업이 이루어져 예상되는 값이었던 0이 출력됨&lt;/strong>을 확인할 수 있다. 하지만 동시접근이 가능한 워커가 1개 이상이 되면 thread-safe하지 않게 되고, 동시접근 워커 개수가 많아질수록 결과가 더 부정확한 경향이 있는 것으로 나타났다.&lt;/p>
-&lt;h3 id="-semaphore-그래서-언제-쓰나요">💡 Semaphore.. 그래서 언제 쓰나요?&lt;/h3>
-&lt;blockquote>
-&lt;p>Mutex는 thread-safe한 작업을 할 때 사용하면 되는 것 같은데 Semaphore는 개념은 알겠는데 언제 써야할 지를 잘 모르겠네요. 일정 개수만큼만 동시 접근을 허용하려는 경우가 있을까요?&lt;/p>
-&lt;/blockquote>
-&lt;p>Semaphore을 사용하기 좋은 케이스는 &lt;strong>동시에 접근할 수 있는 워커 수를 제한하는 경우&lt;/strong>이고, 이는 주로 &lt;strong>전체 작업이 늘어지는 것을 방지하고자 하는 경우&lt;/strong>에 이용된다. 많은 작업을 동시에 수행하려하면 먼저 수행될 수 있는 작업은 먼저 수행되도록 하기보다는 전체적으로 모든 작업이 늘어지게 되고 CPU나 Memory 리소스를 많이 소모하게 되고 이는 서버의 안정성에도 좋지 않다. Semaphore를 이용해 동시 접근 워커 수를 제한하고자하는 케이스는 Go의 Worker pool 패턴을 이용하는 경우나 Pipeline pattern을 이용하는 경우와 유사하다.(&lt;em>처음엔 Go의 모든 Concurrent pattern들을 개별적으로 구별지으려했었는데, 공부하다보니 일정한 개수의 Worker를 이용하는 Worker Pool pattern, Channel을 기반으로 작업 내역을 쪼개어 실시간 처리하는 Pipeline, 한 채널, 여러 Goroutine을 이용하는 Fan-in Fan-out pattern 등등 다들 유사하고 연관이 되어있더라.&lt;/em>)&lt;/p>
-&lt;p>&lt;strong>Semaphore로 동시 접근 Worker 수를 제한하지 않고 모든 Goroutine을 동시적으로 수행하는 경우엔 어떻게 될까?&lt;/strong>&lt;/p>
-&lt;p>Logical Processor 개수를 훨씬 넘는 모든 Goroutine 동시적으로 작업을 진행할 경우 아무리 Goroutine이 concurrent한 작업 수행에 뛰어난 성능을 보인다할지라도 과하게 많은 수의 Goroutine은 성능 저하를 야기하지 않을까 예상했다. 하지만 user-level thread 혹은 green level thread의 일종인 Goroutine은 OS(혹은 Kernel) thread와 달리 Context switch로 인한 penalty가 거의 없어서인지 거의 Throughput 면에서의 성능 차이가 없었다.&lt;/p>
-&lt;blockquote>
-&lt;p>Kernel level thread는 OS가 스케쥴링을 담당하기 때문에 Go 프로그램이 뭐 어떻게 할 수 있는 게 아니지만 Goroutine은 프로그램이 실행되는 동안 Go 런타임이 스케쥴링을 담당한다. 같은 Kernel level thread에 속한 User level thread인 goroutine간의 switch는 cost가 거의 없다. 즉 goroutine이 많든 적든 Kernel level thread간의 context switch cost는 동일하다고 볼 수 있고, 해당 Kernel level thread에 속한 goroutine간의 context switch cost는 거의 없다.&lt;/p>
-&lt;/blockquote>
-&lt;blockquote>
-&lt;p>참고: Kernel level thread에 대한 스케쥴링은 주로 Preemptive 방식을, User level thread에 대한 스케쥴링은 주로 Cooperative한 방식을 이용하지만 Goroutine은 User level thread임에도 Go 1.14 버전부터는 10ns를 기준으로 goroutine을 switch 할 수 있는 asynchronously preemptive한 스케쥴 방식을 지원한다고 한다. 하지만 Go 1.14가 릴리즈된 지 얼마되지 않아서인지, asynchorously preemptive scheduling에 대해서는 명확히 설명된 문서를 찾기 힘들었다.
-User level thread의 예로는 RxJava in Java, Coroutine in Kotlin, Goroutine in Golang이 있다.&lt;/p>
-&lt;/blockquote>
-&lt;p>하지만 Throughput 적인 측면보다는 Machine의 Resource 소모 측면에서는 모든 Goroutine이 동시적으로 수행되는 구조보다는 &lt;strong>Semaphore을 바탕으로한 동시에 일정 개수의 워커만이 작업하는 Worker Pool 구조가 훨씬 Memory나 CPU 리소스를 적게 소모&lt;/strong>하는 듯 했다. 또한 100개의 동시 요청을 수행하는데 동일한 Throughput으로 약 10초가 걸린다고 치면, 요청당 goroutine을 생성하는 경우는 첫 번째 요청도 거의 10초가 걸린 반면 Semaphore을 이용한 경우는 먼저 온 요청은 대체로 빠르게 먼저 처리되는 경향을 보였다. 이 차이는 &lt;strong>처음 요청을 보낸 사용자 마저 10초를 기다리게 할 것이냐, 0.1초만에 응답을 받도록 할 것이냐의 차이&lt;/strong>이다. 또한 &lt;strong>전체 작업이 늘어지면 그 작업에 대한 메모리 점유가 지속&lt;/strong>되기에 메모리 측면에서도 비효율적이다.&lt;/p>
-&lt;h3 id="semaphore을-이용한-go-program-2---이미지-크기-변환기">Semaphore을 이용한 Go Program 2 - 이미지 크기 변환기&lt;/h3>
-&lt;p>마침 이번에 프로젝트에서 thumbnail 생성, image 크기 변환, hashed uri 생성 작업 등을 담당하는 &lt;code>image processing 서버&lt;/code>를 개발하려했는데, image를 불러오는 I/O 작업 이후의 image processing은 CPU Bound 한 작업이기 때문에 동시적으로 동작하는 Goroutine이 일정 숫자(대게 Logical Processor 개수) 이상으로는 많아져봤자 크게 효율이 없을 것이라 예상했고, 그와 관련해 간단하게 이미지 크기 변환 프로그램을 하나 만들어 테스트 해보았다.&lt;/p>
-&lt;p>약 2MB의 이미지에 대한 크기 변환 작업 요청이 동시에 30개 들어왔다는 가정을 했고, semaphore을 이용한 경우 동시적으로 최대 4개의 worker(goroutine)이 작업을 수행할 수 있게, concurrent를 이용한 경우는 30개의 요청 모두 동시적으로 작업을 하는 경우이다.&lt;/p>
-&lt;p>(코드 참고(인터넷 액세스를 하는 경우 Playground에서 동작하지는 않는듯하다): &lt;a class="link" href="https://play.golang.org/p/Vfyw6uCOIuL" target="_blank" rel="noopener"
->https://play.golang.org/p/Vfyw6uCOIuL&lt;/a>)&lt;/p>
-&lt;blockquote>
-&lt;p>사실 Logical Processor 8개, RAM 16GB의 개인 노트북으로는 그 차이가 많이 나지는 않아서 AWS EC2 t2.micro instance에서 성능을 테스트해봤다.&lt;/p>
-&lt;/blockquote>
-&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="nx">ubuntu&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="nx">ip&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">172&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">31&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="err">~$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">sem&lt;/span> &lt;span class="nx">semaphore&lt;/span>
-&lt;span class="nx">변환하고자하는&lt;/span> &lt;span class="nx">Image들을&lt;/span> &lt;span class="nx">메모리에&lt;/span> &lt;span class="nx">Load했습니다&lt;/span>&lt;span class="p">.&lt;/span>
-&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">13&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.974380959&lt;/span>&lt;span class="nx">s&lt;/span>
-&lt;span class="o">...&lt;/span> &lt;span class="nx">생략&lt;/span>
-&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.159552779&lt;/span>&lt;span class="nx">s&lt;/span>
-&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.016627316&lt;/span>&lt;span class="nx">s&lt;/span>
-&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Total&lt;/span> &lt;span class="nx">elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">14.959516003&lt;/span>&lt;span class="nx">s&lt;/span>
-&lt;span class="nx">ubuntu&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="nx">ip&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">172&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">31&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="err">~$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">sem&lt;/span> &lt;span class="nx">concurrent&lt;/span>
-&lt;span class="nx">변환하고자하는&lt;/span> &lt;span class="nx">Image들을&lt;/span> &lt;span class="nx">메모리에&lt;/span> &lt;span class="nx">Load했습니다&lt;/span>&lt;span class="p">.&lt;/span>
-&lt;span class="nx">Killed&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>놀랍게도 동시적으로 30개의 요청을 보내는 경우에 30개의 모든 goroutine이 동시에 작업을 시도할 때에는 과도한 리소스 사용으로 인해 아예 OS가 프로세스를 Kill해버렸다. 즉 &lt;strong>Semaphore로 동시 접근 Worker 수를 제한하지 않는 경우 t2.micro 인스턴스로 돌리는 image 서버에 동시에 30개의 image resizing 요청이 들어오면 process가 죽어버린다&lt;/strong>는 말이다&amp;hellip;!&lt;/p>
-&lt;p>또한 앞서 말했듯이 동시에 요청하는 사용자가 많아지더라도 Semaphore을 이용한 경우는 나중에 들어온 요청일 수록 처리가 늘어지지만, Semaphore를 통해 동시 작업을 제한하지 않는 경우는 전체 작업이 늘어진다.&lt;/p>
-&lt;p>이렇게 Semaphore는 동시 접근 워커 수를 제한하여 전체적인 Throughput 측면보다는 리소스 소모적인 측면과 먼저 처리될 수 있는 작업은 먼저 처리되도록 할 수 있다는 면에서 장점이 있음을 확인할 수 있었다.&lt;/p>
-&lt;h2 id="마치며">마치며&lt;/h2>
-&lt;p>Mutex나 Semaphore의 개념이나 설명과 같은 이론적인 내용은 구글링을 통해 어렵지 않게 얻을 수 있는 흔한 지식인 반면, 정확히 언제 쓰면 좋을지, 언제 쓰일 수 있을지와 같은 실용적인 내용은 찾아보기 어려웠기때문에 Go를 통해 Mutex와 Semaphore을 이용해보는 간단한 프로그램을 만들어 실습해보았다.&lt;/p>
-&lt;p>예제 프로그램으로서 코드를 간결하고 읽기 쉽게 깔끔하게 제공해보고자했는데, 그러기 쉽지 않았던 것 같아 아쉽다. 다음엔 기회가 되면 go의 benchmark test를 이용해보면 어떨까싶다.&lt;/p>
-&lt;h2 id="참고">참고&lt;/h2>
-&lt;p>&lt;strong>Goroutine과 Goroutine scheduling에 대해&lt;/strong> - &lt;a class="link" href="https://thegopher.tistory.com/3" target="_blank" rel="noopener"
->https://thegopher.tistory.com/3&lt;/a>&lt;/p>
-&lt;p>화장실에 비유한 뮤텍스와 세마포어 - &lt;a class="link" href="https://worthpreading.tistory.com/90" target="_blank" rel="noopener"
->https://worthpreading.tistory.com/90&lt;/a>&lt;/p>
-&lt;p>semaphore in Go &lt;a class="link" href="https://medium.com/@deckarep/gos-extended-concurrency-semaphores-part-1-5eeabfa351ce" target="_blank" rel="noopener"
->https://medium.com/@deckarep/gos-extended-concurrency-semaphores-part-1-5eeabfa351ce&lt;/a>&lt;/p>
-&lt;p>cooperative vs preemptive - &lt;a class="link" href="https://medium.com/traveloka-engineering/cooperative-vs-preemptive-a-quest-to-maximize-concurrency-power-3b10c5a920fe" target="_blank" rel="noopener"
->https://medium.com/traveloka-engineering/cooperative-vs-preemptive-a-quest-to-maximize-concurrency-power-3b10c5a920fe&lt;/a>&lt;/p>
-&lt;p>preemptive scheduling in go - &lt;a class="link" href="https://blog.puppyloper.com/menus/Golang/articles/Goroutine%EA%B3%BC%20Go%20scheduler" target="_blank" rel="noopener"
->https://blog.puppyloper.com/menus/Golang/articles/Goroutine과 Go scheduler&lt;/a>&lt;/p></description></item><item><title>Go 언어로 적용해보는 Computer Science - Deadlock</title><link>https://umi0410.github.io/blog/golang/go-deadlock/</link><pubDate>Sun, 31 Jan 2021 18:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-deadlock/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/pprof-debugging-1.png" alt="Featured image of post Go 언어로 적용해보는 Computer Science - Deadlock" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;/ul></description></item><item><title>Go 언어로 적용해보는 Computer Science - Deadlock</title><link>https://umi0410.github.io/blog/golang/go-deadlock/</link><pubDate>Sun, 31 Jan 2021 18:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-deadlock/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/pprof-debugging-1.png" alt="Featured image of post Go 언어로 적용해보는 Computer Science - Deadlock" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>개발 공부를 시작하고 여태까지 몇 년간 데드락을 실제로 접할 일은 없었다. 사실 동시성을 주의해야하는 작업을 해본 적도 없었고, 트랜잭션에 대한 개념도 없었기 때문일 수도 있다. 전공 과목에서 데드락에 대한 내용을 듣고서도 &amp;lsquo;&lt;em>아 이런 게 있구나&lt;/em>&amp;rsquo; 정도로만 생각하고 넘겼었다. 하지만 Go 언어를 통해 개발을 하던 도중 &lt;code>Channel&lt;/code>이나 &lt;code>Mutex&lt;/code>로 인해 종종 데드락을 경험할 수 있었고, 이 경우 프로그램이 완전히 멈춰버리는 크리티컬한 문제가 발생하기도 했고, 디버깅하기 힘든 경우도 있었다. 그런 경험을 하면서 &amp;lsquo;&lt;em>데드락 이 녀석&amp;hellip; 만만치 않구나&lt;/em>&amp;lsquo;라는 생각을 하곤 했다.&lt;/p>
 &lt;p>이번 글에서는 &lt;strong>&lt;code>Golang&lt;/code> 즉 &lt;code>Go&lt;/code> 언어를 통해 어떤 경우에 &lt;code>Deadlock&lt;/code>이 발생할 수 있는지 실제 프로그램을 통해 알아보려한다.&lt;/strong> Mutex에 대한 &lt;code>Lock&lt;/code>과 같이 일반적으로 발생할 수 있는 데드락부터 &lt;code>channel&lt;/code>이나 &lt;code>goroutine&lt;/code>에 대한 &lt;code>Cooperative scheduling&lt;/code>과 같은 Go 언어에 특화된 내용까지를 정리해보았다.&lt;/p>
 &lt;h2 id="deadlock이란">Deadlock이란&lt;/h2>
