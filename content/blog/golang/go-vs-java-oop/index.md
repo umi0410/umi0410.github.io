@@ -3,7 +3,7 @@ title: "Go vs Java - Go에서의 객체 지향"
 date: 2021-01-09T12:46:54+09:00
 chapter: false
 pre: "<b></b>"
-weight: 10
+weight: 50
 noDisqus: false
 draft: false
 categories:
