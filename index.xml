@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sat, 03 Jul 2021 12:46:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/</link><pubDate>Sat, 03 Jul 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-with-ide.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sat, 03 Jul 2021 12:46:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/</link><pubDate>Sat, 03 Jul 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-with-ide.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>저는 &lt;code>Go 언어&lt;/code>를 공부하면서 거의 처음으로 본격적인 테스트 코드를 작성하게 되었습니다. 과거에는 그저 기능을 구현하는 것에만 관심이 있었지 애플리케이션을 어떻게 계층을 나눠 설계할지, 어떻게 해야 유지 보수하기 쉬우면서 안정적인 개발을 할 수 있을지에 대한 고민을 하지 않았습니다. 하지만 Go를 공부하면서 &lt;code>클린 아키텍쳐&lt;/code>나 &lt;code>MSA&lt;/code>, &lt;code>동시성 패턴&lt;/code> 등을 비롯해 &lt;code>테스트 코드&lt;/code>에 대해서도 공부해볼 수 있었습니다. 그 중에서도 테스트 코드에 대해 공부해보며 익혔던 점들을 바탕으로 이번 글에서는 &lt;strong>Golang으로 백엔드 개발을 하면서 테스트 코드를 어떻게 작성할 수 있을지&lt;/strong>에 대해 알아보려합니다.&lt;/p>
 &lt;p>본 글에서 사용된 예시 코드는 &lt;a class="link" href="https://github.com/umi0410/how-to-backend-in-go/tree/master/testcode" target="_blank" rel="noopener"
 >저의 Github how-to-backend-in-go 레포지토리&lt;/a>에 업로드 해둘테니 참고하실 분들은 참고해주세요~!&lt;/p>
@@ -93,8 +93,8 @@
 &lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>assert&lt;/code> 라는 방식을 통한 테스트 케이스 검증은 다양한 테스트 프레임워크에서 사용됩니다. 눈으로 하나 하나 테스트 케이스들의 결과를 확인하는 것이 아니라 assert라는 방식을 통해 자동으로 테스트의 성공/실패를 판단하는 것입니다. 저는 주로 &lt;code>github.com/stretchr/testify&lt;/code> 패키지의 &lt;code>assert&lt;/code> 메소드를 이용하고 있습니다.&lt;/p>
 &lt;p>&lt;figure style="flex-grow: 134; flex-basis: 322px">
-&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-output.png" data-size="1251x932">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-output.png"
-srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-output_hufe5dd54340b2f486cdb532c721c19e5f_159105_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-output_hufe5dd54340b2f486cdb532c721c19e5f_159105_1024x0_resize_box_2.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-output.png" data-size="1251x932">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-output.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-output_hufe5dd54340b2f486cdb532c721c19e5f_159105_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-output_hufe5dd54340b2f486cdb532c721c19e5f_159105_1024x0_resize_box_2.png 1024w"
 width="1251"
 height="932"
 loading="lazy"
@@ -121,8 +121,8 @@ alt="test-output.png">
 >&amp;ldquo;GoMock vs. Testify: Mocking frameworks for Go&amp;rdquo; - codecentric blog&lt;/a>에도 내용이 잘 정리되어있으니 참고해보세요.&lt;/p>
 &lt;h3 id="golang-mocking-프레임워크-gomock-vs-testifymock-비교">Golang mocking 프레임워크 gomock vs testify/mock 비교&lt;/h3>
 &lt;p>&lt;figure style="flex-grow: 137; flex-basis: 330px">
-&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/star-comparison.png" data-size="806x585">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/star-comparison.png"
-srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/star-comparison_hu3121147bea7725a070fb77a748a94b6d_46090_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/star-comparison_hu3121147bea7725a070fb77a748a94b6d_46090_1024x0_resize_box_2.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/star-comparison.png" data-size="806x585">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/star-comparison.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/star-comparison_hu3121147bea7725a070fb77a748a94b6d_46090_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/star-comparison_hu3121147bea7725a070fb77a748a94b6d_46090_1024x0_resize_box_2.png 1024w"
 width="806"
 height="585"
 loading="lazy"
@@ -268,8 +268,8 @@ alt="star-comparison.png">
 >Using Subtests and Sub-benchmarks&lt;/a>&amp;rdquo; - Go Blog, &amp;ldquo;&lt;a class="link" href="https://github.com/uber-go/guide/blob/master/style.md" target="_blank" rel="noopener"
 >Uber Go style guide&lt;/a>&amp;ldquo;의 test-tables 파트 - uber)&lt;/p>
 &lt;p>&lt;figure style="flex-grow: 356; flex-basis: 855px">
-&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-with-ide.png" data-size="1184x332">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-with-ide.png"
-srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-with-ide_hu7b61495424919d2e1c8d663236a41b57_159980_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/test-with-ide_hu7b61495424919d2e1c8d663236a41b57_159980_1024x0_resize_box_2.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-with-ide.png" data-size="1184x332">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-with-ide.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-with-ide_hu7b61495424919d2e1c8d663236a41b57_159980_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-with-ide_hu7b61495424919d2e1c8d663236a41b57_159980_1024x0_resize_box_2.png 1024w"
 width="1184"
 height="332"
 loading="lazy"
@@ -278,8 +278,8 @@ alt="test-with-ide.png">
 &lt;figcaption>test-with-ide.png&lt;/figcaption>
 &lt;/figure>&lt;/p>
 &lt;p>&lt;figure style="flex-grow: 161; flex-basis: 387px">
-&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/run-each-test.png" data-size="815x505">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/run-each-test.png"
-srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/run-each-test_hu619b36e63953e285c6c9c2ff6f3f94e9_98540_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-tdd/run-each-test_hu619b36e63953e285c6c9c2ff6f3f94e9_98540_1024x0_resize_box_2.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/run-each-test.png" data-size="815x505">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/run-each-test.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/run-each-test_hu619b36e63953e285c6c9c2ff6f3f94e9_98540_480x0_resize_box_2.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/run-each-test_hu619b36e63953e285c6c9c2ff6f3f94e9_98540_1024x0_resize_box_2.png 1024w"
 width="815"
 height="505"
 loading="lazy"
