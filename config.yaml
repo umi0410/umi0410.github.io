@@ -8,7 +8,8 @@ title: Jinsu Playground
 disqusShortname: umi0410
 
 # GA Tracking ID
-googleAnalytics:
+googleAnalytics: UA-177403492-1
+
 
 # Theme i18n support
 # Available values: en, fr, id, ja, ko, pt-br, zh-cn, es, de, nl
