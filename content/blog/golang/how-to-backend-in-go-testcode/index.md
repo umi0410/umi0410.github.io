@@ -1,6 +1,6 @@
 ---
 title: "Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)"
-date: 2021-07-03T12:46:54+09:00
+date: 2021-07-17T12:46:54+09:00
 weight: 44
 noDisqus: false
 draft: false
