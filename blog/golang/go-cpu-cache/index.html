@@ -1,13 +1,72 @@
-<!doctype html><html lang=ko-kr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="컴퓨터 구조를 수강하며 이론적으로 배웠던 CPU와 메모리 사이의 캐시가 어떻게 동작하는지 간단히 알아보고
+<!doctype html><html lang=ko-kr>
+<head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="컴퓨터 구조를 수강하며 이론적으로 배웠던 CPU와 메모리 사이의 캐시가 어떻게 동작하는지 간단히 알아보고
 그 효과를 간단한 프로그램을 통한 벤치마킹으로 알아봤습니다.
-"><title>Go 언어로 적용해보는 Computer Science - Cache</title><link rel=canonical href=https://umi0410.github.io/blog/golang/go-cpu-cache/><link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="Go 언어로 적용해보는 Computer Science - Cache"><meta property="og:description" content="컴퓨터 구조를 수강하며 이론적으로 배웠던 CPU와 메모리 사이의 캐시가 어떻게 동작하는지 간단히 알아보고
+"><title>Go 언어로 적용해보는 Computer Science - Cache</title>
+<link rel=canonical href=https://umi0410.github.io/blog/golang/go-cpu-cache/>
+<link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="Go 언어로 적용해보는 Computer Science - Cache">
+<meta property="og:description" content="컴퓨터 구조를 수강하며 이론적으로 배웠던 CPU와 메모리 사이의 캐시가 어떻게 동작하는지 간단히 알아보고
 그 효과를 간단한 프로그램을 통한 벤치마킹으로 알아봤습니다.
-"><meta property="og:url" content="https://umi0410.github.io/blog/golang/go-cpu-cache/"><meta property="og:site_name" content="Jinsu Playground"><meta property="og:type" content="article"><meta property="article:section" content="Blog"><meta property="article:published_time" content="2021-01-27T15:25:54+09:00"><meta property="article:modified_time" content="2021-01-27T15:25:54+09:00"><meta name=twitter:title content="Go 언어로 적용해보는 Computer Science - Cache"><meta name=twitter:description content="컴퓨터 구조를 수강하며 이론적으로 배웠던 CPU와 메모리 사이의 캐시가 어떻게 동작하는지 간단히 알아보고
+">
+<meta property="og:url" content="https://umi0410.github.io/blog/golang/go-cpu-cache/">
+<meta property="og:site_name" content="Jinsu Playground">
+<meta property="og:type" content="article"><meta property="article:section" content="Blog"><meta property="article:published_time" content="2021-01-27T15:25:54+09:00"><meta property="article:modified_time" content="2021-01-27T15:25:54+09:00">
+<meta name=twitter:title content="Go 언어로 적용해보는 Computer Science - Cache">
+<meta name=twitter:description content="컴퓨터 구조를 수강하며 이론적으로 배웠던 CPU와 메모리 사이의 캐시가 어떻게 동작하는지 간단히 알아보고
 그 효과를 간단한 프로그램을 통한 벤치마킹으로 알아봤습니다.
-"><link rel="shortcut icon" href=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png><script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-177403492-1','auto'),ga('send','pageview'))</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Noto+Sans+KR:wght@400&display=swap" rel=stylesheet><style>:root{--body-background:#fafeff;--base-font-family:'Noto Sans KR', sans-serif}.site-name{--site-name-font-family:'East Sea Dokdo', cursive;font-family:var(--site-name-font-family);font-size:3.2rem!important}.left-sidebar{--sidebar-avatar-size:200px}figure.site-avatar{margin-left:auto!important;margin-right:auto!important}</style></head><body class="article-page has-toc"><script>(function(){const a='StackColorScheme';localStorage.getItem(a)||localStorage.setItem(a,"auto")})()</script><script>(function(){const b='StackColorScheme',a=localStorage.getItem(b),c=window.matchMedia('(prefers-color-scheme: dark)').matches===!0;a=='dark'||a==='auto'&&c?document.documentElement.dataset.scheme='dark':document.documentElement.dataset.scheme='light'})()</script><div class="container main-container flex
-extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-home><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18"/></svg><span>Back</span></a></div><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/golang/>Golang (Go 언어)</a>
-<a href=/categories/cs-with-golang/>Golang으로 적용해보는 Computer Science</a></header><h2 class=article-title><a href=/blog/golang/go-cpu-cache/>Go 언어로 적용해보는 Computer Science - Cache</a></h2><h3 class=article-subtitle>컴퓨터 구조를 수강하며 이론적으로 배웠던 CPU와 메모리 사이의 캐시가 어떻게 동작하는지 간단히 알아보고
-그 효과를 간단한 프로그램을 통한 벤치마킹으로 알아봤습니다.</h3><footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--published>Jan 27, 2021</time></footer></div></header><section class=article-content><h2 id=시작하며>시작하며</h2><p>저번 학기에 <code>컴퓨터 구조</code>를 수강하면서 간과하고 있던 로우 레벨의 지식에도 흥미가 생겼었다. 그 중 CPU와 Memory, Disk의 역할에 대해 알아볼 수 있었고 <strong>캐시는 CPU와 Memory 사이에 위치해 메모리 대신 빠르게 CPU에게 데이터를 제공하는 녀석</strong>이라고 배웠다.</p><p>이전에는 주로 캐시라고 하면 주로 CDN과 같은 네트워크에서 쓰이는 캐시들밖에 몰랐다. 그렇다보니 L1 캐시, L2 캐시 같은 얘기를 들으면 OSI 7계층과 연관 지어 &lsquo;음..? L2 캐시는 스위치에서 쓰는 캐시인가..?&rsquo; 라는 상상을 하곤했다.</p><p>이번에는 Go를 통해 배열에 여러 차례 접근하는 프로그램을 만들어보고 벤치마킹을 통해 캐시라는 녀석이 어떤 효과를 가져다주는지 직접 확인해보려한다.</p><h2 id=캐시란>캐시란</h2><p>캐시는 아주 다양한 문맥에서 사용된다. 공통적으로 &ldquo;사용자가 요청할 것 같은 데이터를 작고 빠른 저장소에 저장해놓음으로써 좀 더 빨리 해당 데이터를 제공한다"는 목적을 갖는다. CDN, DB, REST API, Memory, CPU 등등 다양한 곳에서 쓰일 수 있을 것 같다. 그 중 이번에는 <strong>CPU와 메모리 사이의 캐시</strong>에 대해 알아보겠다.</p><p>CPU와 메모리 사이의 캐시는 <strong>메모리의 데이터를 얻기 위해 메모리에 직접 접근하지 않고 캐시라는 빠른 저장소를 이용해 해당 데이터를 얻게끔</strong>해준다. 예를 들어 변수 a=10 이라는 데이터가 메모리에 존재한다해도 a의 값을 얻기 위해 메모리에 직접 접근하기 보다는 가까우면서 빠르게 이용 가능한 캐시에서 데이터를 가져올 수도 있다는 것이다. 사실 캐시의 개념적인 측면에서 보면 메모리 또한 디스크 대신 빠르게 값을 전달해주기 위한 경우일 수 있으니 캐시 기능을 한다고 볼 수 있다. 그리고 CPU와 메모리 사이에 정말 캐시라는 이름을 갖는 녀석들은 프로세서 속에 있는 L1 캐시, 프로세서 옆에 있는 L2 캐시, 프로세서들이 공유하는 L3 캐시가 있긴 하지만 이는 시대가 지나면서 얼마든지 변할 수 있는 내용들이기 때문에 어떤 캐시가 어디에 있고 누구랑 누가 공유하는지와 같은 세부 내용은 크게 중요하진 않을 것 같다.</p><p>물리적인 크기나 거리는 속도와 반비례할 수 밖에 없다. 거리가 멀면 정보가 전달되는 속도가 느려지고 크기가 크면 여러 Mux나 Gate를 이용한다는 것이기 때문에 느려진다. 그렇기때문에 캐시는 작고 가까워야한다. 데이터를 요청하는 녀석은 CPU이기 때문에 캐시는 CPU 속 혹은 그 근처에 위치한다. 또한 작아야하기때문에 모든 정보를 담을 수 없고, 사용자가 요청할법한 데이터만을 담아야한다. 이 때 어떻게 사용자가 요청할 법한 데이터를 정할까? 이는 <code>공간 지역성</code>과 <code>시간 지역성</code>이라는 중요한 두 가지 성질을 기반으로 한다.</p><p>이외에도 태그나 충돌 같은 개념들이 있긴하지만 실제로 벤치마킹해보기도 쉽지 않고 다소 지엽적인 내용이라 간단히만 정리해보면 태그 없이 주소값을 모듈러(나머지)연산해서 cache line index를 결정하고 그것만을 이용해 데이터를 저장하면 한 line 내에 저장할 워드(Word)에 대한 충돌이 발생할 수 있다. cache line이 20개인 캐시는 0번지와 20번지가 같은 line이므로 충돌이 발생해 계속해서 같은 line에 서로의 데이터가 번갈아 저장될 수 있다는 것이다. 하지만 태그를 이용하면 cache line 수는 줄어들더라도 한 line내에 여러 태그의 정보를 저장할 수 있게되어 cache line이 10개인 cache의 한 line에 0번지와 20번지의 데이터가 다른 태그로 저장되어 불필요한 충돌을 방지할 수 있다는 장점이있다. 간단히 설명하기는 힘든 내용이라 좀 더 자세히 알고싶다면 <code>Direct mapped cache</code>나 <code>Fully associative cache</code> 등으로 검색해보기를 권장한다.</p><h2 id=spatial-locality>Spatial locality</h2><p><code>Spatial locality(공간 지역성)</code>이란 지금 <strong>요청 받은 데이터와</strong> <strong>가까운 곳에 위치한 데이터는 높은 확률로 다시 요청 받게 된다</strong>는 성질이다. 예를 들어 100번지의 a=10과 108번지의 b=20이 존재할 때 변수 a를 요청하면 이후 a와 가까운 주소에 저장된 b 또한 높은 확률로 요청된다는 것이다.</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+">
+<link rel="shortcut icon" href=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-177403492-1','auto'),ga('send','pageview'))</script>
+<link rel=preconnect href=https://fonts.googleapis.com>
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Noto+Sans+KR:wght@400&display=swap" rel=stylesheet>
+<style>:root{--body-background:#fafeff;--base-font-family:'Noto Sans KR', sans-serif}.site-name{--site-name-font-family:'East Sea Dokdo', cursive;font-family:var(--site-name-font-family);font-size:3.2rem!important}.left-sidebar{--sidebar-avatar-size:200px}figure.site-avatar{margin-left:auto!important;margin-right:auto!important}</style>
+</head>
+<body class="article-page has-toc">
+<script>(function(){const a='StackColorScheme';localStorage.getItem(a)||localStorage.setItem(a,"auto")})()</script><script>(function(){const b='StackColorScheme',a=localStorage.getItem(b),c=window.matchMedia('(prefers-color-scheme: dark)').matches===!0;a=='dark'||a==='auto'&&c?document.documentElement.dataset.scheme='dark':document.documentElement.dataset.scheme='light'})()</script>
+<div class="container main-container flex
+extended">
+<div id=article-toolbar>
+<a href=https://umi0410.github.io class=back-home><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18"/></svg>
+<span>Back</span>
+</a>
+</div>
+<main class="main full-width">
+<article class=main-article>
+<header class=article-header>
+<div class=article-details>
+<header class=article-category>
+<a href=/categories/golang/>
+Golang (Go 언어)
+</a>
+<a href=/categories/cs-with-golang/>
+Golang으로 적용해보는 Computer Science
+</a>
+</header>
+<h2 class=article-title>
+<a href=/blog/golang/go-cpu-cache/>Go 언어로 적용해보는 Computer Science - Cache</a>
+</h2>
+<h3 class=article-subtitle>
+컴퓨터 구조를 수강하며 이론적으로 배웠던 CPU와 메모리 사이의 캐시가 어떻게 동작하는지 간단히 알아보고
+그 효과를 간단한 프로그램을 통한 벤치마킹으로 알아봤습니다.
+</h3>
+<footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--published>Jan 27, 2021</time>
+</footer></div>
+</header>
+<section class=article-content>
+<h2 id=시작하며>시작하며</h2>
+<p>저번 학기에 <code>컴퓨터 구조</code>를 수강하면서 간과하고 있던 로우 레벨의 지식에도 흥미가 생겼었다. 그 중 CPU와 Memory, Disk의 역할에 대해 알아볼 수 있었고 <strong>캐시는 CPU와 Memory 사이에 위치해 메모리 대신 빠르게 CPU에게 데이터를 제공하는 녀석</strong>이라고 배웠다.</p>
+<p>이전에는 주로 캐시라고 하면 주로 CDN과 같은 네트워크에서 쓰이는 캐시들밖에 몰랐다. 그렇다보니 L1 캐시, L2 캐시 같은 얘기를 들으면 OSI 7계층과 연관 지어 &lsquo;음..? L2 캐시는 스위치에서 쓰는 캐시인가..?&rsquo; 라는 상상을 하곤했다.</p>
+<p>이번에는 Go를 통해 배열에 여러 차례 접근하는 프로그램을 만들어보고 벤치마킹을 통해 캐시라는 녀석이 어떤 효과를 가져다주는지 직접 확인해보려한다.</p>
+<h2 id=캐시란>캐시란</h2>
+<p>캐시는 아주 다양한 문맥에서 사용된다. 공통적으로 &ldquo;사용자가 요청할 것 같은 데이터를 작고 빠른 저장소에 저장해놓음으로써 좀 더 빨리 해당 데이터를 제공한다"는 목적을 갖는다. CDN, DB, REST API, Memory, CPU 등등 다양한 곳에서 쓰일 수 있을 것 같다. 그 중 이번에는 <strong>CPU와 메모리 사이의 캐시</strong>에 대해 알아보겠다.</p>
+<p>CPU와 메모리 사이의 캐시는 <strong>메모리의 데이터를 얻기 위해 메모리에 직접 접근하지 않고 캐시라는 빠른 저장소를 이용해 해당 데이터를 얻게끔</strong>해준다. 예를 들어 변수 a=10 이라는 데이터가 메모리에 존재한다해도 a의 값을 얻기 위해 메모리에 직접 접근하기 보다는 가까우면서 빠르게 이용 가능한 캐시에서 데이터를 가져올 수도 있다는 것이다. 사실 캐시의 개념적인 측면에서 보면 메모리 또한 디스크 대신 빠르게 값을 전달해주기 위한 경우일 수 있으니 캐시 기능을 한다고 볼 수 있다. 그리고 CPU와 메모리 사이에 정말 캐시라는 이름을 갖는 녀석들은 프로세서 속에 있는 L1 캐시, 프로세서 옆에 있는 L2 캐시, 프로세서들이 공유하는 L3 캐시가 있긴 하지만 이는 시대가 지나면서 얼마든지 변할 수 있는 내용들이기 때문에 어떤 캐시가 어디에 있고 누구랑 누가 공유하는지와 같은 세부 내용은 크게 중요하진 않을 것 같다.</p>
+<p>물리적인 크기나 거리는 속도와 반비례할 수 밖에 없다. 거리가 멀면 정보가 전달되는 속도가 느려지고 크기가 크면 여러 Mux나 Gate를 이용한다는 것이기 때문에 느려진다. 그렇기때문에 캐시는 작고 가까워야한다. 데이터를 요청하는 녀석은 CPU이기 때문에 캐시는 CPU 속 혹은 그 근처에 위치한다. 또한 작아야하기때문에 모든 정보를 담을 수 없고, 사용자가 요청할법한 데이터만을 담아야한다. 이 때 어떻게 사용자가 요청할 법한 데이터를 정할까? 이는 <code>공간 지역성</code>과 <code>시간 지역성</code>이라는 중요한 두 가지 성질을 기반으로 한다.</p>
+<p>이외에도 태그나 충돌 같은 개념들이 있긴하지만 실제로 벤치마킹해보기도 쉽지 않고 다소 지엽적인 내용이라 간단히만 정리해보면 태그 없이 주소값을 모듈러(나머지)연산해서 cache line index를 결정하고 그것만을 이용해 데이터를 저장하면 한 line 내에 저장할 워드(Word)에 대한 충돌이 발생할 수 있다. cache line이 20개인 캐시는 0번지와 20번지가 같은 line이므로 충돌이 발생해 계속해서 같은 line에 서로의 데이터가 번갈아 저장될 수 있다는 것이다. 하지만 태그를 이용하면 cache line 수는 줄어들더라도 한 line내에 여러 태그의 정보를 저장할 수 있게되어 cache line이 10개인 cache의 한 line에 0번지와 20번지의 데이터가 다른 태그로 저장되어 불필요한 충돌을 방지할 수 있다는 장점이있다. 간단히 설명하기는 힘든 내용이라 좀 더 자세히 알고싶다면 <code>Direct mapped cache</code>나 <code>Fully associative cache</code> 등으로 검색해보기를 권장한다.</p>
+<h2 id=spatial-locality>Spatial locality</h2>
+<p><code>Spatial locality(공간 지역성)</code>이란 지금 <strong>요청 받은 데이터와</strong> <strong>가까운 곳에 위치한 데이터는 높은 확률로 다시 요청 받게 된다</strong>는 성질이다. 예를 들어 100번지의 a=10과 108번지의 b=20이 존재할 때 변수 a를 요청하면 이후 a와 가까운 주소에 저장된 b 또한 높은 확률로 요청된다는 것이다.</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
 
 <span class=kn>import</span> <span class=p>(</span>
 	<span class=s>&#34;fmt&#34;</span>
@@ -28,9 +87,54 @@ extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-h
 </span><span class=cm>b: 0xc000100018
 </span><span class=cm>c: 0xc000100020
 </span><span class=cm>*/</span>
-</code></pre></div><p>a, b, c의 크기는 8바이트로 주소값 또한 8바이트가 차이난다. (16진법이기에 20과 18의 차이는 8이다.) 즉 대체로 <strong>비슷한 시기에 할당된 변수는 근접한 메모리 주소</strong>를 갖게 된다. 우리는 비슷한 시기에 할당한 변수 혹은 연속된 배열 요소에 자주 빠른 시일 내에 접근을 하지 맨 위에서 선언한 변수와 저 멀리 맨 밑에서 선언한 변수를 마구잡이로 왔다 갔다 하면서 작업을 하지 않는 편이기 때문에 공간 지역성을 근거로한 캐시가 효력을 갖게 된다. 만약 공간적으로 먼 맨 위의 변수와 맨 아래의 변수를 자주 번갈아가며 접근한다면 그것은 시간지역성을 띄는 경우이다.</p><h2 id=temporal-locality>Temporal locality</h2><p><code>Temporal locality(시간 지역성)</code>이란 <strong>최근에 요청했던 데이터는 높은 확률로 다시 요청 받게 된다</strong>는 성질이다. 예를 들어 100번지의 a=10과 9999번지의 b=20은 서로 주소적인 거리는 멀지만 둘 다 최근에 호출됐다면 캐시에 적재하겠다는 것이다. 캐시는 주로 직사각형 형태로 생겼으며 <strong>가로(행)는 연속된 주소의 데이터를 저장하는 공간 지역성, 세로(열)는 최근에 호출된 데이터를 저장하는 시간 지역성</strong>을 담당한다.</p><h2 id=두-지역성-비교>두 지역성 비교</h2><p>12칸의 캐시가 있다고 가정하자. 가로로 4칸 세로로 3칸 존재한다면 공간/시간 지역성의 균형이 잡힌 캐시라고 볼 수 있다.(경우에 따라 다르겠지만)</p><p><figure style=flex-grow:579;flex-basis:1390px><a href=/blog/golang/go-cpu-cache/balanced-cache.png data-size=620x107><img src=/blog/golang/go-cpu-cache/balanced-cache.png srcset="/blog/golang/go-cpu-cache/balanced-cache_hu49d8d624edd0378535d64f9a5c47e767_8216_480x0_resize_box_2.png 480w, /blog/golang/go-cpu-cache/balanced-cache_hu49d8d624edd0378535d64f9a5c47e767_8216_1024x0_resize_box_2.png 1024w" width=620 height=107 loading=lazy alt=balanced-cache.png></a><figcaption>balanced-cache.png</figcaption></figure></p><p>시간 지역성은 최근 불린 데이터는 다시 불릴 확률이 높다는 것이고 이는 연속된 공간이 아닌 다양한 공간(주소)의 데이터를 캐시에 저장한다는 말이기도 하다. 0번지 부근, 16번지 부근, 24번지 부근의 다양한 공간의 데이터를 저장할 수 있으면서 그 녀석들간의 주변 데이터도 제공하는 공간지역성도 만족한다.</p><p>두 가지 지역성에 의해 다양한 캐시들이 데이터를 적재하고 제공한다. 요점은 캐시는 빠르게 동작해야하고 그러기 위해선 크기가 작고 가까워야하며 크기가 작기 때문에 모든 데이터를 담을 수 없으니 알짜 데이터만을 담아야하는데 그 알짜는 지역성을 기반으로 선별된다는 것이다. 크기가 한정적이기 때문에 한 지역성을 키우면 한 지역성은 작아질 수밖에 없다.</p><h3 id=공간-지역성에-치우친-캐시-구조>공간 지역성에 치우친 캐시 구조</h3><p><figure style=flex-grow:845;flex-basis:2029px><a href=/blog/golang/go-cpu-cache/spatial-locality-biased-cache.png data-size=930x110><img src=/blog/golang/go-cpu-cache/spatial-locality-biased-cache.png srcset="/blog/golang/go-cpu-cache/spatial-locality-biased-cache_hu038761de6193f1262a5c02c2aef3a97f_10262_480x0_resize_box_2.png 480w, /blog/golang/go-cpu-cache/spatial-locality-biased-cache_hu038761de6193f1262a5c02c2aef3a97f_10262_1024x0_resize_box_2.png 1024w" width=930 height=110 loading=lazy alt=spatial-locality-biased-cache.png></a><figcaption>spatial-locality-biased-cache.png</figcaption></figure></p><p>한정된 크기의 캐시 속에서 공간지역성을 극대화시켜버리면 당연히 인접한 공간의 자료만 이용할 수 있고, 최근에 불린 데이터들은 안중에도 없고 인접한 공간의 데이터만을 저장하게 된다. 예를 들어 다음과 같은 시간 지역성이 필요한 경우에 제대로 기능을 할 수 없다.</p><ol><li>0~11번지 사이의 데이터가 한 번 접근 ⇒ 캐시에 0~11번지 적재</li><li>이후 12번지의 데이터에 접근 ⇒ 캐시에 데이터가 없기때문에 0~11번지의 데이터 대신 12~23번지의 데이터를 캐시에 적재</li><li>다시 최근에 접근했던 데이터인 0번지의 데이터에 접근 시도
+</code></pre></div><p>a, b, c의 크기는 8바이트로 주소값 또한 8바이트가 차이난다. (16진법이기에 20과 18의 차이는 8이다.) 즉 대체로 <strong>비슷한 시기에 할당된 변수는 근접한 메모리 주소</strong>를 갖게 된다. 우리는 비슷한 시기에 할당한 변수 혹은 연속된 배열 요소에 자주 빠른 시일 내에 접근을 하지 맨 위에서 선언한 변수와 저 멀리 맨 밑에서 선언한 변수를 마구잡이로 왔다 갔다 하면서 작업을 하지 않는 편이기 때문에 공간 지역성을 근거로한 캐시가 효력을 갖게 된다. 만약 공간적으로 먼 맨 위의 변수와 맨 아래의 변수를 자주 번갈아가며 접근한다면 그것은 시간지역성을 띄는 경우이다.</p>
+<h2 id=temporal-locality>Temporal locality</h2>
+<p><code>Temporal locality(시간 지역성)</code>이란 <strong>최근에 요청했던 데이터는 높은 확률로 다시 요청 받게 된다</strong>는 성질이다. 예를 들어 100번지의 a=10과 9999번지의 b=20은 서로 주소적인 거리는 멀지만 둘 다 최근에 호출됐다면 캐시에 적재하겠다는 것이다. 캐시는 주로 직사각형 형태로 생겼으며 <strong>가로(행)는 연속된 주소의 데이터를 저장하는 공간 지역성, 세로(열)는 최근에 호출된 데이터를 저장하는 시간 지역성</strong>을 담당한다.</p>
+<h2 id=두-지역성-비교>두 지역성 비교</h2>
+<p>12칸의 캐시가 있다고 가정하자. 가로로 4칸 세로로 3칸 존재한다면 공간/시간 지역성의 균형이 잡힌 캐시라고 볼 수 있다.(경우에 따라 다르겠지만)</p>
+<p><figure style=flex-grow:579;flex-basis:1390px>
+<a href=/blog/golang/go-cpu-cache/balanced-cache.png data-size=620x107><img src=/blog/golang/go-cpu-cache/balanced-cache.png srcset="/blog/golang/go-cpu-cache/balanced-cache_hu49d8d624edd0378535d64f9a5c47e767_8216_480x0_resize_box_3.png 480w, /blog/golang/go-cpu-cache/balanced-cache_hu49d8d624edd0378535d64f9a5c47e767_8216_1024x0_resize_box_3.png 1024w" width=620 height=107 loading=lazy alt=balanced-cache.png>
+</a>
+<figcaption>balanced-cache.png</figcaption>
+</figure></p>
+<p>시간 지역성은 최근 불린 데이터는 다시 불릴 확률이 높다는 것이고 이는 연속된 공간이 아닌 다양한 공간(주소)의 데이터를 캐시에 저장한다는 말이기도 하다. 0번지 부근, 16번지 부근, 24번지 부근의 다양한 공간의 데이터를 저장할 수 있으면서 그 녀석들간의 주변 데이터도 제공하는 공간지역성도 만족한다.</p>
+<p>두 가지 지역성에 의해 다양한 캐시들이 데이터를 적재하고 제공한다. 요점은 캐시는 빠르게 동작해야하고 그러기 위해선 크기가 작고 가까워야하며 크기가 작기 때문에 모든 데이터를 담을 수 없으니 알짜 데이터만을 담아야하는데 그 알짜는 지역성을 기반으로 선별된다는 것이다. 크기가 한정적이기 때문에 한 지역성을 키우면 한 지역성은 작아질 수밖에 없다.</p>
+<h3 id=공간-지역성에-치우친-캐시-구조>공간 지역성에 치우친 캐시 구조</h3>
+<p><figure style=flex-grow:845;flex-basis:2029px>
+<a href=/blog/golang/go-cpu-cache/spatial-locality-biased-cache.png data-size=930x110><img src=/blog/golang/go-cpu-cache/spatial-locality-biased-cache.png srcset="/blog/golang/go-cpu-cache/spatial-locality-biased-cache_hu038761de6193f1262a5c02c2aef3a97f_10262_480x0_resize_box_3.png 480w, /blog/golang/go-cpu-cache/spatial-locality-biased-cache_hu038761de6193f1262a5c02c2aef3a97f_10262_1024x0_resize_box_3.png 1024w" width=930 height=110 loading=lazy alt=spatial-locality-biased-cache.png>
+</a>
+<figcaption>spatial-locality-biased-cache.png</figcaption>
+</figure></p>
+<p>한정된 크기의 캐시 속에서 공간지역성을 극대화시켜버리면 당연히 인접한 공간의 자료만 이용할 수 있고, 최근에 불린 데이터들은 안중에도 없고 인접한 공간의 데이터만을 저장하게 된다. 예를 들어 다음과 같은 시간 지역성이 필요한 경우에 제대로 기능을 할 수 없다.</p>
+<ol>
+<li>0~11번지 사이의 데이터가 한 번 접근 ⇒ 캐시에 0~11번지 적재</li>
+<li>이후 12번지의 데이터에 접근 ⇒ 캐시에 데이터가 없기때문에 0~11번지의 데이터 대신 12~23번지의 데이터를 캐시에 적재</li>
+<li>다시 최근에 접근했던 데이터인 0번지의 데이터에 접근 시도
 ⇒ 0번 데이터는 최근에 접근했던 데이터임에도 시간 지역성이 활용되지 못함
-⇒ 캐시에서 데이터를 찾을 수 없음.</li></ol><h3 id=시간-지역성에-치우친-캐시-구조>시간 지역성에 치우친 캐시 구조</h3><p><figure style=flex-grow:154;flex-basis:370px><a href=/blog/golang/go-cpu-cache/temporal-locality-biased-cache.png data-size=312x202><img src=/blog/golang/go-cpu-cache/temporal-locality-biased-cache.png srcset="/blog/golang/go-cpu-cache/temporal-locality-biased-cache_hu5d03129976ee7a9e19515a8e72953e35_8599_480x0_resize_box_2.png 480w, /blog/golang/go-cpu-cache/temporal-locality-biased-cache_hu5d03129976ee7a9e19515a8e72953e35_8599_1024x0_resize_box_2.png 1024w" width=312 height=202 loading=lazy alt=temporal-locality-biased-cache.png></a><figcaption>temporal-locality-biased-cache.png</figcaption></figure></p><p>위의 경우 최근에 호출된 다양한 주소의 데이터들을 캐시에 저장해준다. 하지만 캐시의 크기는 한정되어있기 때문에 세로가 길어지면 가로는 짧아진다. 즉 최근 접근을 시도한 다양한 주소의 데이터를 저장할 수 있지만 그 데이터의 인근 데이터에 대한 저장은 많이 할 수 없다는 것이다.</p><p>예를 들어 위의 그림과 같은 경우 최근 0, 3, 12, 18, 6, 20번지의 데이터에 접근했고 이후에도 해당 번지에 대한 데이터를 캐시를 통해 이용할 수 있다. 바로 내가 최근에 접근했던 데이터이기때문이다. 하지만 만약 18번지의 데이터에 접근한 경우 높은 확률로 공간지역성에 의거 19, 20, 21, &mldr; 번지의 데이터에 접근하겠지만, 이 예시는 시간지역성에 치우쳐져 19번지의 데이터만을 캐시에서 제공받을 수 있다.</p><h2 id=프로그램을-통한-벤치마킹>프로그램을 통한 벤치마킹</h2><p>저번에 Mutex, Semaphore를 직접 벤치마킹해보면서 Go의 내장 벤치마크 기능을 이용하면 좀 더 편리하게 결과를 보여줄 수 있을 것 같았기에 이번에 Go의 내장 벤치마크 기능을 이용해봤다.</p><p><strong>1000행 1000열의 2차원 int형 배열의 어떠한 요소에 접근해서 +1 하는 작업을 1000회 수행하는 것을 하나의 싸이클로 하는 벤치마크</strong>를 작성했다. 2차원 배열은 가로로는 연속적인 주소값을 갖기에 공간 지역성을 활용할 수 있지만 세로로는 N * (int형 자료형의 크기)씩 차이 나는 주소값을 갖기 때문에 공간 지역성을 활용하기 힘들고, 최근 접근했던 주소라면 시간 지역성은 활용할 수 있다.</p><p><strong>공간 지역성</strong> (가로로 연속적인 데이터)</p><ul><li>공간 지역성을 사용하는 경우 가로로 연속된 요소에 접근. 즉 연속된 주소를 갖는 1000개의 요소에 접근</li><li>공간 지역성을 사용하지 않는 경우에는 세로로 요소에 접근. 즉 1000 * int 자료형의 크기만큼 차이나는 연속되지 않은 주소의 1000개의 요소에 접근</li></ul><p><strong>시간 지역성</strong> (연속적 주소와 상관없이 최근에 불린 데이터)</p><ul><li>시간 지역성을 사용하는 경우 주소값이 근접하진 않지만 4개 혹은 16개의 데이터에만 계속해서 접근</li><li>시간 지역성을 사용하지 않은 경우에는 계속해서 처음 접근하는 데이터에만 접근</li></ul><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+⇒ 캐시에서 데이터를 찾을 수 없음.</li>
+</ol>
+<h3 id=시간-지역성에-치우친-캐시-구조>시간 지역성에 치우친 캐시 구조</h3>
+<p><figure style=flex-grow:154;flex-basis:370px>
+<a href=/blog/golang/go-cpu-cache/temporal-locality-biased-cache.png data-size=312x202><img src=/blog/golang/go-cpu-cache/temporal-locality-biased-cache.png srcset="/blog/golang/go-cpu-cache/temporal-locality-biased-cache_hu5d03129976ee7a9e19515a8e72953e35_8599_480x0_resize_box_3.png 480w, /blog/golang/go-cpu-cache/temporal-locality-biased-cache_hu5d03129976ee7a9e19515a8e72953e35_8599_1024x0_resize_box_3.png 1024w" width=312 height=202 loading=lazy alt=temporal-locality-biased-cache.png>
+</a>
+<figcaption>temporal-locality-biased-cache.png</figcaption>
+</figure></p>
+<p>위의 경우 최근에 호출된 다양한 주소의 데이터들을 캐시에 저장해준다. 하지만 캐시의 크기는 한정되어있기 때문에 세로가 길어지면 가로는 짧아진다. 즉 최근 접근을 시도한 다양한 주소의 데이터를 저장할 수 있지만 그 데이터의 인근 데이터에 대한 저장은 많이 할 수 없다는 것이다.</p>
+<p>예를 들어 위의 그림과 같은 경우 최근 0, 3, 12, 18, 6, 20번지의 데이터에 접근했고 이후에도 해당 번지에 대한 데이터를 캐시를 통해 이용할 수 있다. 바로 내가 최근에 접근했던 데이터이기때문이다. 하지만 만약 18번지의 데이터에 접근한 경우 높은 확률로 공간지역성에 의거 19, 20, 21, &mldr; 번지의 데이터에 접근하겠지만, 이 예시는 시간지역성에 치우쳐져 19번지의 데이터만을 캐시에서 제공받을 수 있다.</p>
+<h2 id=프로그램을-통한-벤치마킹>프로그램을 통한 벤치마킹</h2>
+<p>저번에 Mutex, Semaphore를 직접 벤치마킹해보면서 Go의 내장 벤치마크 기능을 이용하면 좀 더 편리하게 결과를 보여줄 수 있을 것 같았기에 이번에 Go의 내장 벤치마크 기능을 이용해봤다.</p>
+<p><strong>1000행 1000열의 2차원 int형 배열의 어떠한 요소에 접근해서 +1 하는 작업을 1000회 수행하는 것을 하나의 싸이클로 하는 벤치마크</strong>를 작성했다. 2차원 배열은 가로로는 연속적인 주소값을 갖기에 공간 지역성을 활용할 수 있지만 세로로는 N * (int형 자료형의 크기)씩 차이 나는 주소값을 갖기 때문에 공간 지역성을 활용하기 힘들고, 최근 접근했던 주소라면 시간 지역성은 활용할 수 있다.</p>
+<p><strong>공간 지역성</strong> (가로로 연속적인 데이터)</p>
+<ul>
+<li>공간 지역성을 사용하는 경우 가로로 연속된 요소에 접근. 즉 연속된 주소를 갖는 1000개의 요소에 접근</li>
+<li>공간 지역성을 사용하지 않는 경우에는 세로로 요소에 접근. 즉 1000 * int 자료형의 크기만큼 차이나는 연속되지 않은 주소의 1000개의 요소에 접근</li>
+</ul>
+<p><strong>시간 지역성</strong> (연속적 주소와 상관없이 최근에 불린 데이터)</p>
+<ul>
+<li>시간 지역성을 사용하는 경우 주소값이 근접하진 않지만 4개 혹은 16개의 데이터에만 계속해서 접근</li>
+<li>시간 지역성을 사용하지 않은 경우에는 계속해서 처음 접근하는 데이터에만 접근</li>
+</ul>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
 
 <span class=kn>import</span> <span class=p>(</span>
     <span class=s>&#34;testing&#34;</span>
@@ -104,7 +208,7 @@ extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-h
         <span class=p>}</span>
     <span class=p>})</span>
 <span class=p>}</span>
-</code></pre></div><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=nx>goos</span><span class=p>:</span> <span class=nx>linux</span>
+</code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=nx>goos</span><span class=p>:</span> <span class=nx>linux</span>
 <span class=nx>goarch</span><span class=p>:</span> <span class=nx>amd64</span>
 <span class=nx>pkg</span><span class=p>:</span> <span class=nx>playground</span><span class=o>/</span><span class=nx>unix</span><span class=o>-</span><span class=nx>socket</span><span class=o>/</span><span class=nx>cache</span>
 <span class=nx>BenchmarkSpatialLocality</span><span class=o>/</span><span class=nx>공간지역성_사용</span>                           <span class=mi>50000</span>               <span class=mi>894</span> <span class=nx>ns</span><span class=o>/</span><span class=nx>op</span>
@@ -112,10 +216,163 @@ extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-h
 <span class=nx>BenchmarkTemporalLocality</span><span class=o>/</span><span class=nx>시간_지역성_적극_사용</span><span class=p>.</span><span class=nx>_최근_접근한_데이터_4개</span><span class=p>.</span>  <span class=mi>50000</span>              <span class=mi>1918</span> <span class=nx>ns</span><span class=o>/</span><span class=nx>op</span>
 <span class=nx>BenchmarkTemporalLocality</span><span class=o>/</span><span class=nx>시간_지역성_조금_사용</span><span class=p>.</span><span class=nx>_최근_접근한_데이터_16개</span><span class=p>.</span> <span class=mi>50000</span>              <span class=mi>4153</span> <span class=nx>ns</span><span class=o>/</span><span class=nx>op</span>
 <span class=nx>BenchmarkTemporalLocality</span><span class=o>/</span><span class=nx>시간_지역성_X</span><span class=p>.</span><span class=nx>_새로운_데이터에만_접근</span><span class=p>.</span>         <span class=mi>50000</span>              <span class=mi>6564</span> <span class=nx>ns</span><span class=o>/</span><span class=nx>op</span>
-</code></pre></div><p>결과를 확인해보니 간단한 배열 내의 요소들에 대한 연산인데도 꽤나 차이가 컸다.</p><h2 id=마치며>마치며</h2><p>저번 학기에 컴퓨터 구조를 수강하면서 CPU-Memory 캐시의 효과를 직접 배열에 대한 프로그램을 통해 보여주는 예시를 보고 신기했던 기억이 있어서 이렇게 벤치마킹 프로그램을 작성해봤다. 다른 CS 주요 지식들에 비해 어려울 것은 없는 편이고 우리가 쉽게 접해오던 내용이라 더 이해하기 쉽지 않았을까 싶다.</p><h2 id=참고>참고</h2><ul><li>캐시란 - <a class=link href=https://ko.wikipedia.org/wiki/%EC%BA%90%EC%8B%9C target=_blank rel=noopener>https://ko.wikipedia.org/wiki/캐시</a></li><li>캐시가 동작하는 아주 구체적인 원리 - <a class=link href=https://parksb.github.io/article/29.html target=_blank rel=noopener>https://parksb.github.io/article/29.html</a></li><li>cache mapping - <a class=link href=https://m.blog.naver.com/jkssleeky/220478400046 target=_blank rel=noopener>https://m.blog.naver.com/jkssleeky/220478400046</a></li></ul></section><footer class=article-footer><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-contents--wrapper><h2 class=section-title>관련 글</h2><div class=related-contents><div class="flex article-list--tile"><article class=has-image><a href=/blog/golang/go-socket/><div class=article-image><img src=/blog/golang/go-socket/server-client-socket.25567a9a8e35e4878b3820141329b6da_huc5be35f5857cc34672b838b13057c03e_282874_250x150_fill_q75_box_smart1.jpeg width=250 height=150 loading=lazy data-key data-hash="md5-JVZ6mo415IeLOCAUEym22g=="></div><div class=article-details><h2 class=article-title>Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket)</h2></div></a></article><article class=has-image><a href=/blog/golang/go-deadlock/><div class=article-image><img src=/blog/golang/go-deadlock/pprof-debugging-1.d1f321c8f5ce97d5cc607546d7c31712_hu27a13bf8dcdafb0aaff224765e3a83ab_59369_250x150_fill_box_smart1_2.png width=250 height=150 loading=lazy data-key data-hash="md5-0fMhyPXOl9XMYHVG18MXEg=="></div><div class=article-details><h2 class=article-title>Go 언어로 적용해보는 Computer Science - Deadlock</h2></div></a></article><article class=has-image><a href=/blog/golang/go-mutex-semaphore/><div class=article-image><img src=/blog/golang/go-mutex-semaphore/mutex-2.ec80287e58d91bc66a01f1e91b68cd50_hu253887d6f424b5a6c4c14b3309becda5_68035_250x150_fill_box_smart1_2.png width=250 height=150 loading=lazy data-key data-hash="md5-7IAofljZG8ZqAfHpG2jNUA=="></div><div class=article-details><h2 class=article-title>Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore</h2></div></a></article><article class=has-image><a href=/blog/golang/how-to-backend-in-go-testcode/><div class=article-image><img src=/blog/golang/how-to-backend-in-go-testcode/test-with-ide.e83038fd0ad61ce8e85069ab96d89062_hu7b61495424919d2e1c8d663236a41b57_159980_250x150_fill_box_smart1_2.png width=250 height=150 loading=lazy data-key data-hash="md5-6DA4/QrWHOjoUGmrltiQYg=="></div><div class=article-details><h2 class=article-title>Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)</h2></div></a></article><article class=has-image><a href=/blog/golang/how-to-backend-in-go-db/><div class=article-image><img src=/blog/golang/how-to-backend-in-go-db/o2m-relation.73e7e39c70cfc03dd37c4e76a3c340b4_huda98d5d877ff5063fa9c786910881686_21160_250x150_fill_box_smart1_2.png width=250 height=150 loading=lazy data-key data-hash="md5-c+fjnHDPwD3TfE52o8NAtA=="></div><div class=article-details><h2 class=article-title>Golang으로 백엔드 개발하기 - 1. 데이터베이스 작업하기 (Ent 프레임워크 이용)</h2></div></a></article></div></div></aside><div class=disqus-container><div id=disqus_thread></div><script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return}var b=document,a=b.createElement('script');a.async=!0,a.src='//umi0410.disqus.com/embed.js',a.setAttribute('data-timestamp',+new Date),(b.head||b.body).appendChild(a)})()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div><style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style><script>window.addEventListener('onColorSchemeChange',a=>{DISQUS&&DISQUS.reset({reload:!0})})</script><footer class=site-footer><section class=copyright>&copy;
+</code></pre></div><p>결과를 확인해보니 간단한 배열 내의 요소들에 대한 연산인데도 꽤나 차이가 컸다.</p>
+<h2 id=마치며>마치며</h2>
+<p>저번 학기에 컴퓨터 구조를 수강하면서 CPU-Memory 캐시의 효과를 직접 배열에 대한 프로그램을 통해 보여주는 예시를 보고 신기했던 기억이 있어서 이렇게 벤치마킹 프로그램을 작성해봤다. 다른 CS 주요 지식들에 비해 어려울 것은 없는 편이고 우리가 쉽게 접해오던 내용이라 더 이해하기 쉽지 않았을까 싶다.</p>
+<h2 id=참고>참고</h2>
+<ul>
+<li>캐시란 - <a class=link href=https://ko.wikipedia.org/wiki/%EC%BA%90%EC%8B%9C target=_blank rel=noopener>https://ko.wikipedia.org/wiki/캐시</a></li>
+<li>캐시가 동작하는 아주 구체적인 원리 - <a class=link href=https://parksb.github.io/article/29.html target=_blank rel=noopener>https://parksb.github.io/article/29.html</a></li>
+<li>cache mapping - <a class=link href=https://m.blog.naver.com/jkssleeky/220478400046 target=_blank rel=noopener>https://m.blog.naver.com/jkssleeky/220478400046</a></li>
+</ul>
+</section>
+<footer class=article-footer>
+<section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span>
+</section>
+</footer>
+</article>
+<aside class=related-contents--wrapper>
+<h2 class=section-title>관련 글</h2>
+<div class=related-contents>
+<div class="flex article-list--tile">
+<article class=has-image>
+<a href=/blog/golang/go-socket/>
+<div class=article-image>
+<img src=/blog/golang/go-socket/server-client-socket.25567a9a8e35e4878b3820141329b6da_huc5be35f5857cc34672b838b13057c03e_282874_250x150_fill_q75_box_smart1.jpeg width=250 height=150 loading=lazy data-key data-hash="md5-JVZ6mo415IeLOCAUEym22g==">
+</div>
+<div class=article-details>
+<h2 class=article-title>Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket)</h2>
+</div>
+</a>
+</article>
+<article class=has-image>
+<a href=/blog/golang/go-deadlock/>
+<div class=article-image>
+<img src=/blog/golang/go-deadlock/pprof-debugging-1.d1f321c8f5ce97d5cc607546d7c31712_hu27a13bf8dcdafb0aaff224765e3a83ab_59369_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-0fMhyPXOl9XMYHVG18MXEg==">
+</div>
+<div class=article-details>
+<h2 class=article-title>Go 언어로 적용해보는 Computer Science - Deadlock</h2>
+</div>
+</a>
+</article>
+<article class=has-image>
+<a href=/blog/golang/go-mutex-semaphore/>
+<div class=article-image>
+<img src=/blog/golang/go-mutex-semaphore/mutex-2.ec80287e58d91bc66a01f1e91b68cd50_hu253887d6f424b5a6c4c14b3309becda5_68035_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-7IAofljZG8ZqAfHpG2jNUA==">
+</div>
+<div class=article-details>
+<h2 class=article-title>Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore</h2>
+</div>
+</a>
+</article>
+<article class=has-image>
+<a href=/blog/golang/how-to-backend-in-go-webapp/>
+<div class=article-image>
+<img src=/blog/golang/how-to-backend-in-go-webapp/output.8af8bebb21fe028ac92f562189cb643b_hu537a11d34916ac1c2def7909b69ddbc5_22456_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-ivi+uyH+AorJL1YhictkOw==">
+</div>
+<div class=article-details>
+<h2 class=article-title>Golang으로 백엔드 개발하기 - 3. 웹 애플리케이션 개발해보기 (feat. fiber)</h2>
+</div>
+</a>
+</article>
+<article class=has-image>
+<a href=/blog/golang/how-to-backend-in-go-testcode/>
+<div class=article-image>
+<img src=/blog/golang/how-to-backend-in-go-testcode/test-with-ide.e83038fd0ad61ce8e85069ab96d89062_hu7b61495424919d2e1c8d663236a41b57_159980_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-6DA4/QrWHOjoUGmrltiQYg==">
+</div>
+<div class=article-details>
+<h2 class=article-title>Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)</h2>
+</div>
+</a>
+</article>
+</div>
+</div>
+</aside>
+<div class=disqus-container>
+<div id=disqus_thread></div>
+<script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return}var b=document,a=b.createElement('script');a.async=!0,a.src='//umi0410.disqus.com/embed.js',a.setAttribute('data-timestamp',+new Date),(b.head||b.body).appendChild(a)})()</script>
+<noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript>
+<a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a>
+</div>
+<style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style>
+<script>window.addEventListener('onColorSchemeChange',a=>{DISQUS&&DISQUS.reset({reload:!0})})</script>
+<footer class=site-footer>
+<section class=copyright>
+&copy;
 2020 -
-2021 Jinsu Playground</section><section class=powerby><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a>로 만듦<br><a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a>의 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=2.4.0>Stack</a></b> 테마 사용 중</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+2021 Jinsu Playground
+</section>
+<section class=powerby>
+<a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a>로 만듦 <br>
+<a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a>의 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=2.4.0>Stack</a></b> 테마 사용 중
+</section>
+</footer>
+<div class=pswp tabindex=-1 role=dialog aria-hidden=true>
+<div class=pswp__bg></div>
+<div class=pswp__scroll-wrap>
+<div class=pswp__container>
+<div class=pswp__item></div>
+<div class=pswp__item></div>
+<div class=pswp__item></div>
+</div>
+<div class="pswp__ui pswp__ui--hidden">
+<div class=pswp__top-bar>
+<div class=pswp__counter></div>
+<button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
 <button class="pswp__button pswp__button--share" title=Share></button>
 <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
-<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css integrity="sha256-c0uckgykQ9v5k+IqViZOZKc47Jn7KQil4/MP3ySA3F8=" crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE=" crossorigin=anonymous></main><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#시작하며>시작하며</a></li><li><a href=#캐시란>캐시란</a></li><li><a href=#spatial-locality>Spatial locality</a></li><li><a href=#temporal-locality>Temporal locality</a></li><li><a href=#두-지역성-비교>두 지역성 비교</a><ol><li><a href=#공간-지역성에-치우친-캐시-구조>공간 지역성에 치우친 캐시 구조</a></li><li><a href=#시간-지역성에-치우친-캐시-구조>시간 지역성에 치우친 캐시 구조</a></li></ol></li><li><a href=#프로그램을-통한-벤치마킹>프로그램을 통한 벤치마킹</a></li><li><a href=#마치며>마치며</a></li><li><a href=#참고>참고</a></li></ol></nav></div></section></aside></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g=" crossorigin=anonymous defer></script><script type=text/javascript src=/ts/main.js defer></script><script>(function(){const a=document.createElement('link');a.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",a.type="text/css",a.rel="stylesheet",document.head.appendChild(a)})()</script></body></html>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+<div class=pswp__preloader>
+<div class=pswp__preloader__icn>
+<div class=pswp__preloader__cut>
+<div class=pswp__preloader__donut></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+<div class=pswp__share-tooltip></div>
+</div>
+<button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+</button>
+<div class=pswp__caption>
+<div class=pswp__caption__center></div>
+</div>
+</div>
+</div>
+</div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css integrity="sha256-c0uckgykQ9v5k+IqViZOZKc47Jn7KQil4/MP3ySA3F8=" crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE=" crossorigin=anonymous>
+</main>
+<aside class="sidebar right-sidebar sticky">
+<section class="widget archives">
+<div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
+</div>
+<h2 class="widget-title section-title">Table of contents</h2>
+<div class=widget--toc>
+<nav id=TableOfContents>
+<ol>
+<li><a href=#시작하며>시작하며</a></li>
+<li><a href=#캐시란>캐시란</a></li>
+<li><a href=#spatial-locality>Spatial locality</a></li>
+<li><a href=#temporal-locality>Temporal locality</a></li>
+<li><a href=#두-지역성-비교>두 지역성 비교</a>
+<ol>
+<li><a href=#공간-지역성에-치우친-캐시-구조>공간 지역성에 치우친 캐시 구조</a></li>
+<li><a href=#시간-지역성에-치우친-캐시-구조>시간 지역성에 치우친 캐시 구조</a></li>
+</ol>
+</li>
+<li><a href=#프로그램을-통한-벤치마킹>프로그램을 통한 벤치마킹</a></li>
+<li><a href=#마치며>마치며</a></li>
+<li><a href=#참고>참고</a></li>
+</ol>
+</nav>
+</div>
+</section>
+</aside>
+</div>
+<script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g=" crossorigin=anonymous defer></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const a=document.createElement('link');a.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",a.type="text/css",a.rel="stylesheet",document.head.appendChild(a)})()</script>
+</body>
+</html>
