@@ -8,8 +8,6 @@ categories:
   - Golang
 image: output.png
 ---
-# 웹 애플리케이션 개발해보기 (feat. fiber)
-
 ## 시작하며
 
 이번에는 Go언어에서 **유명한 웹 프레임워크를 비교**해보고 간단하게 **Pingpong 서버를 개발**해보겠습니다.
