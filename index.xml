@@ -1,5 +1,200 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Fri, 13 Aug 2021 12:46:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Golang으로 백엔드 개발하기 - 3. 웹 애플리케이션 개발해보기 (feat. fiber)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-webapp/</link><pubDate>Fri, 13 Aug 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-webapp/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-webapp/output.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 3. 웹 애플리케이션 개발해보기 (feat. fiber)" />&lt;h1 id="웹-애플리케이션-개발해보기-feat-fiber">웹 애플리케이션 개발해보기 (feat. fiber)&lt;/h1>
-&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Wed, 01 Sep 2021 12:46:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Golang으로 백엔드 개발하기 - 4. Custom Middleware(미들웨어) 작성해보기 (feat. fiber)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/</link><pubDate>Wed, 01 Sep 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/log.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 4. Custom Middleware(미들웨어) 작성해보기 (feat. fiber)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>안녕하세요. 저번 글에서는 &lt;code>fiber&lt;/code> 라는 웹 프레임워크로 간단히 웹 애플리케이션을 만드는 방법에 대해 알아봤으니
+이번엔 웹 애플리케이션을 만들다보면 꼭 필요해지는 &lt;code>middleware&lt;/code> 작성법에 대해 알아보겠습니다.
+여태까지 백엔드에서 서버를 개발하면서는 &lt;code>JS&lt;/code>의 &lt;code>Express&lt;/code> 프레임워크를 제외하고는 미들웨어 개발이 그닥 쉽게 이해되는 부분은 아니었던 것 같습니다.
+&lt;code>Express&lt;/code>에서 미들웨어를 작성하는 방법은 굉장히 직관적이고 문서도 많은 편이었거든요. 하지만 &lt;code>Spring&lt;/code>은 &lt;code>Filter&lt;/code>나 &lt;code>Interceptor&lt;/code>를 이해하기 위해 많은 내용을 알아야하고,
+&lt;code>Django&lt;/code>는 Class based나 function based, 그리고 middleware를 추가하는 법 등이 좀 복잡한 편이라고 생각합니다.&lt;/p>
+&lt;p>그리고 &lt;code>Golang&lt;/code>은 아무래도 코드로 말하는 사람들이 많아서인지 그닥 &lt;strong>middleware 작성과 같은 부분들이 문서로 잘 나와있진 않고, 코드를 까보면서 만드는 경우가 많았던 것 같습니다.&lt;/strong>
+그래서 이번 글에서는 &lt;strong>&lt;code>fiber&lt;/code> 로 웹서버를 띄우면서 간단히 미들웨어 하나 만들어보겠습니다.&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>제공되는 &lt;code>Basic Authentication&lt;/code> middleware을 이용해 요청 유저를 식별&lt;/li>
+&lt;li>식별된 유저 정보가 삽입된 logger를 &lt;code>context&lt;/code>에 주입&lt;/li>
+&lt;/ol>
+&lt;p>이렇게 하면 이후 service layer등에서는 요청 유저가 삽입된 logger을 통해 로그를 작성하니 로그 추적하기가 용이해지겠죠? ㅎㅎ
+(BasicAuth를 이용하는 이유는 남이 작성한 미들웨어를 가져다쓰는 방법을 편하게 알아보기 위함일 뿐 인증 방법으로 권장해서는 아닙니다.)&lt;/p>
+&lt;h2 id="미들웨어-그게-뭐야-왜-필요해">미들웨어?? 그게 뭐야? 왜 필요해?!&lt;/h2>
+&lt;p>웹 프레임워크에서 말하는 미들웨어는 보통 요청에 따른 핸들러를 수행하기 전 혹은 수행한 후에 수행하는 작업을 말합니다. 주로 체인의 형태라고 보시면 되고
+한 미들웨어에서 응답을 완료하면 걔가 요청 핸들러의 역할을 하게 된다고 보면 될 것 같습니다. 응답을 완료하지 않으면 다음 미들웨어를 호출하죠.&lt;/p>
+&lt;p>서버 개발을 처음할 때는 미들웨어의 필요성을 잘 느끼지 못할 수 있습니다. 하지만 어느정도 개발을 하거나 배포를 해나가다보면 &lt;em>&amp;lsquo;아&amp;hellip; 모든 요청마다 ~~~한 작업을 수행하고 싶은데&amp;rsquo;&lt;/em> 이런 생각이 들 때가 있을 수 있습니다.
+예를 들어 &lt;strong>API 별로 레이턴시를 체크&lt;/strong>하고 싶을 수도 있고, &lt;strong>body나 query string을 로그&lt;/strong>로 남기거나 &lt;strong>어떤 유저의 요청인지 매 요청마다 정보를 주입&lt;/strong>하고 싶을 수 있죠.
+이런 경우 middleware를 이용하면 모든 요청은 미들웨어를 거치면서 처리되기 때문에 편리하게 작업할 수 있습니다!&lt;/p>
+&lt;p>대표적으로는 &lt;code>인증&lt;/code>이나 &lt;code>캐싱&lt;/code>, &lt;code>로깅&lt;/code>, &lt;code>응답 타임아웃&lt;/code> 등에 사용하고 있는 것 같아요!&lt;/p>
+&lt;h2 id="남이-만든-미들웨어-사용해보기---basicauth">남이 만든 미들웨어 사용해보기 - BasicAuth&lt;/h2>
+&lt;p>Go를 통해 개발하는 이상 저희는 문서에만 의존할 수는 없습니다. 코드를 까봐야죠 !_!
+&lt;a class="link" href="https://github.com/gofiber/fiber/issues/338" target="_blank" rel="noopener"
+>Guidelines for creating Middleware - fiber Github Issue&lt;/a> 이슈에는 미들웨어 작성에 대한 몇 가지 가이드라인이 제시되어있더라구요.
+참고해보시면 좋을 것 같기도 합니다.&lt;/p>
+&lt;p>저는 &lt;a class="link" href="https://github.com/gofiber/fiber/blob/master/middleware/basicauth" target="_blank" rel="noopener"
+>gofiber/fiber/middleware/basicauth&lt;/a> 의 코드를 바탕으로 해석해보겠습니다. 링크를 따라가면 README가 있긴하지만 정보가 많지는 않죠.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// fiber의 basicauth 미들웨어 코드 중 일부입니다.
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="c1">// Config defines the config for middleware.
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">type&lt;/span> &lt;span class="nx">Config&lt;/span> &lt;span class="kd">struct&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// Next defines a function to skip this middleware when returned true.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">//
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// Optional. Default: nil
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">Next&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">c&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Ctx&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">bool&lt;/span>
+&lt;span class="c1">// Users defines the allowed credentials
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">//
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// Required. Default: map[string]string{}
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">Users&lt;/span> &lt;span class="kd">map&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="kt">string&lt;/span>
+&lt;span class="c1">// Realm is a string to define realm attribute of BasicAuth.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// the realm identifies the system to authenticate against
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// and can be used by clients to save credentials
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">//
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// Optional. Default: &amp;#34;Restricted&amp;#34;.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">Realm&lt;/span> &lt;span class="kt">string&lt;/span>
+&lt;span class="c1">// Authorizer defines a function you can pass
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// to check the credentials however you want.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// It will be called with a username and password
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// and is expected to return true or false to indicate
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// that the credentials were approved or not.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">//
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// Optional. Default: nil.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">Authorizer&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">bool&lt;/span>
+&lt;span class="c1">// Unauthorized defines the response body for unauthorized responses.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// By default it will return with a 401 Unauthorized and the correct WWW-Auth header
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">//
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// Optional. Default: nil
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">Unauthorized&lt;/span> &lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Handler&lt;/span>
+&lt;span class="c1">// ContextUser is the key to store the username in Locals
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">//
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// Optional. Default: &amp;#34;username&amp;#34;
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">ContextUsername&lt;/span> &lt;span class="kt">string&lt;/span>
+&lt;span class="c1">// ContextPass is the key to store the password in Locals
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">//
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// Optional. Default: &amp;#34;password&amp;#34;
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">ContextPassword&lt;/span> &lt;span class="kt">string&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>위의 코드가 BasicAuth 미들웨어의 설정을 담당하는 Config 타입에 대한 코드입니다. 간단히 몇 개만 알아두면 이해하는 데에 도움이 되는 것들만 짚어보겠습니다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Next&lt;/code> - nil이 아닌 경우 &lt;code>Next(*fiber.Ctx)&lt;/code>가 true를 반환하면 Basic Auth 미들웨어 자체를 건너뜀.&lt;/li>
+&lt;li>&lt;code>Users&lt;/code> - 이 map에 정의된 유저만이 유효한 유저로 이용될 수도 있음. (Authorizer가 nil인 경우 이 정보를 바탕으로 인증 진행)&lt;/li>
+&lt;li>&lt;code>Authorizer&lt;/code> - 인증 로직을 담당함. nil로 둘 경우 Users에서 일치하는 유저를 찾음. 여길 커스터마이징해서 DB에서 찾거나 할 수도 있음.&lt;/li>
+&lt;li>&lt;code>ContextUsername&lt;/code>, &lt;code>ContextPassword&lt;/code> - 인증 후 Context에 어떤 키로 각 정보를 담을지. (기본값은 &amp;ldquo;username&amp;rdquo;, &amp;ldquo;password&amp;rdquo;)&lt;/li>
+&lt;/ul>
+&lt;p>오호.. 막상 코드를 까보니 그닥 어렵지 않죠?! 그럼 과연 이 코드들이 설명한 게 맞는지 한 번 서버를 띄워봅시다.&lt;/p>
+&lt;h3 id="basic-auth-미들웨어를-다양하게-설정해보기">Basic Auth 미들웨어를 다양하게 설정해보기&lt;/h3>
+&lt;h4 id="1-항상-인증에-성공하는-authorizer를-이용하는-config">1. 항상 인증에 성공하는 Authorizer를 이용하는 Config&lt;/h4>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// newBasicAuthConfigAlwaysAllow 는 언제나 인증에 성공하는 Authorizer를
+&lt;/span>&lt;span class="c1">// 이용하는 Config를 만듭니다.
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">newBasicAuthConfigAlwaysAllow&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">basicauth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Config&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">basicauth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Config&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="nx">Authorizer&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">username&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">password&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">true&lt;/span>
+&lt;span class="p">},&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">basicauth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nf">newBasicAuthConfigAlwaysAllow&lt;/span>&lt;span class="p">()))&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text"># curl -u username:password는 해당 username과 password로 Basic auth를 하는 요청을 보냅니다.
+$ curl -u wrong:wrong localhost:8000
+Welcome!
+$ curl -u foo:bar localhost:8000
+Welcome!
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Authorizer가 username과 password가 어떻든 true를 반환해 인증에 성공합니다.&lt;/p>
+&lt;h4 id="2-미리-정의된-유저에-대해서만-인증에-성공하는-authorizer를-이용하는-config">2. 미리 정의된 유저에 대해서만 인증에 성공하는 Authorizer를 이용하는 Config&lt;/h4>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// newBasicAuthConfigAlwaysAllow 는 Users에 존재하는 유저 정보에 대해서만
+&lt;/span>&lt;span class="c1">// 인증에 성공하는 Authorizer를 이용하는 Config를 만듭니다.
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">newBasicAuthConfigAllowOnlyAdmin&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">basicauth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Config&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">basicauth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Config&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="nx">Users&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kd">map&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="s">&amp;#34;foo&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s">&amp;#34;bar&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="p">},&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">basicauth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nf">newBasicAuthConfigAllowOnlyAdmin&lt;/span>&lt;span class="p">()))&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text"># curl -u username:password는 해당 username과 password로 Basic auth를 하는 요청을 보냅니다.
+$ curl -u wrong:wrong localhost:8001
+Unauthorized
+$ curl -u foo:bar localhost:8001
+Welcome!
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>앞서 말했듯 Authorizer를 설정하지 않고 nil로 둘 경우 Users 맵의 데이터를 이용하는 Authorizer가 기본값으로 설정됩니다.
+저는 &lt;code>username=foo, password=bar&lt;/code>인 유저 정보를 맵에 기록했기 때문에 foo:bar 요청만이 승인되는 것을 볼 수 있습니다.&lt;/p>
+&lt;p>자, 이렇게 남이 작성한 미들웨어를 설정만 조금 바꿔서 이용해봤는데, 코드를 읽는 것도 그걸 바탕으로 가져다가 쓰는 것도 어렵지 않다는 걸 알게 됐군요.
+이제는 직접 미들웨어를 작성해보겠습니다.&lt;/p>
+&lt;h2 id="custom-middleware-작성하기">Custom middleware 작성하기&lt;/h2>
+&lt;p>커스텀으로 미들웨어를 작성할 때에는 그닥 정해진 기준이 많지는 않습니다.
+대부분의 미들웨어들은 Skipper 등의 개념으로(basic auth 미들웨어에선 Next라고 정의됨.) 해당 미들웨어의 기능을 실행하지 않고 넘어가는 설정이나
+뭐 각종 설정들이 존재는 하지만 우리는 근본적으로 커스텀 미들웨어를 어떻게 작성하는지에 대해 궁금하니까 그 부분만 알아보겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kn">package&lt;/span> &lt;span class="nx">fiber&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="c1">// Handler defines a function to serve HTTP requests.
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">type&lt;/span> &lt;span class="nx">Handler&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nx">Ctx&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">error&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>fiber 프레임워크에서는 middleware을 정의할 때 &lt;code>fiber.Handler&lt;/code> 라는 일종의 함수 타입을 이용합니다. 그리고 &lt;code>fiber.Handler&lt;/code>는 보통은 클로져를 이용하는 형태로 제공됩니다.
+제가 볼 땐 좀 특이한 것 같은데 아마 echo도 이런 식으로 클로져를 이용해 미들웨어를 생성했던 것 같습니다. 다음과 같이 말이죠.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">func&lt;/span> &lt;span class="nf">NewMiddleware&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">config&lt;/span> &lt;span class="nx">Config&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Handler&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// config에 기본값을 넣은 config를 클로져로 접근하려 함.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">config&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nf">injectDefaultValues&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">config&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 실제 미들웨어 역할을 할 함수.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// config에 클로져로 접근한다.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">c&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Ctx&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="c1">// 다음 미들웨어(혹은 요청 핸들러)를 수행한다.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="nx">c&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Next&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>근데 이런 경우는 아무래도 config를 설정해야하는 경우인 것 같고 저희는 그냥 최대한 심플하게 만들어볼게요. 목표는 Basic Auth를 거친 뒤 유저 정보가 기입된 logger를 context에 삽입해주는 것입니다.
+그럼 어떤 계층에서든 &lt;code>ctx.Get(&amp;quot;logger&amp;quot;)&lt;/code> 등을 이용해 logger에 편리하게 접근할 수 있죠! log 프레임워크는 &lt;code>sirupsen/logrus&lt;/code> 를 이용하겠습니다.
+컬러도 잘 나오고 확장성도 좋은 걸로 알고 있어요!&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">var&lt;/span> &lt;span class="nx">injectLoggerMiddleware&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">ctx&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Ctx&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="c1">// basic auth middleware가 주입한 username을 이용합니다.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">username&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Locals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;username&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">logger&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">WithField&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;user&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">username&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// context에 logger라는 키로 유저 정보를 주입한 logger를 전달합니다!
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Locals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;logger&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">logger&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 다음 미들웨어(혹은 요청 핸들러)를 수행합니다.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Next&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="c1">// injectLoggerMiddleware는 basicauth가 context에 주입한 username을 이용하기 때문에
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// 꼭 basicauth middleware 다음에 수행되어야합니다!
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">basicauth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nf">newBasicAuthConfigAllowOnlyAdmin&lt;/span>&lt;span class="p">()))&lt;/span>
+&lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Use&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">injectLoggerMiddleware&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 요청 핸들러는 이런 식으로 middleware에게 주입받은 logger를 context에서 꺼내쓸 수 있습니다.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">app&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">ctx&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Ctx&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">error&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">logger&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Locals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;logger&amp;#34;&lt;/span>&lt;span class="p">).(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Entry&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">logger&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Info&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;유저가 접속했습니다&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">SendString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Welcome!\n&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">})&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;figure style="flex-grow: 830; flex-basis: 1993px">
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/log.png" data-size="872x105">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/log.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/log_hu6da6c55463c6a62988b186d685cd2c7c_23812_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/log_hu6da6c55463c6a62988b186d685cd2c7c_23812_1024x0_resize_box_3.png 1024w"
+width="872"
+height="105"
+loading="lazy"
+alt="log.png">
+&lt;/a>
+&lt;figcaption>log.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>그럼 다음과 같이 Basic Auth를 통해 각각 다른 유저로 요청을 보내면 해당 요청을 처리하는 동안은 해당 context 속의 logger을 이용해 로그를 남길 수 있는 걸 볼 수 있습니다.
+이렇게 정리해보니 golang에서도 middleware를 작성하는 게 그리 어렵지 않네요~!&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>&lt;code>echo&lt;/code> 프레임워크를 쓰면서는 미들웨어를 작성할 때 좀 애를 먹었던 기억이 있는데, 막상 &lt;code>fiber&lt;/code>로 미들웨어를 작성해보니
+생각보다 많이 직관적이고 쉬워서 좀 놀랐습니다. &lt;em>(사실 글을 쓸 필요가 없었을지도..?)&lt;/em> 그래도 Go로 작성된 한글 자료도 많아졌으면 좋겠고,
+누군가는 &lt;code>fiber&lt;/code> 미들웨어를 작성하는 방법이 좀 이해되지 않고 어려우실 수 있으니 도움이 될 수 있으면 좋겠습니다 ㅎㅎ
+다음엔 서버 개발에 있어 또 하나의 중요한 점인! 에러 핸들링에 대해 알아보겠습니다! 감사합니다.&lt;/p>
+&lt;h2 id="참고">참고&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://github.com/gofiber/fiber/issues/338" target="_blank" rel="noopener"
+>Guidelines for creating Middleware - fiber Github Issue&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/gofiber/fiber/tree/master/middleware" target="_blank" rel="noopener"
+>Fiber middleware&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.gofiber.io/guide/error-handling" target="_blank" rel="noopener"
+>Fiber error handling&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.redhat.com/ko/topics/middleware/what-is-middleware" target="_blank" rel="noopener"
+>Redhat - 미들웨어란&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Golang으로 백엔드 개발하기 - 3. 웹 애플리케이션 개발해보기 (feat. fiber)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-webapp/</link><pubDate>Fri, 13 Aug 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-webapp/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-webapp/output.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 3. 웹 애플리케이션 개발해보기 (feat. fiber)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>이번에는 Go언어에서 &lt;strong>유명한 웹 프레임워크를 비교&lt;/strong>해보고 간단하게 &lt;strong>Pingpong 서버를 개발&lt;/strong>해보겠습니다.
 다만 &amp;ldquo;&lt;em>Golang으로 백엔드 개발하기&lt;/em>&amp;ldquo;를 주제로 글을 쓰면서 주 목적으로 했던 것은 개발하면서 계속 궁금했지만 어딘가에서 뚜렷한 설명을 찾아보기 힘들었던 내용들을
 다뤄보고자하는 것이었기 때문에 이번 주제는 그닥 주 목적에 해당하는 주제는 아니므로 이번엔 아주 가~볍게 훑어보고 넘어가겠습니다.

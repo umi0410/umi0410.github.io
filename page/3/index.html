@@ -1,15 +1,15 @@
 <!doctype html><html lang=ko-kr>
-<head><meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="메가존 클라우드에서 데브옵스 엔지니어 인턴으로 근무했던 후기를 작성했습니다."><title>Category: 메가존 클라우드 인턴 후기 - Jinsu Playground</title>
-<link rel=canonical href=https://umi0410.github.io/categories/megazone-cloud-internship/>
-<link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="Category: 메가존 클라우드 인턴 후기 - Jinsu Playground">
-<meta property="og:description" content="메가존 클라우드에서 데브옵스 엔지니어 인턴으로 근무했던 후기를 작성했습니다.">
-<meta property="og:url" content="https://umi0410.github.io/categories/megazone-cloud-internship/">
+<head>
+<meta name=generator content="Hugo 0.87.0"><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!"><title>Jinsu Playground</title>
+<link rel=canonical href=https://umi0410.github.io/>
+<link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="Jinsu Playground">
+<meta property="og:description" content="깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!">
+<meta property="og:url" content="https://umi0410.github.io/">
 <meta property="og:site_name" content="Jinsu Playground">
-<meta property="og:type" content="website"><meta property="og:updated_time" content=" 2021-09-01T12:46:54+09:00 "><meta property="og:image" content="https://umi0410.github.io/categories/megazone-cloud-internship/thumbnail.png">
-<meta name=twitter:title content="Category: 메가존 클라우드 인턴 후기 - Jinsu Playground">
-<meta name=twitter:description content="메가존 클라우드에서 데브옵스 엔지니어 인턴으로 근무했던 후기를 작성했습니다."><meta name=twitter:card content="summary_large_image">
-<meta name=twitter:image content="https://umi0410.github.io/categories/megazone-cloud-internship/thumbnail.png"><link rel=alternate type=application/rss+xml href=https://umi0410.github.io/categories/megazone-cloud-internship/index.xml>
+<meta property="og:type" content="website"><meta property="og:updated_time" content=" 2021-09-01T12:46:54+09:00 ">
+<meta name=twitter:title content="Jinsu Playground">
+<meta name=twitter:description content="깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!"><link rel=alternate type=application/rss+xml href=https://umi0410.github.io/index.xml>
 <link rel="shortcut icon" href=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png>
 <script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-177403492-1','auto'),ga('send','pageview'))</script>
 <link rel=preconnect href=https://fonts.googleapis.com>
@@ -70,93 +70,38 @@
 </ol>
 </aside>
 <main class="main full-width">
-<h3 class=section-title>
-Categories
+<section class=article-list>
+<article class=has-image>
+<header class=article-header>
+<div class=article-image>
+<a href=/blog/aws/aws_eks_elb/>
+<img src=/blog/aws/aws_eks_elb/preview_huc38b74e19f60c2848e88837c4c6920fa_1709468_800x0_resize_box_3.png srcset="/blog/aws/aws_eks_elb/preview_huc38b74e19f60c2848e88837c4c6920fa_1709468_800x0_resize_box_3.png 800w, /blog/aws/aws_eks_elb/preview_huc38b74e19f60c2848e88837c4c6920fa_1709468_1600x0_resize_box_3.png 1600w" width=800 height=432 loading=lazy alt="Featured image of post EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기">
+</a>
+</div>
+<div class=article-details>
+<header class=article-category>
+<a href=/categories/aws/>
+AWS
+</a>
+</header>
+<h2 class=article-title>
+<a href=/blog/aws/aws_eks_elb/>EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기</a>
+</h2>
+<h3 class=article-subtitle>
+`데브옵스` 인턴으로 근무한 지가 벌써 두 달이 되어갑니다. 이것 저것 배운 것이 많았던 시간이었는데, 그 중 꽤나 삽질을 했던 `Kubernetes` 와 `ELB`를 이용하는 부분에 대해 정리를 해볼까합니다. `jenkins`, `spinnaker`, `argo`, `terraform`, `ansible`, `github action`, ... 등등 다양한 내용을 경험할 수 있던 시간이었지만, 그 중 kubernetes에서 무슨 작업을 하던 빼놓을 수 없으면서 어딘가 깔끔히 그 흐름이 정리된 곳을 보기 힘들었던 **service를 ELB에 연결**하기에 대한 내용을 정리해보겠습니다.
+*본 포스트는 EKS를 통해 K8s를 이용할 때를 기준으로 설명합니다.*
 </h3>
-<div class=section-card>
-<div class=section-details>
-<h3 class=section-count>6 pages</h3>
-<h1 class=section-term>메가존 클라우드 인턴 후기</h1>
-<h2 class=section-description>메가존 클라우드에서 데브옵스 엔지니어 인턴으로 근무했던 후기를 작성했습니다.</h2>
-</div>
-<div class=section-image>
-<img src=/categories/megazone-cloud-internship/thumbnail_huaed2850ad2750bd21c0ea378f4b3d958_6575_120x120_fill_box_smart1_3.png width=120 height=120 loading=lazy>
-</div>
-</div>
-<section class=article-list--compact>
-<article>
-<a href=/blog/megazone-cloud/index/>
-<div class=article-details>
-<h2 class=article-title>메가존 클라우드 데브옵스 인턴 후기</h2>
-<footer class=article-time>
-<time datetime=2020-09-04T12:46:54+09:00>Sep 04, 2020</time>
-</footer>
-</div>
-<div class=article-image>
-<img src=/blog/megazone-cloud/index/mzcloud-logo_huaed2850ad2750bd21c0ea378f4b3d958_6575_120x120_fill_box_smart1_3.png width=120 height=120 loading=lazy>
-</div>
-</a>
-</article>
-<article>
-<a href=/blog/megazone-cloud/stargate-infra/>
-<div class=article-details>
-<h2 class=article-title>1. Stargate라는 인프라 구축기</h2>
-<footer class=article-time>
-<time datetime=2020-09-04T12:46:54+09:00>Sep 04, 2020</time>
-</footer>
-</div>
-<div class=article-image>
-<img src=/blog/megazone-cloud/stargate-infra/dev-architecture.svg loading=lazy alt="Featured image of post 1. Stargate라는 인프라 구축기">
-</div>
-</a>
-</article>
-<article>
-<a href=/blog/megazone-cloud/ci-cd-pipeline/>
-<div class=article-details>
-<h2 class=article-title>2. Github Action, Spinnaker을 이용한 CI/CD 파이프라인 구축기</h2>
-<footer class=article-time>
-<time datetime=2020-09-04T12:46:54+09:00>Sep 04, 2020</time>
-</footer>
-</div>
-<div class=article-image>
-<img src=/blog/megazone-cloud/ci-cd-pipeline/ci-cd-pipeline_hu2d78a6f76281dd93e8329c8b5a44cef9_282268_120x120_fill_box_smart1_3.png width=120 height=120 loading=lazy>
-</div>
-</a>
-</article>
-<article>
-<a href=/blog/megazone-cloud/argo-poc/>
-<div class=article-details>
-<h2 class=article-title>3. Argo Project들에 대한 PoC(개념 증명) 진행</h2>
-<footer class=article-time>
-<time datetime=2020-09-04T12:46:54+09:00>Sep 04, 2020</time>
-</footer>
-</div>
-<div class=article-image>
-<img src=/blog/megazone-cloud/argo-poc/argo-events-top-level_hu911ca173f7b6efecb06ab37a91a70151_401443_120x120_fill_box_smart1_3.png width=120 height=120 loading=lazy>
-</div>
-</a>
-</article>
-<article>
-<a href=/blog/megazone-cloud/spaceone-helm/>
-<div class=article-details>
-<h2 class=article-title>4. SpaceONE Helm Chart 개발</h2>
-<footer class=article-time>
-<time datetime=2020-09-04T12:46:54+09:00>Sep 04, 2020</time>
-</footer>
-</div>
-</a>
-</article>
-<article>
-<a href=/blog/megazone-cloud/spacectl/>
-<div class=article-details>
-<h2 class=article-title>5. SpaceONE CLI Client인 spacectl 설계 및 개발</h2>
-<footer class=article-time>
-<time datetime=2020-09-04T12:46:54+09:00>Sep 04, 2020</time>
-</footer>
-</div>
-</a>
+<footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--published>Sep 06, 2020</time>
+</footer></div>
+</header>
 </article>
 </section>
+<nav class=pagination>
+<a class=page-link href=/>1</a>
+<a class=page-link href=/page/2/>2</a>
+<span class="page-link current">3</span>
+</nav>
 <footer class=site-footer>
 <section class=copyright>
 &copy;
