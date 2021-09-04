@@ -1,4 +1,237 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Wed, 01 Sep 2021 12:46:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Golang으로 백엔드 개발하기 - 4. Custom Middleware(미들웨어) 작성해보기 (feat. fiber)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/</link><pubDate>Wed, 01 Sep 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/log.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 4. Custom Middleware(미들웨어) 작성해보기 (feat. fiber)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sun, 05 Sep 2021 01:46:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Golang으로 백엔드 개발하기 - 5. Error Handling. 에러 잘 처리하기 (feat. fiber)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/</link><pubDate>Sun, 05 Sep 2021 01:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/chain.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 5. Error Handling. 에러 잘 처리하기 (feat. fiber)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>드디어 에러를 다뤄볼 차례가 됐네요. 작년까지만 해도 &lt;code>Error&lt;/code>나 &lt;code>Exception&lt;/code> 처리의 중요성을 잘 몰랐던 것 같습니다. 하지만 API &lt;strong>클라이언트랑 작업을 하면 할수록 에러 처리의 중요성을 느끼게 되는 것 같아요&lt;/strong>. 왜냐하면 백엔드에서 각각의 에러 케이스에 대한 &lt;code>status_code&lt;/code>나 &lt;code>error_type&lt;/code>등을 명확히 정의하지 않으면 클라이언트는 에러를 해석할 방법이 없기 때문입니다.&lt;/p>
+&lt;p>또한 &lt;strong>에러를 잘 처리한 뒤 올바르게 응답하거나 로그를 남기는 것은 유지/보수 시에 백엔드 개발자 스스로 에게도 정말 중요&lt;/strong>할 수 있습니다. 우리는 실제 운영 환경의 로그를 마치 우리가 로컬에서 개발할 때 처럼 항상 보고있을 수는 없기 때문이죠. 즉 에러 로그만 따로 &amp;ldquo;편리하게&amp;rdquo; 볼 수 있거나 에러 로그로 인한 Notification System이 있으면 훨씬 에러를 추적(Tracing)하기 쉽겠죠!&lt;/p>
+&lt;p>그리고 &lt;strong>&lt;code>Golang&lt;/code>은 다른 언어들과 달리 Try Catch의 형태로 에러를 처리하지 않는다&lt;/strong>는 점을 모두들 알고 계실 겁니다. 하지만 이 에러를 그럼 어떻게 처리하지에 대한 방안은 뚜렷이 인지하지 못한 경우가 많을 수 있습니다.(제가 그랬습니다. ㅎㅎ..) 그래서 대충 에러 로그를 출력하게만 하고 통일성 없는 방식으로 그때 그때 떠오르는 대로 에러처리를 해왔던 것 같아요.&lt;/p>
+&lt;p>그럼 이번 글에서는 에러를 왜 우아하게, 잘 처리해야하는지 살펴보고 그를 위한 방법도 소개해보겠습니다.&lt;/p>
+&lt;h2 id="-에러를-wrapping-하자">📦 에러를 Wrapping 하자&lt;/h2>
+&lt;p>다른 언어들은 에러를 상속해 정의하는 방식을 이용하지만 &lt;strong>&lt;code>Golang&lt;/code>은 에러를 &lt;code>Wrapping&lt;/code>하는 방식을 이용&lt;/strong>합니다. 좀 낯설어서 그렇지 익숙해지면 훨씬 간결한 것 같습니다.&lt;/p>
+&lt;p>예를 들어 Redis 관련 에러는 모두 추상적인 에러인 &lt;code>RedisError&lt;/code>에 속하고 조회 도중 발생한 에러는 &lt;code>RedisGetError&lt;/code>라고 정의하는 경우가 있다고 해보겠습니다. 자바의 경우는 다음과 같이 정의하겠죠.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">RedisError&lt;/span> &lt;span class="kd">extends&lt;/span> &lt;span class="n">Exception&lt;/span>&lt;span class="o">{&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="nf">RedisError&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">String&lt;/span> &lt;span class="n">msg&lt;/span>&lt;span class="o">){&lt;/span>
+&lt;span class="kd">super&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">msg&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">RedisGetError&lt;/span> &lt;span class="kd">extends&lt;/span> &lt;span class="n">RedisError&lt;/span>&lt;span class="o">{&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="nf">RedisError&lt;/span>&lt;span class="o">(){&lt;/span>
+&lt;span class="kd">super&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="s">&amp;#34;레디스 조회 관련 에러&amp;#34;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">Something&lt;/span>&lt;span class="o">{&lt;/span>
+&lt;span class="kd">public&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">somethingWithRedis&lt;/span>&lt;span class="o">(){&lt;/span>
+&lt;span class="k">try&lt;/span>&lt;span class="o">{&lt;/span>
+&lt;span class="n">redis&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">get&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="s">&amp;#34;X&amp;#34;&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;span class="o">}&lt;/span> &lt;span class="k">catch&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">RedisGetError&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="o">){&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// 레디스 조회 관련 에러 케이스에 대한 대응
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="o">}&lt;/span> &lt;span class="k">catch&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">RedisError&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="o">){&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// 레디스 조회를 제외한 레디스 관련 에러 케이스에 대한 대응
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="o">}&lt;/span> &lt;span class="k">catch&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="n">Exception&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="o">){&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// 그 외의 모든 에러 케이스에 대한 대응
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;span class="o">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>이렇게 Java의 경우는 &lt;code>상속&lt;/code>을 통해 각 에러 케이스에 대해 대응합니다. 하지만 Golang에서는 주로 다음과 같은 방법으로 에러를 처리합니다.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;code>error.New(msg string)&lt;/code> 으로 sentinel error(더 이상 쪼갤 수 없는 최상위 에러 같은 느낌)를 정의&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>fmt.Errorf(&amp;quot;%s: %w&amp;quot;, msg, sentinelErr)&lt;/code> 으로 sentinel error를 감싼(wrap) 자식 에러를 정의&lt;/p>
+&lt;p>에러를 Wrapping 하면 sentinel error에 좀 더 정보를 추가할 수 있어 친절한 에러가 되죠!&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>errors.Is(err, parentErr)&lt;/code> 으로 err의 wrapping chain에 parentErr이 존재하는지 판단&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>에러를 Wrapping한다는 개념이 잘 이해되지 않는 분들은 &lt;a class="link" href="https://golangbyexample.com/wrapping-and-unwrapping-error-golang/" target="_blank" rel="noopener"
+>Wrapping and Un-wrapping of error in Go (Golang)&lt;/a>을 참고해주시면 좋을 것 같습니다.&lt;/p>
+&lt;p>그럼 Go에선 위와 같은 케이스가 어떻게 구현될 수 있는지 적어보겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">var&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;span class="nx">ErrRedis&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;레디스 관련 에러&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">ErrRedisGet&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Errorf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;조회 도중 에러: %w&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrRedis&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">)&lt;/span>
+&lt;span class="kd">type&lt;/span> &lt;span class="nx">Something&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">Something&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">somethingWithRedis&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">redis&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;X&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Is&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrRedisGet&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// 레디스 조회 관련 에러 케이스에 대한 대응
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Is&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrRedis&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// 레디스 조회를 제외한 레디스 관련 에러 케이스에 대한 대응
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// 그 외의 모든 에러 케이스에 대한 대응
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Go에서 error는 &lt;code>interface&lt;/code>이기 때문에 간혹 &lt;code>type assertion&lt;/code>을 이용해 에러의 타입을 비교하거나 직접 error variable와 비교하는 경우도 있긴합니다만 바람직하지는 않습니다. type assertion은 애초에 다소 불안하거나 번거로운 면이 있고 직접 error value와 비교하는 경우는 해당 error value를 제공하던 package가 추후에는 어떤 error value를 재정의할 지 모르기 때문입니다. &lt;strong>예를 들어 &lt;code>ErrRedisGet&lt;/code> 를 리턴하던 패키지가 &lt;code>ErrRedisGet&lt;/code> 를 Wrapping한 &lt;code>ErrRedisHashGet&lt;/code> 를 리턴하는 형태로 변경됐다고 가정&lt;/strong>합시다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">var&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;span class="nx">ErrRedis&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;레디스 관련 에러&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">ErrRedisGet&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Errorf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;조회 도중 에러: %w&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrRedis&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">)&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">r&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">redis&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">HashGet&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">key&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">Hash&lt;/span> &lt;span class="nx">Get&lt;/span> &lt;span class="nx">도중&lt;/span> &lt;span class="nx">에러가&lt;/span> &lt;span class="nx">발생한&lt;/span> &lt;span class="nx">경우&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrRedisGet&lt;/span> &lt;span class="c1">// 이 버전에서는 ErrRedisGet을 리턴함.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// 에러가 발생하지 않은 경우
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">Something&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">somethingWithRedis&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">redis&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">HashGet&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;X&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nx">ErrRedisGet&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="c1">// Redis 조회 도중 에러가 발생한 경우에 대한 대응
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>기존 버전에선 &lt;code>ErrRedisGet&lt;/code> 을 리턴하고, 그 결과를 확인하는 메소드에서도 &lt;code>ErrRedisGet&lt;/code> 과 직접 &lt;code>==&lt;/code>으로 비교를 하니 올바르게 동작합니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 131; flex-basis: 314px">
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/chain.png" data-size="929x708">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/chain.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/chain_hua96618047d845851ee10ee4de25bc827_61443_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/chain_hua96618047d845851ee10ee4de25bc827_61443_1024x0_resize_box_3.png 1024w"
+width="929"
+height="708"
+loading="lazy"
+alt="chain.png">
+&lt;/a>
+&lt;figcaption>chain.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">var&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;span class="nx">ErrRedis&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;레디스 관련 에러&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">ErrRedisGet&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Errorf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;조회 도중 에러: %w&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrRedis&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">ErrRedisHashGet&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Errorf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;해쉬 조회 도중 에러: %w&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrRedisGet&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">)&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">r&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">redis&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">HashGet&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">key&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">Hash&lt;/span> &lt;span class="nx">Get&lt;/span> &lt;span class="nx">도중&lt;/span> &lt;span class="nx">에러가&lt;/span> &lt;span class="nx">발생한&lt;/span> &lt;span class="nx">경우&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrRedisHashGet&lt;/span> &lt;span class="c1">// 이 버전에서는 ErrRedisGet을 리턴함.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// 에러가 발생하지 않은 경우
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">Something&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">somethingWithRedis&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">redis&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">HashGet&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;X&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="c1">// 만약 아래처럼 errors.Is를 이용하면 ErrRedisGet은 실제로 리턴된
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// ErrRedisHashGet의 wrapping chain에 존재하므로 기존과 동일하게
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// 올바르게 동작할 수 있음.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// if errors.Is(err, ErrRedisGet){}
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="c1">// 하지만 이제는 ==을 통한 직접 비교는 예상한대로 동작하지 못함 ㅜㅜ
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nx">ErrRedisGet&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="c1">// ㅜㅜ
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="o">...&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>하지만 다음 버전에선 &lt;code>redis.HashGet()&lt;/code> 이 Hash에 대한 조회 도중 에러가 발생했을 땐 &lt;code>ErrRedisGet&lt;/code>이 아닌 그것을 Wrap한 &lt;code>ErrRedisHashGet&lt;/code>을 리턴한다면 기존의 &lt;code>==&lt;/code>을 이용한 직접 비교는 올바른 결과를 가져다주지 못할 것입니다.&lt;/p>
+&lt;p>다소 어렵거나 낯설 수 있는 내용이라 간단한 내용을 위주로 예시를 들어봤습니다. 관심이 있으신 분들은 기본으로 제공되는 &lt;code>errors&lt;/code> 패키지 외에 &lt;a class="link" href="https://github.com/pkg/errors" target="_blank" rel="noopener"
+>https://github.com/pkg/errors&lt;/a> 라는 패키지를 이용하는 경우도 있으니 한 번 살펴보시면 좋을 것 같습니다.&lt;/p>
+&lt;p>자, 그럼 에러를 Wrap하라는 내용 하나 갖고 얘기를 주절 주절 길게 했으니 이제 실제로 웹 백엔드 개발에서의 에러 처리에 대해 알아봅시다~!&lt;/p>
+&lt;h2 id="-웹서버가-에러를-제대로-처리하지-않으면">🤔 웹서버가 에러를 제대로 처리하지 않으면?&lt;/h2>
+&lt;p>에러를 제대로 처리하지 않으면 일반적으로 웹 프레임워크들은 &lt;code>500 Internal Error&lt;/code>로 응답하기 때문에 Client는 &lt;code>500 Internal Error&lt;/code> 응답 밖에 받을 수 없습니다&amp;hellip; 경우에 따라서는 Body는 올바르게 받을 수도 있긴하지만 매우 불안하죠. 에러의 원인을 모르니 클라이언트 측에서도 유저에게 &lt;strong>&amp;ldquo;알 수 없는 이유로 요청에 실패했습니다.&amp;rdquo; 같은 메시지를 띄운다면 유저 경험도 당연히 좋지 않아지겠죠&lt;/strong>.&lt;/p>
+&lt;p>각 에러 케이스에 적절히 대응해서 응답하면 클라이언트와 유저가 모두 잘 반응할 수 있을 것입니다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>로그인하지 않은 유저의 요청이라 에러가 난 경우&lt;/strong> =&amp;gt; 401 Unauthorized 응답 =&amp;gt; 클라이언트는 유저를 로그인 창으로 안내함.&lt;/li>
+&lt;li>권한이 없는 유저의 요청이라 에러가 난 경우 =&amp;gt; 403 Forbidden 응답 =&amp;gt; 클라이언트는 유저에게 권한이 없어서 불가능하다는 친절한 오류 메시지를 띄움.&lt;/li>
+&lt;li>&lt;strong>존재하지 않는 리소스에 접근해 에러가 난 경우&lt;/strong> =&amp;gt; 404 Not Found 응답 =&amp;gt; 클라이언트는 유저에게 해당 리소스가 존재하지 않는다는 친절한 오류 메시지를 띄움.&lt;/li>
+&lt;/ul>
+&lt;h2 id="fiber에서-에러-처리하는-법">&lt;code>Fiber&lt;/code>에서 에러 처리하는 법&lt;/h2>
+&lt;p>&lt;code>fiber&lt;/code>는 golang 웹 프레임워크들 중에서 문서가 참 잘 되어있는 편이라고 생각합니다. &lt;a class="link" href="https://docs.gofiber.io/guide/error-handling" target="_blank" rel="noopener"
+>Error Handling&lt;/a> 파트를 보면 웹 프레임워크단에서는 어떻게 에러를 처리할 지 간단히 살펴볼 수 있습니다. Default Error Handler는 기본적으로 사용되는 것이고, Custom Error Handler을 따로 정의해 이용을 할 수도 있습니다. 하지만 저는 저번 시간에 다뤘던 &lt;code>Middleware&lt;/code> 방식을 이용해 에러를 잘 처리해보겠습니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 160; flex-basis: 386px">
+&lt;a href="https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/errorhandler.png" data-size="1142x710">&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/errorhandler.png"
+srcset="https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/errorhandler_hucfef4304ecce075cbbc083aa9e1131cf_67229_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/how-to-backend-in-go-errorhandle/errorhandler_hucfef4304ecce075cbbc083aa9e1131cf_67229_1024x0_resize_box_3.png 1024w"
+width="1142"
+height="710"
+loading="lazy"
+alt="errorhandler.png">
+&lt;/a>
+&lt;figcaption>errorhandler.png&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>간단히 조금 설명을 드리자면 Fiber에서 제공하는 Error Handler는 &lt;code>fiber.Handler&lt;/code>들이 리턴한 error 타입을 실제 HTTP Response로 어떻게 변환을 할까에 대한 내용을 포함하고 있는 것이고, 제가 정의하는 미들웨어 방식의 Error Handler는 하나의 middleware로서 다른 &lt;code>fiber.Handler&lt;/code>(미들웨어 혹은 요청 핸들러)가 리턴한 error을 fiber의 Default Error Handler가 이해할 수 있는 fiber의 error type으로 변환시키는 것이라고 보시면 됩니다.&lt;/p>
+&lt;h3 id="예시---username으로-user-조회">예시 - username으로 User 조회&lt;/h3>
+&lt;p>전체 코드는 이전 글들과 마찬가지로 제 깃헙 &lt;a class="link" href="https://github.com/umi0410/how-to-backend-in-go/tree/master/errorhandle" target="_blank" rel="noopener"
+>umi0410/how-to-backend-in-go&lt;/a>에 올려두겠습니다. 글에서는 간단한 코드 비교와 HTTP 응답만 설명드릴게요.&lt;/p>
+&lt;p>에러를 잘 Wrapping한 정도에 따라 다르게 응답하는 세 가지 경우가 있습니다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Worst&lt;/strong> - 에러를 어딘가에 정의하지도 Wrap하지도 않은 익명 에러 리턴 =&amp;gt; 적절히 에러를 판단할 수 없어 500 Error&lt;/li>
+&lt;li>&lt;strong>Ungraceful&lt;/strong> - 어딘가에 정의된 Error을 리턴 =&amp;gt; 에러를 적절히 판단해 올바른 Status code로 응답은 가능하지만 에러에 대한 자세한 문맥이나 설명이 없음.&lt;/li>
+&lt;li>&lt;strong>Graceful&lt;/strong> - 에러를 잘 Wrap해서 리턴 =&amp;gt; 에러를 적절히 판단해 올바른 Status code로 응답할 수 있고 에러에 대한 자세한 문맥이나 설명도 클라이언트에게 제시됨.&lt;/li>
+&lt;/ul>
+&lt;p>코드로 보면 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">var&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;span class="nx">ErrResourceNotFound&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;존재하지 않는 리소스&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">users&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">[]&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nx">User&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">User&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">Name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s">&amp;#34;우미잉&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Age&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">25&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Username&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s">&amp;#34;umi0410&amp;#34;&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">)&lt;/span>
+&lt;span class="o">...&lt;/span> &lt;span class="nx">생략&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">svc&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">UserService&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">GetUserWorst&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">username&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nx">User&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">user&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">users&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Username&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nx">username&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">nil&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;유저가 존재하지 않는 유저(username=&amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">username&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s">&amp;#34;)&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">svc&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">UserService&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">GetUserUngracefully&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">username&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nx">User&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">user&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">users&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Username&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nx">username&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">nil&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrResourceNotFound&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">svc&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">UserService&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">GetUserGracefully&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">username&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="nx">User&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">user&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">users&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Username&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nx">username&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">user&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">nil&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Errorf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;입력된 username=%s: %w&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">username&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrResourceNotFound&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>위와 같이 에러와 에러를 리턴하는 서비스 메소드들을 정의하고 커스텀 에러 핸들러로서의 미들웨어는 아래와 같이 작성했습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="kd">func&lt;/span> &lt;span class="nf">customErrorHandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">ctx&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Ctx&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">error&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// 다음 핸들러를 호출한 뒤
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// 본 미들웨어의 작업은 사후처리!
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Next&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Is&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">ErrResourceNotFound&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// fiber의 Default Error Handler가 알아들을 수 있는 형태의 fiber Error을 리턴
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="nx">fiber&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">NewError&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">404&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Error&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">err&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>이 미들웨어는 다른 일반적인 미들웨어들과는 약간은 다르게 동작한다고 볼 수 있는데요. &lt;strong>대부분의 미들웨어들은 요청을 실제로 처리하기 전에 자신의 작업을 수행하는 사전처리 방식을 이용&lt;/strong>하는데요. 예를 들어 저번 글에서 살펴본 basic auth 미들웨어는 요청을 처리하는 핸들러 이전에 미들웨어로서 요청자의 인증 정보를 기입(사전처리)하는 역할을 했죠. 하지만 &lt;strong>이 미들웨어는 요청을 처리하는 핸들러의 결과 에러를 이용하기 때문에 미들웨어가 시작하자마자 다음 핸들러를 호출하고 그 결과 에러를 이용합니다. 사후처리 방식이죠!&lt;/strong>&lt;/p>
+&lt;p>그럼 이제 customErrorHandler가 리턴한 에러를 fiber의 Default Error Handler가 잘 처리해줄 것입니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">$ curl http://localhost:8000/worst/jinsu -w &amp;#34;\t%{http_code}\n&amp;#34;
+유저가 존재하지 않는 유저(username=jinsu) 500
+$ curl http://localhost:8000/ungraceful/jinsu -w &amp;#34;\t%{http_code}\n&amp;#34;
+존재하지 않는 리소스 404
+$ curl http://localhost:8000/graceful/jinsu -w &amp;#34;\t%{http_code}\n&amp;#34;
+입력된 username=jinsu: 존재하지 않는 리소스 404
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>응답을 보시면 worst case의 경우 status code가 500이기 때문에 클라이언트가 해당 에러 케이스에 대해 올바른 처리를 할 수 있는 방법이 없습니다.. 응답을 정규표현식을 이용해 판단해야할까요..? ㅎㅎ&amp;hellip;&lt;/p>
+&lt;p>그리고 ungraceful case의 경우 status code는 404로 잘 정의되었지만 응답 바디가 다소 불친절해 클라이언트측에서 디버깅하기가 힘들겠죠.&lt;/p>
+&lt;p>반면 graceful한 경우에는 status code도 잘 정의되었고 에러 바디도 자세합니다 굿굿이에요!&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>정말 작년까지는 에러를 핸들링하는 것에 대해 별 생각이 없었던 것 같습니다. 하지만 사이드 프로젝트를 하면서 에러를 제대로 처리하지 않아 &lt;code>Index Out Of Range 런타임 에러&lt;/code> 하나에도 서버가 종료되어버린다거나 모든 에러를 &lt;code>500 Internal Error&lt;/code>로 리턴해버리는 케이스를 겪으면서 &amp;lsquo;&lt;em>아&amp;hellip; 에러를 잘 처리해야 하는구나&lt;/em>&amp;lsquo;를 느껴볼 수 있었고, 실제 프로덕트를 개발하면서 &amp;lsquo;&lt;em>클라이언트 측에서 에러에 대한 적절한 액션을 취하기 위해선 status code나 error_type등을 잘 전달해야겠구나&lt;/em>&amp;rsquo; 라는 생각도 해볼 수 있었던 것 같습니다.&lt;/p>
+&lt;p>게다가 Go에서 에러를 처리하는 방법에 대해 깊게 생각을 못해봤었는데 &lt;a class="link" href="https://github.com/yorkie-team/yorkie" target="_blank" rel="noopener"
+>yorkie&lt;/a> 라는 오픈소스에 기여(&lt;a class="link" href="https://github.com/yorkie-team/yorkie/pull/222" target="_blank" rel="noopener"
+>PR #222&lt;/a> )하게 되면서 멘토님께서 잘 이끌어주셔서 에러를 Wrapping한다는 개념에 대해 자세히 알아볼 수 있었던 기회가 된 것 같습니다.&lt;/p>
+&lt;p>이번에 &lt;a class="link" href="https://www.depromeet.com/" target="_blank" rel="noopener"
+>디프만&lt;/a> 10기로 활동하게 되었는데 10기 인터뷰 당시에도 클라이언트와 협업하면서 어려웠던 점과 해결해나간 방식과 관련된 질문을 받았을 때에도 에러 핸들링과 관련지어 답변을 했을만큼 에러 핸들링은 &amp;lsquo;&lt;em>그래도 내가 한편으로는 아직 성장하고 있나보다.. ㅎㅎ&lt;/em>&amp;lsquo;를 느낄 수 있었던 새로운 경험이었던 것 같습니다! 이 글을 읽으시는 &lt;strong>여러분들도 이제 에러 잘 처리하고 저와 함께 클라이언트에게 칭찬받는 백엔드 개발자가 되어봅시다&lt;/strong>~!&lt;/p>
+&lt;h2 id="참고">참고&lt;/h2>
+&lt;ul>
+&lt;li>Working with Errors in Go 1.13 - &lt;a class="link" href="https://go.dev/blog/go1.13-errors" target="_blank" rel="noopener"
+>https://go.dev/blog/go1.13-errors&lt;/a>&lt;/li>
+&lt;li>Wrapping and Un-wrapping of error in Go (Golang) - &lt;a class="link" href="https://golangbyexample.com/wrapping-and-unwrapping-error-golang/" target="_blank" rel="noopener"
+>https://golangbyexample.com/wrapping-and-unwrapping-error-golang/&lt;/a>&lt;/li>
+&lt;li>Add RPC Config validation and handle the errors (&lt;a class="link" href="https://github.com/yorkie-team/yorkie" target="_blank" rel="noopener"
+>yorkie&lt;/a> PR #222) - &lt;a class="link" href="https://github.com/yorkie-team/yorkie/pull/222" target="_blank" rel="noopener"
+>https://github.com/yorkie-team/yorkie/pull/222&lt;/a>&lt;/li>
+&lt;li>fiber docs Error Handling - &lt;a class="link" href="https://docs.gofiber.io/guide/error-handling" target="_blank" rel="noopener"
+>https://docs.gofiber.io/guide/error-handling&lt;/a>&lt;/li>
+&lt;li>Error는 검사만 하지말고, 우아하게 처리하세요. - &lt;a class="link" href="http://cloudrain21.com/golang-graceful-error-handling" target="_blank" rel="noopener"
+>http://cloudrain21.com/golang-graceful-error-handling&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Golang으로 백엔드 개발하기 - 4. Custom Middleware(미들웨어) 작성해보기 (feat. fiber)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/</link><pubDate>Wed, 01 Sep 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-middleware/log.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 4. Custom Middleware(미들웨어) 작성해보기 (feat. fiber)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>안녕하세요. 저번 글에서는 &lt;code>fiber&lt;/code> 라는 웹 프레임워크로 간단히 웹 애플리케이션을 만드는 방법에 대해 알아봤으니
 이번엔 웹 애플리케이션을 만들다보면 꼭 필요해지는 &lt;code>middleware&lt;/code> 작성법에 대해 알아보겠습니다.
 여태까지 백엔드에서 서버를 개발하면서는 &lt;code>JS&lt;/code>의 &lt;code>Express&lt;/code> 프레임워크를 제외하고는 미들웨어 개발이 그닥 쉽게 이해되는 부분은 아니었던 것 같습니다.
@@ -876,7 +1109,7 @@ alt="o2m-relation.png">
 &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;TourProduct(id=%d, name=%s, manager=%s)\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">tour&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Edges&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Manager&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ID&lt;/span>&lt;span class="p">)&lt;/span>
 &lt;span class="p">}&lt;/span>
 &lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;pre>&lt;code>전체 유저 조회
+&lt;/code>&lt;/pre>&lt;/div>&lt;pre tabindex="0">&lt;code>전체 유저 조회
 User(id=umi0410, name=박진수)
 User(id=devumi, name=개발자)
 --------------------------------------------------------------------------
@@ -3495,7 +3728,7 @@ tag를 이용해 이미지를 제공하기는 힘들었고, 맞는 방향이 아
 &lt;p>간단하게 &lt;code>spacectl&lt;/code>이 어떤 식으로 이용되는 도구인지 예시를 보여드리겠습니다.
 아래의 커맨드를 이용해 손쉽게 &lt;code>SpaceONE&lt;/code>의 다양한 마이크로서비스들의 API를 이용할
 수 있습니다.&lt;/p>
-&lt;pre>&lt;code>$ spacectl list domain
+&lt;pre tabindex="0">&lt;code>$ spacectl list domain
 domain_id | name | state | plugin_id ...
 domain-abc123abc | umi0410| ENABLED | ...
 $ spacectl list server -p domain_id=domain-abc123abc
