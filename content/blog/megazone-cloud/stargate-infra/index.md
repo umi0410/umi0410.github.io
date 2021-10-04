@@ -13,8 +13,7 @@ description: |
   등등을 배포한 이야기
 ---
 ## Stargate라는 개발 인프라 구축기
-
-![dev-architecture](dev-architecture.svg)
+![dev-architecture.svg](/blog/megazone-cloud/stargate-infra/dev-architecture.svg)
 
 <p align="center">chart by Jinsu Park</p>
 
