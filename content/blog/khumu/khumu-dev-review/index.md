@@ -18,6 +18,10 @@ description: |
 ![](capture-1.png)
 ![](capture-3.png)
 
+* [Github](https://github.com/khu-dev)
+* [PlayStore 출시](https://play.google.com/store/apps/details?id=com.khumu.android)
+* [프로젝트 및 팀 소개 페이지](https://khumu.oopy.io/)
+
 학교 수업을 듣다보니 한 학기에 2개 3개의 프로젝트를 개발해야하는 경우가 있었습니다. 완전 개발이 처음이었던 시기에는 이러한
 양적인 개발 속에서도 배울 점이 많았지만 어느 정도 지나고 나니 양적인 개발 속에서는 크게 배울 점이 느껴지지 않았고, 머리가 아닌
 손으로 개발을 하고 있는 느낌을 받게 되었습니다.
