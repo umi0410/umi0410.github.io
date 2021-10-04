@@ -3279,7 +3279,7 @@ alt="spaceone_preview_2">
 기술이 다가 아닌, 팀원들을 위해 솔선수범하는 개발자,
 팀원들의 생각을 읽어줄 수 있고, 잘 이해해줄 수 있는 개발자가 되기 위해 노력해야겠단 생각이 듭니다.
 쉽진 않겠지만, 나아가고 싶은 방향은 정해진 것 같아 다행입니다!&lt;/p></description></item><item><title>1. Stargate라는 인프라 구축기</title><link>https://umi0410.github.io/blog/megazone-cloud/stargate-infra/</link><pubDate>Fri, 04 Sep 2020 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/megazone-cloud/stargate-infra/</guid><description>&lt;img src="https://umi0410.github.io/blog/megazone-cloud/stargate-infra/dev-architecture.svg" alt="Featured image of post 1. Stargate라는 인프라 구축기" />&lt;h2 id="stargate라는-개발-인프라-구축기">Stargate라는 개발 인프라 구축기&lt;/h2>
-&lt;p>&lt;img src="https://umi0410.github.io/dev-architecture.svg" alt="dev-architecture" />&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/megazone-cloud/stargate-infra/dev-architecture.svg" alt="dev-architecture.svg" />&lt;/p>
 &lt;!-- raw HTML omitted -->
 &lt;p>저희 팀의 개발 인프라는 위와 같습니다. 마침 제가 입사할 쯤이 기존에 존재하던 인프라를 새로운 환경으로
 이전해야할 시점이었습니다. 덕분에 저는 저희 개발 환경을 처음부터 구축하고, 우리의 서비스를
