@@ -146,9 +146,9 @@ srcset="https://umi0410.github.io/blog/ssr-serverless-og/awslabs_hucebe86c00a0fa
 width="1163"
 height="728"
 loading="lazy"
-alt="awslabs github">
+alt="awslabs Github - https://github.com/awslabs/aws-lambda-go-api-proxy">
 &lt;/a>
-&lt;figcaption>awslabs github&lt;/figcaption>
+&lt;figcaption>awslabs Github - &lt;a href="https://github.com/awslabs/aws-lambda-go-api-proxy">https://github.com/awslabs/aws-lambda-go-api-proxy&lt;/a>&lt;/figcaption>
 &lt;/figure>&lt;/p>
 &lt;p>AWS에서 개발 중인 오픈소스 같습니다. 최근 커밋도 6일 전인 활발한 프로젝트인가봐요! (근데 왜 &lt;code>ALB(TargetGroup) - Lambda&lt;/code>에 대한 어댑터나 프록시 오픈소스는 개발을 해주지 않은 걸까요.. 궁금합니다.)&lt;/p>
 &lt;p>어쨌든 &lt;code>Lambda&lt;/code> + &lt;code>API Gateway&lt;/code>를 이용하면서 저렴하면서도 편리하게 개발을 할 수 있었습니다. 여기서 끝나면 좋았겠지만 다음 삽질이 있었습니다.&lt;/p>

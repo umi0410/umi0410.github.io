@@ -175,9 +175,9 @@ SSR로 오픈 그래프 메타데이터들이 담긴 HTML을 제공</strong>해�
 </code></pre></div><p>위와 같이 람다로 들어오는 요청을 처리하기 위한 핸들러를 찾아 호출하는 로직을 직접 구현하지 않고 기존의 유명한 웹 프레임워크들과 그에 대한 어댑터를 통해 개발할 수 있었습니다! (참고: <a class=link href=https://github.com/awslabs/aws-lambda-go-api-proxy target=_blank rel=noopener>aws-lambda-go-api-proxy</a>)
 람다의 핸들러가 <code>fiber</code> 앱에게 요청을 넘겨서 그 응답을 리턴하는 형태죠. fiber 앱의 <strong>핸들러들은 SSR 방식의 동적으로 생성된 HTML들을 리턴</strong>해줬습니다.</p>
 <p><figure style=flex-grow:159;flex-basis:383px>
-<a href=/blog/ssr-serverless-og/awslabs.png data-size=1163x728><img src=/blog/ssr-serverless-og/awslabs.png srcset="/blog/ssr-serverless-og/awslabs_hucebe86c00a0fac0cd2e2c5a874c5ec8d_132590_480x0_resize_box_3.png 480w, /blog/ssr-serverless-og/awslabs_hucebe86c00a0fac0cd2e2c5a874c5ec8d_132590_1024x0_resize_box_3.png 1024w" width=1163 height=728 loading=lazy alt="awslabs github">
+<a href=/blog/ssr-serverless-og/awslabs.png data-size=1163x728><img src=/blog/ssr-serverless-og/awslabs.png srcset="/blog/ssr-serverless-og/awslabs_hucebe86c00a0fac0cd2e2c5a874c5ec8d_132590_480x0_resize_box_3.png 480w, /blog/ssr-serverless-og/awslabs_hucebe86c00a0fac0cd2e2c5a874c5ec8d_132590_1024x0_resize_box_3.png 1024w" width=1163 height=728 loading=lazy alt="awslabs Github - https://github.com/awslabs/aws-lambda-go-api-proxy">
 </a>
-<figcaption>awslabs github</figcaption>
+<figcaption>awslabs Github - <a href=https://github.com/awslabs/aws-lambda-go-api-proxy>https://github.com/awslabs/aws-lambda-go-api-proxy</a></figcaption>
 </figure></p>
 <p>AWS에서 개발 중인 오픈소스 같습니다. 최근 커밋도 6일 전인 활발한 프로젝트인가봐요! (근데 왜 <code>ALB(TargetGroup) - Lambda</code>에 대한 어댑터나 프록시 오픈소스는 개발을 해주지 않은 걸까요.. 궁금합니다.)</p>
 <p>어쨌든 <code>Lambda</code> + <code>API Gateway</code>를 이용하면서 저렴하면서도 편리하게 개발을 할 수 있었습니다. 여기서 끝나면 좋았겠지만 다음 삽질이 있었습니다.</p>
