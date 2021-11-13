@@ -21,11 +21,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Noto+Sans+KR:wght@400&display=swap" rel="stylesheet">
 <style>
-        /// Overwrite CSS variable
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+        /*/// Overwrite CSS variable*/
+        /* 커스텀 폰트 Pretendard
+        참고: https://github.com/orioncactus/pretendard?fbclid=IwAR23hPNsiUD4Q1DLldv6VPZMgGxtZyrm9_zcc6rN4PKIaYNhQhfi9SqRtZ4*/
         :root{
             --body-background: #fafeff;
-            --base-font-family: 'Noto Sans KR', sans-serif;
+            --base-font-family: Pretendard, 'Noto Sans KR', sans-serif;
         }
         .site-name{
             --site-name-font-family: 'East Sea Dokdo', cursive;
