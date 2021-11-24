@@ -1,13 +1,13 @@
 <!doctype html><html lang=ko-kr>
 <head>
-<meta name=generator content="Hugo 0.89.2"><meta charset=utf-8>
+<meta name=generator content="Hugo 0.89.4"><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!"><title>Jinsu Playground</title>
 <link rel=canonical href=https://umi0410.github.io/>
 <link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="Jinsu Playground">
 <meta property="og:description" content="깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!">
 <meta property="og:url" content="https://umi0410.github.io/">
 <meta property="og:site_name" content="Jinsu Playground">
-<meta property="og:type" content="website"><meta property="og:updated_time" content=" 2021-11-07T03:46:54+09:00 ">
+<meta property="og:type" content="website"><meta property="og:updated_time" content=" 2021-11-24T03:46:54+09:00 ">
 <meta name=twitter:title content="Jinsu Playground">
 <meta name=twitter:description content="깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!"><link rel=alternate type=application/rss+xml href=https://umi0410.github.io/index.xml>
 <link rel="shortcut icon" href=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png>
@@ -71,6 +71,36 @@
 </aside>
 <main class="main full-width">
 <section class=article-list>
+<article class=has-image>
+<header class=article-header>
+<div class=article-image>
+<a href=/blog/optimizing-count-query-strategy/>
+<img src=/blog/optimizing-count-query-strategy/index_hu2e0266c55b356006b8efd84bbe6e386e_394889_800x0_resize_box_3.png srcset="/blog/optimizing-count-query-strategy/index_hu2e0266c55b356006b8efd84bbe6e386e_394889_800x0_resize_box_3.png 800w, /blog/optimizing-count-query-strategy/index_hu2e0266c55b356006b8efd84bbe6e386e_394889_1600x0_resize_box_3.png 1600w" width=800 height=752 loading=lazy alt="Featured image of post 쿼리 최적화하기 - 조회수와 같은 Count 성격의 작업 최적화하기 (N+1 문제 관련, feat. Redis)">
+</a>
+</div>
+<div class=article-details>
+<header class=article-category>
+<a href=/categories/golang/>
+Golang (Go 언어)
+</a>
+<a href=/categories/spring/>
+Spring (스프링)
+</a>
+<a href=/categories/jpa/>
+JPA
+</a>
+</header>
+<h2 class=article-title>
+<a href=/blog/optimizing-count-query-strategy/>쿼리 최적화하기 - 조회수와 같은 Count 성격의 작업 최적화하기 (N+1 문제 관련, feat. Redis)</a>
+</h2>
+<h3 class=article-subtitle>
+백엔드 개발을 하며 흔히 겪을 수 있는 N+1 문제나 비효율적 쿼리 문제, 그 중에서도 조회수와 같은 Count 성격의 작업을 Redis를 이용해 어떻게 최적화할 수 있을지 다뤄보았습니다.
+</h3>
+<footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--published>Nov 24, 2021</time>
+</footer></div>
+</header>
+</article>
 <article class=has-image>
 <header class=article-header>
 <div class=article-image>
@@ -269,30 +299,6 @@ Computer Science의 주요 파트 중 하나인 운영체제에서 이론적으�
 </h3>
 <footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
 <time class=article-time--published>Jan 20, 2021</time>
-</footer></div>
-</header>
-</article>
-<article class=has-image>
-<header class=article-header>
-<div class=article-image>
-<a href=/blog/golang/go-vs-java-oop/>
-<img src=/blog/golang/go-vs-java-oop/declaration_hu2809de309117ad963d612eaa5a399aab_35836_800x0_resize_box_3.png srcset="/blog/golang/go-vs-java-oop/declaration_hu2809de309117ad963d612eaa5a399aab_35836_800x0_resize_box_3.png 800w, /blog/golang/go-vs-java-oop/declaration_hu2809de309117ad963d612eaa5a399aab_35836_1600x0_resize_box_3.png 1600w" width=800 height=700 loading=lazy alt="Featured image of post Go vs Java - Go에서의 객체 지향">
-</a>
-</div>
-<div class=article-details>
-<header class=article-category>
-<a href=/categories/golang/>
-Golang (Go 언어)
-</a>
-</header>
-<h2 class=article-title>
-<a href=/blog/golang/go-vs-java-oop/>Go vs Java - Go에서의 객체 지향</a>
-</h2>
-<h3 class=article-subtitle>
-주로 Java로 설명되는 객체지향적인 특징들을 Go에서는 어떻게 적용할 수 있는지 알아봤습니다.
-</h3>
-<footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-<time class=article-time--published>Jan 09, 2021</time>
 </footer></div>
 </header>
 </article>
