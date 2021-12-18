@@ -42,7 +42,7 @@ params:
         subtitle: 깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!
         avatar:
             local: true
-            src: media/profile_2_circle.png
+            src: media/profile-3.jpg
 
     article:
         math: false # 수식 표현
