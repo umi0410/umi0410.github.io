@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on Jinsu Playground</title><link>https://umi0410.github.io/page/</link><description>Recent content in Pages on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://umi0410.github.io/page/index.xml" rel="self" type="application/rss+xml"/><item><title>About me</title><link>https://umi0410.github.io/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/about/</guid><description>😄 소개 이름: 박진수
 학력: 경희대학교 컴퓨터공학과
 자기소개
-Golang, Cloud services, MSA, 컨테이너와 자동화, 깔끔한 아키텍쳐에 관심이 많습니다.
-어떤 기술을 배우거나 적용시킬 때 &amp;ldquo;언제&amp;rdquo;, &amp;ldquo;왜&amp;rdquo; 그 기술이 필요한지에 대해 생각해보는 것을 좋아합니다.
-특히나 요즘은 Golang을 이용한 Go스러운 개발과 Messaging Service에 관심이 많습니다.
-진행 중인 프로젝트에서는 MSA와 K8s, ArgoCD, Github Action, Golang, Python등을 적용하며 서비스 설계와 다양한 기술들을 공부 중입니다.
-관심사 깔끔하고 튼튼한 백엔드 구조 및 설계 TDD, Mocking 테스트 및 배포 자동화 Golang Java Spring Boot 마이크로서비스 아키텍쳐 메시지 큐 컨테이너 클라우드 인프라 상황에 맞는 AWS 인프라 설계 CI/CD 파이프라인 📅 활동 내용 배틀팡 백엔드 개발 [2021.</description></item><item><title>Archives</title><link>https://umi0410.github.io/archives/</link><pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/archives/</guid><description/></item><item><title>Search</title><link>https://umi0410.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/search/</guid><description/></item></channel></rss>
+Golang, Spring, 클라우드 인프라, MSA, 컨테이너와 자동화, 대규모 트래픽과 확장성을 고려한 설계 등에 관심이 많습니다.
+어떤 기술을 배우거나 적용시킬 때 &amp;ldquo;언제&amp;rdquo;, &amp;ldquo;왜&amp;rdquo; 그 기술이 필요한지에 대해 생각해보는 것을 좋아합니다. 그런 생각을 자유롭게 공유하는 자리를 사랑합니다 :)
+특히나 요즘은 대용량 트래픽, 대규모 프로젝트에 대비한 캐싱이나 데이터베이스 설계, CQRS에 관심이 많습니다.
+위와 같은 주제로 자유롭게 의견을 공유하는 것을 좋아하는 팀원들을 만나 좋은 케미를 내며 개발해나가는 게 꿈입니다.</description></item><item><title>Archives</title><link>https://umi0410.github.io/archives/</link><pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/archives/</guid><description/></item><item><title>Search</title><link>https://umi0410.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/search/</guid><description/></item></channel></rss>
