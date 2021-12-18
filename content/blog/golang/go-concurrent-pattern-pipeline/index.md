@@ -6,7 +6,7 @@ chapter: false
 pre: "<b></b>"
 weight: 110
 noDisqus: false
-draft: false
+draft: true
 image: illustration.png
 categories:
   - Golang
@@ -14,6 +14,10 @@ description: |
   Golang의 Concurrent pattern 중 하나로서 Channel을 바탕으로 커뮤니케이션하며 작업을 진행하는 패턴인
   Pipeline pattern에 대해 간략해 소개해봤고, 언제 사용해야할지 그 use case에 대해 알아보았습니다. 
 ---
+
+> **본 게시글은 Pipeline pattern에 공부한 뒤 작성했지만, 이후 개인적으로 Pipeline pattern에 대해 동의하지 못할 만할 내용을 많이 발견하여
+> 숨기기 처리한 게시글입니다.** 본 게시글의 내용을 믿지 마세요...
+
 ## ✋ 시작하며
 
 `Go`를 공부하기 시작한 지도 벌써 몇 달이 지난 것 같다. 데브옵스 인턴을 마치면서 특히나 관심있었던 Go를 공부하기 시작했었고, 지난 몇 달간 AWS KRUG내의 소모임인 AUSG의 스터디 활동으로 Go를 주제로 공부해왔다. Golang의 꽃이라고 할 수 있는 요소들이 몇 개 있었는데 나는 그 중 `goroutine`과 `channel`에서 매력을 느꼈고 그를 바탕으로한 `concurrency pattern`들에 대해 이래 저래 많이 알아봐왔다.
