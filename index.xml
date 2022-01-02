@@ -1226,13 +1226,26 @@ alt="output.png">
 &lt;li>내가 Go 언어를 선택한 이유 - &lt;a class="link" href="https://pronist.tistory.com/67" target="_blank" rel="noopener"
 >https://pronist.tistory.com/67&lt;/a>&lt;/li>
 &lt;/ul></description></item><item><title>Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)</title><link>https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/</link><pubDate>Sat, 17 Jul 2021 12:46:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/how-to-backend-in-go-testcode/test-with-ide.png" alt="Featured image of post Golang으로 백엔드 개발하기 - 2. 테스트 코드 작성 및 Go에서 Mocking 이용하기 (gomock, testify 이용)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
-&lt;p>저는 &lt;code>Go 언어&lt;/code>를 공부하면서 거의 처음으로 본격적인 테스트 코드를 작성하게 되었습니다. 과거에는 그저 기능을 구현하는 것에만 관심이 있었지 애플리케이션을 어떻게 계층을 나눠 설계할지, 어떻게 해야 유지 보수하기 쉬우면서 안정적인 개발을 할 수 있을지에 대한 고민을 하지 않았습니다. 하지만 Go를 공부하면서 &lt;code>클린 아키텍쳐&lt;/code>나 &lt;code>MSA&lt;/code>, &lt;code>동시성 패턴&lt;/code> 등을 비롯해 &lt;code>테스트 코드&lt;/code>에 대해서도 공부해볼 수 있었습니다. 그 중에서도 테스트 코드에 대해 공부해보며 익혔던 점들을 바탕으로 이번 글에서는 &lt;strong>Golang으로 백엔드 개발을 하면서 테스트 코드를 어떻게 작성할 수 있을지&lt;/strong>에 대해 알아보려합니다.&lt;/p>
+&lt;p>저는 &lt;code>Go 언어&lt;/code>를 공부하면서 처음으로 테스트 코드라는 것을 접하게 되었습니다.
+과거에는 그저 기능을 구현하는 것에만 관심이 있었지 애플리케이션을 어떻게 계층을 나눠 설계할지,
+어떻게 해야 유지 보수하기 쉬우면서 안정적인 개발을 할 수 있을지에 대한 고민을 하지 않았습니다.&lt;/p>
+&lt;p>하지만 Go를 공부하면서부터는 &lt;code>클린 아키텍쳐&lt;/code>나 &lt;code>MSA&lt;/code>, &lt;code>동시성 패턴&lt;/code> 등을 비롯해 &lt;code>테스트 코드&lt;/code>에
+대해서도 공부해볼 수 있었습니다.
+그 중에서도 테스트 코드에 대해 공부해보며 익혔던 점들을 바탕으로 이번 글에서는
+&lt;strong>Golang으로 백엔드 개발을 하면서 테스트 코드를 어떻게 작성할 수 있을지&lt;/strong>에 대해 알아보려합니다.&lt;/p>
 &lt;p>본 글에서 사용된 예시 코드는 &lt;a class="link" href="https://github.com/umi0410/how-to-backend-in-go/tree/master/testcode" target="_blank" rel="noopener"
 >저의 Github how-to-backend-in-go 레포지토리&lt;/a>에 업로드 해둘테니 참고하실 분들은 참고해주세요~!&lt;/p>
 &lt;h2 id="tdd-test-driven-development와-유닛-테스트">TDD (Test Driven Development)와 유닛 테스트&lt;/h2>
-&lt;p>사용자의 반응에 맞춰 재빠르게 대응할 수 있도록 개발 주기가 빨라지면서 &lt;code>DevOps&lt;/code> 문화 뿐만 아니라 &lt;code>TDD&lt;/code>도 많은 인기를 얻게 된 것 같습니다. &lt;code>TDD&lt;/code>란 개발을 먼저 다~ 진행한 뒤 한 번에 배포하거나 시간 날 때 테스트 코드를 짜는 것이 아니라 우리가 개발해야할 최소한의 내용들을 검증할 수 있는 테스트 코드를 먼저 작성한 뒤 해당 테스트를 통과하는 코드를 개발해나가는 개발 방법론입니다.&lt;/p>
-&lt;p>TDD에 대해 설명하자면 TDD만으로도 책 몇 권의 분량이 될 수 있고, 저 또한 TDD를 잘 아는 것은 아니기에 자세한 설명은 생략하겠습니다. &lt;strong>이번 글의 주된 내용은 TDD에 대해 소개하는 것보다는 Golang으로 유닛 테스트를 작성&lt;/strong>하는 요령입니다.&lt;/p>
-&lt;p>유닛 테스트는 다른 계층과 무관하게 독립적으로 각각의 메소드의 기능을 테스트하는 것이라고 볼 수 있겠습니다. 계층마다 해당 테스트를 통해 검증하고자 하는 주요한 내용은 다를 수 있습니다. 유닛 테스트는 주로 자신만을 테스트 하기 때문에 자기 계층의 동작을 테스트하지 다른 계층의 동작까지 테스트하진 않습니다. 또한 경우에 따라 아예 다른 계층을 실제로 이용하지 않고 모킹(Mocking)한 타입을 이용하는 경우도 있습니다.&lt;/p>
+&lt;p>사용자의 반응에 맞춰 재빠르게 대응할 수 있도록 개발 주기가 빨라지면서 &lt;code>DevOps&lt;/code> 문화 뿐만 아니라
+&lt;code>TDD&lt;/code>도 많은 인기를 얻게 된 것 같습니다.
+&lt;code>TDD&lt;/code>란 개발을 먼저 다~ 진행한 뒤 한 번에 배포하거나 시간 날 때 테스트 코드를 짜는 것이 아니라
+우리가 개발해야할 최소한의 내용들을 검증할 수 있는 테스트 코드를 먼저 작성한 뒤 해당 테스트를 통과하는 코드를 개발해나가는 개발 방법론입니다.&lt;/p>
+&lt;p>TDD에 대해 설명하자면 TDD만으로도 책 몇 권의 분량이 될 수 있고, 저 또한 TDD를 잘 아는 것은 아니기에 자세한 설명은 생략하겠습니다.
+이번 글의 주된 내용은 TDD에 대해 소개하는 것보다는 &lt;strong>Golang으로 유닛 테스트를 작성&lt;/strong>하는 요령입니다.&lt;/p>
+&lt;p>유닛 테스트는 다른 계층과 무관하게 독립적으로 각각의 메소드의 기능을 테스트하는 것이라고 볼 수 있겠습니다.
+계층마다 해당 테스트를 통해 검증하고자 하는 주요한 내용은 다를 수 있습니다.
+유닛 테스트는 주로 자신만을 테스트 하기 때문에 자기 계층의 동작을 테스트하지 다른 계층의 동작까지 테스트하진 않습니다.
+또한 경우에 따라 아예 다른 계층을 실제로 이용하지 않고 모킹(Mocking)한 타입을 이용하는 경우도 있습니다.&lt;/p>
 &lt;ol>
 &lt;li>
 &lt;p>&lt;strong>Data access layer&lt;/strong>&lt;/p>
@@ -1260,15 +1273,19 @@ alt="output.png">
 &lt;/ul>
 &lt;/li>
 &lt;/ol>
-&lt;p>참고로 &lt;strong>저는 Business layer를 위주로 테스트&lt;/strong>하고 있습니다. Data access layer의 경우 많은 부분이 Database framework(ORM)을 통해 검증이 되었고, Presentation layer도 Web framework들에 의해 많은 부분이 검증되었을 뿐 아니라 포스트맨 같은 도구들을 통해 확인해보기도 쉽기 때문입니다. 반면 Business layer의 동작은 매번 눈으로 혹은 머리로 확인하기 쉽지 않기 때문입니다.&lt;/p>
+&lt;p>참고로 &lt;strong>저는 Business layer를 위주로 테스트&lt;/strong>하고 있습니다.
+Data access layer의 경우 많은 부분이 Database framework(ORM)을 통해 검증이 되었고,
+Presentation layer도 Web framework들에 의해 많은 부분이 검증되었을 뿐 아니라 포스트맨 같은 도구들을 통해 확인해는 것이 더 편한 경우도 존재하기 때문입니다.
+반면 Business layer의 동작은 매우 중요하고, 테스트 코드 없이 매번 수작업으로 그 동작을 검증하는 것은 매우 번거롭기 때문입니다.&lt;/p>
+&lt;p>(계층이나 관심사를 어떻게 나누냐에 따라 Business layer는 다양하게 불리는 것 같습니다. 예를 들어 내부 계층, 도메인 계층, 코어 로직 계층 등등으로 불리기도 합니다.)&lt;/p>
 &lt;h2 id="unit-test를-도입하기-전에-알아두면-좋은-것들">Unit test를 도입하기 전에 알아두면 좋은 것들&lt;/h2>
 &lt;ol>
-&lt;li>테스트를 위한 의존성 주입 및 변수 초기화 방법&lt;/li>
+&lt;li>유연성을 위한 의존성 주입 및 변수 초기화 방법&lt;/li>
 &lt;li>mocking에 대하여&lt;/li>
 &lt;li>assert 구문 이용&lt;/li>
 &lt;/ol>
 &lt;p>Spring을 바탕으로 개발하는 경우 JUnit이라는 테스트 프레임워크를 주로 이용하고 이를 통해 테스트하는 방식이 거의 정형화 되어있는 것 같습니다. 하지만 Golang은 그닥 테스트 코드를 작성하는 형태가 정형화되어있지는 않습니다. 하지만 어떤 언어나 프레임워크를 통해 유닛 테스트 코드를 사용하든 위의 세 가지 항목들을 어떻게 이용할 지 알아야할 것입니다.&lt;/p>
-&lt;h3 id="1-테스트를-위한-의존성-주입-및-변수-초기화-방법">1. 테스트를 위한 의존성 주입 및 변수 초기화 방법&lt;/h3>
+&lt;h3 id="1-유연성을-위한-의존성-주입-및-변수-초기화-방법">1. 유연성을 위한 의존성 주입 및 변수 초기화 방법&lt;/h3>
 &lt;p>어떠한 모듈이 자신의 멤버 변수들을 내부적으로 생성하는 것이 아니라 외부에서 주입 받는 형태인 &lt;code>의존성 주입&lt;/code>은 유연한 의존성 관리를 위해 권장됩니다. 예를 들어 User에 대한 도메인/비즈니스 로직을 실행하며 UserRepository를 이용해 User를 영속적으로 저장하기도 하는 UserService가 UserRepository에 의존하는 경우를 살펴봅시다.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// 1. 의존성 주입 형태 - Good
 &lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">NewUserService&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">userRepository&lt;/span> &lt;span class="nx">UserRepository&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">UserService&lt;/span>&lt;span class="p">{&lt;/span>
@@ -1704,20 +1721,11 @@ alt="o2m-relation.png">
 &lt;p>&lt;em>출처: &lt;a class="link" href="https://entgo.io/docs/schema-edges" target="_blank" rel="noopener"
 >https://entgo.io/docs/schema-edges&lt;/a>&lt;/em>&lt;/p>
 &lt;p>위와 같은 경우 데이터베이스상으로는 &lt;code>Pet&lt;/code> 테이블이 자신의 &lt;code>owner_id&lt;/code> 컬럼을 통해 &lt;code>User&lt;/code>을 참조하므로 &lt;code>Pet&lt;/code>이 &lt;code>From&lt;/code>, &lt;code>User&lt;/code>가 &lt;code>To&lt;/code>가 되며 이를 통해 owner라는 관계를 나타낼 수 있습니다.
-하지만 &lt;code>ent&lt;/code>는 그 반대로 &lt;code>User&lt;/code>가 &lt;code>Pet&lt;/code>을 관리(참조)한다는 의미로 &lt;code>User&lt;/code>가 &lt;code>From&lt;/code>, &lt;code>Pet&lt;/code>이 &lt;code>To&lt;/code>가 되어 &lt;code>pets&lt;/code>라는 관계를 나타내는 식으로 정의합니다. 이러한 대조적인 방식으로 인해 많은 사람들이 혼란을 겪는 것 같습니다.&lt;/p>
-&lt;p>굳이 이러한 방식이 합당한 이유를 찾아보자면&amp;hellip; 저는 collection의 아이템 관리 방식과 유사하게 관계를 정의하고 싶어서가 아니었을까 싶습니다.&lt;/p>
-&lt;p>예를 들어 일반적으로 우리는 collection에 아이템을 추가할 때 다음과 같이 코드를 작성하지 데이터베이스의 방식처럼 아이템(N)이 자신이 속하는 컬렉션(1)을 설정하지 않습니다.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// Go에서의 예시
-&lt;/span>&lt;span class="c1">// 1. 컬렉션 방식
-&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Pets&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nb">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Pets&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">newPet&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;span class="c1">// 2. 보통의 우리가 생각하는 데이터베이스의 방식. N쪽이 1을 참조
-&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="nx">newPet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Owner&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">user&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="c1">// Java에서의 예시
-&lt;/span>&lt;span class="c1">// 1. 컬렉션 방식
-&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">pets&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">append&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">newPet&lt;/span>&lt;span class="o">);&lt;/span>
-&lt;span class="c1">// 2. 보통의 우리가 생각하는 데이터베이스의 방식. N쪽이 1을 참조
-&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">newPet&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">setOwner&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="o">);&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>아무튼 그래서 ent에서는 &lt;strong>1:N 방식에서 1이 연관 관계의 주인처럼 동작/정의한다&lt;/strong>고 생각하고 작업하고 있습니다.(실제 문서에서도 From쪽 즉 1 혹은 User 쪽이 연관 관계의 주인이라고 기술되어있는데, 이 부분은 JPA와는 거의 반대라고 볼 수 있죠.) 사실 굳이 저렇게 정의하는 이유가 뭘까 나름의 이유를 붙여본 것이고, 그냥 &lt;strong>예시를 참고하시면서 테이블의 참조 관계랑 반대라고 외우시길 추천&lt;/strong>(ㅎㅎ&amp;hellip;.;;)합니다!&lt;/p>
+하지만 &lt;code>ent&lt;/code>는 그 반대로 &lt;code>User&lt;/code>가 &lt;code>Pet&lt;/code>을 관리(참조)한다는 의미로 &lt;code>User&lt;/code>가 &lt;code>From&lt;/code>, &lt;code>Pet&lt;/code>이 &lt;code>To&lt;/code>가 되어 &lt;code>pets&lt;/code>라는 관계를 나타내는 식으로 정의하는 것 같습니다.
+이렇게 기존의 테이블 설계 방식과는 대조되는 방식으로 인해 많은 사람들이 혼란을 겪는 것 같아요.&lt;/p>
+&lt;p>이렇게 테이블을 정의하도록 ent를 개발한 개발자들의 의도나 철학은 뭔지 잘 모르겠습니다. 혹시 아시는 분이 있다면 알려주시면 좀 더 entf를 이해하는 데에 도움이 될 것 같아요!&lt;/p>
+&lt;p>아무튼 ent에서는 &lt;strong>1:N 방식에서 1이 연관 관계의 주인처럼 동작/정의한다&lt;/strong>고 생각하고 작업하고 있습니다.(실제 문서에서도 From쪽. 즉 1 혹은 User 쪽이 연관 관계의 주인이라고 기술되어있는데, 이 부분은 JPA와는 거의 반대라고 볼 수 있죠.)
+저는 그냥 &lt;strong>예시를 참고하면서 실제 테이블의 참조 관계랑 반대라고 외웠어요.&lt;/strong>(ㅎㅎ&amp;hellip;.;;)&lt;/p>
 &lt;h4 id="스키마-정의-및-적용">스키마 정의 및 적용&lt;/h4>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="c1">// ent/schema/user.go
 &lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kn">package&lt;/span> &lt;span class="nx">schema&lt;/span>

@@ -188,20 +188,11 @@ $ go run entgo.io/ent/cmd/ent init TourProduct <span class=c1># or shortly $ ent
 </figure></p>
 <p><em>출처: <a class=link href=https://entgo.io/docs/schema-edges target=_blank rel=noopener>https://entgo.io/docs/schema-edges</a></em></p>
 <p>위와 같은 경우 데이터베이스상으로는 <code>Pet</code> 테이블이 자신의 <code>owner_id</code> 컬럼을 통해 <code>User</code>을 참조하므로 <code>Pet</code>이 <code>From</code>, <code>User</code>가 <code>To</code>가 되며 이를 통해 owner라는 관계를 나타낼 수 있습니다.
-하지만 <code>ent</code>는 그 반대로 <code>User</code>가 <code>Pet</code>을 관리(참조)한다는 의미로 <code>User</code>가 <code>From</code>, <code>Pet</code>이 <code>To</code>가 되어 <code>pets</code>라는 관계를 나타내는 식으로 정의합니다. 이러한 대조적인 방식으로 인해 많은 사람들이 혼란을 겪는 것 같습니다.</p>
-<p>굳이 이러한 방식이 합당한 이유를 찾아보자면&mldr; 저는 collection의 아이템 관리 방식과 유사하게 관계를 정의하고 싶어서가 아니었을까 싶습니다.</p>
-<p>예를 들어 일반적으로 우리는 collection에 아이템을 추가할 때 다음과 같이 코드를 작성하지 데이터베이스의 방식처럼 아이템(N)이 자신이 속하는 컬렉션(1)을 설정하지 않습니다.</p>
-<div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// Go에서의 예시
-</span><span class=c1>// 1. 컬렉션 방식
-</span><span class=c1></span><span class=nx>user</span><span class=p>.</span><span class=nx>Pets</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>user</span><span class=p>.</span><span class=nx>Pets</span><span class=p>,</span> <span class=nx>newPet</span><span class=p>)</span>
-<span class=c1>// 2. 보통의 우리가 생각하는 데이터베이스의 방식. N쪽이 1을 참조
-</span><span class=c1></span><span class=nx>newPet</span><span class=p>.</span><span class=nx>Owner</span> <span class=p>=</span> <span class=nx>user</span>
-</code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=c1>// Java에서의 예시
-</span><span class=c1>// 1. 컬렉션 방식
-</span><span class=c1></span><span class=n>user</span><span class=o>.</span><span class=na>pets</span><span class=o>.</span><span class=na>append</span><span class=o>(</span><span class=n>newPet</span><span class=o>);</span>
-<span class=c1>// 2. 보통의 우리가 생각하는 데이터베이스의 방식. N쪽이 1을 참조
-</span><span class=c1></span><span class=n>newPet</span><span class=o>.</span><span class=na>setOwner</span><span class=o>(</span><span class=n>user</span><span class=o>);</span>
-</code></pre></div><p>아무튼 그래서 ent에서는 <strong>1:N 방식에서 1이 연관 관계의 주인처럼 동작/정의한다</strong>고 생각하고 작업하고 있습니다.(실제 문서에서도 From쪽 즉 1 혹은 User 쪽이 연관 관계의 주인이라고 기술되어있는데, 이 부분은 JPA와는 거의 반대라고 볼 수 있죠.) 사실 굳이 저렇게 정의하는 이유가 뭘까 나름의 이유를 붙여본 것이고, 그냥 <strong>예시를 참고하시면서 테이블의 참조 관계랑 반대라고 외우시길 추천</strong>(ㅎㅎ&mldr;.;;)합니다!</p>
+하지만 <code>ent</code>는 그 반대로 <code>User</code>가 <code>Pet</code>을 관리(참조)한다는 의미로 <code>User</code>가 <code>From</code>, <code>Pet</code>이 <code>To</code>가 되어 <code>pets</code>라는 관계를 나타내는 식으로 정의하는 것 같습니다.
+이렇게 기존의 테이블 설계 방식과는 대조되는 방식으로 인해 많은 사람들이 혼란을 겪는 것 같아요.</p>
+<p>이렇게 테이블을 정의하도록 ent를 개발한 개발자들의 의도나 철학은 뭔지 잘 모르겠습니다. 혹시 아시는 분이 있다면 알려주시면 좀 더 entf를 이해하는 데에 도움이 될 것 같아요!</p>
+<p>아무튼 ent에서는 <strong>1:N 방식에서 1이 연관 관계의 주인처럼 동작/정의한다</strong>고 생각하고 작업하고 있습니다.(실제 문서에서도 From쪽. 즉 1 혹은 User 쪽이 연관 관계의 주인이라고 기술되어있는데, 이 부분은 JPA와는 거의 반대라고 볼 수 있죠.)
+저는 그냥 <strong>예시를 참고하면서 실제 테이블의 참조 관계랑 반대라고 외웠어요.</strong>(ㅎㅎ&mldr;.;;)</p>
 <h4 id=스키마-정의-및-적용>스키마 정의 및 적용</h4>
 <div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// ent/schema/user.go
 </span><span class=c1></span><span class=kn>package</span> <span class=nx>schema</span>
@@ -375,7 +366,7 @@ TourProduct(id=1, name=미국 뉴욕 여행, manager=umi0410)
 <section class=copyright>
 &copy;
 2020 -
-2021 Jinsu Playground
+2022 Jinsu Playground
 </section>
 <section class=powerby>
 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a>로 만듦 <br>
