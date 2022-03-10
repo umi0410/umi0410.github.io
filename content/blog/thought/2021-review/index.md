@@ -1,6 +1,6 @@
 ---
 title: "2021년 회고"
-date: 2021-10-02T15:46:54+09:00
+date: 2021-12-20T15:46:54+09:00
 weight: 37
 noDisqus: false
 draft: false

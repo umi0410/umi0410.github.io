@@ -31,8 +31,8 @@ menu:
 ## 기술 스택 및 관심사
 
 * 깔끔하고 튼튼한 백엔드 구조 및 설계
+  * Java Spring Boot, JPA
   * Golang
-  * Java Spring Boot
   * MSA, DDD, CQRS, 메시지 큐, 이벤트 드리븐 아키텍쳐
   * TDD, Mocking
   * 테스트 및 배포 자동화
@@ -44,12 +44,22 @@ menu:
 
 ## 💼 경력 사항
 
+### [당근마켓](https://www.daangn.com/) 플랫폼 팀 서버 엔지니어 인턴 [2021.12~2022.02]
+
+- 문자 발송 플랫폼의 Golang 서버를 담당
+  - 특히 기존에 발생하던 에러를 올바르게 처리하는 업무를 진행
+  - 일반적으로 **하루 400건 정도 발생하던 문자 발송 에러를 95% 이상 해결 및 감소**
+- 문자 발송 업체의 장애 및 기타 장애들이 전파되지 않도록 애플리케이션 수준에서의 `Circuit breaker` 패턴을 적용
+- 하루 수 백건씩 발생하던 문자 발송 업체와의 `keep-alive` 관련 이슈 해결
+  - Wireshark로 TCP 패킷 분석 후 문자 업체 측 `MaxIdleConnectionTimeout`을 밝혀냄
+- 문자 발송이 성공적으로 수행되지 못한 케이스에 대한 재시도 로직 개선
+
 ### [배틀팡](https://battlepang.com) 개발 리드 [2021.03~2021.12]
 
 ![battlepang.drawio.png](/media/battlepang.drawio.png)
 ![battlepang-preview.png](/media/battlepang_preview.png)
 
-> 짧은 영상을 바탕으로한 대결 서비스 [배틀팡](https://battlepang.com)에서 AWS 인프라 관리 및 Spring boot 위주로 전체 백엔드 개발 중입니다.
+> 짧은 영상을 바탕으로한 대결 서비스 [배틀팡](https://battlepang.com)에서 AWS 인프라 관리 및 Spring boot 위주로 전체 백엔드 개발 했습니다.
 
 * `TDD`를 바탕으로 `Spring Boot` RESTful API 서버 개발
 * `JPA`를 이용하며 복잡한 참조 관계로 인한 성능 저하를 다양한 방법으로 해결
@@ -116,6 +126,7 @@ menu:
 ## 기타 활동들
 
 * **[개발 동아리 디프만](https://www.depromeet.com/)에서 10기 백엔드로 활동** [2021.08~2021.12]
+* 2021 **오픈소스 컨트리뷰션 아카데미** Golang Yorkie 프로젝트 멘티 [2021.08~2021.09]
 * **[오픈 소스 컨트리뷰톤: 오픈스택 팀 멘티](/experiences/open-source/open-source-contributhon-2020)** [2020.08~2020.09]
 * **한국 AWS Communitiy KRUG의 대학생 그룹 [AUSG](https://ausg.me)에서 3기로 활동 중** [2019.06~]
 * **경희대학교 소프트웨어 페스티발 웹/앱 최우수상 수상** [2019.11]
