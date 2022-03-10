@@ -1,125 +1,25 @@
-<!doctype html><html lang=ko-kr>
-<head><meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="경희대학교 커뮤니티 &#34;쿠뮤&#34;를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
+<!doctype html><html lang=ko-kr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="경희대학교 커뮤니티 &#34;쿠뮤&#34;를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
 정리해보려 합니다.
-"><title>쿠뮤 MVP 개발기</title>
-<link rel=canonical href=https://umi0410.github.io/blog/khumu/khumu-dev-review/>
-<link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="쿠뮤 MVP 개발기">
-<meta property="og:description" content="경희대학교 커뮤니티 &#34;쿠뮤&#34;를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
+"><title>쿠뮤 MVP 개발기</title><link rel=canonical href=https://umi0410.github.io/blog/khumu/khumu-dev-review/><link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="쿠뮤 MVP 개발기"><meta property="og:description" content="경희대학교 커뮤니티 &#34;쿠뮤&#34;를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
 정리해보려 합니다.
-">
-<meta property="og:url" content="https://umi0410.github.io/blog/khumu/khumu-dev-review/">
-<meta property="og:site_name" content="Jinsu Playground">
-<meta property="og:type" content="article"><meta property="article:section" content="Blog"><meta property="article:published_time" content="2021-10-02T15:46:54+09:00"><meta property="article:modified_time" content="2021-10-02T15:46:54+09:00"><meta property="og:image" content="https://umi0410.github.io/blog/khumu/khumu-dev-review/thumbnail-wide.png">
-<meta name=twitter:title content="쿠뮤 MVP 개발기">
-<meta name=twitter:description content="경희대학교 커뮤니티 &#34;쿠뮤&#34;를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
+"><meta property="og:url" content="https://umi0410.github.io/blog/khumu/khumu-dev-review/"><meta property="og:site_name" content="Jinsu Playground"><meta property="og:type" content="article"><meta property="article:section" content="Blog"><meta property="article:published_time" content="2021-10-02T15:46:54+09:00"><meta property="article:modified_time" content="2021-10-02T15:46:54+09:00"><meta property="og:image" content="https://umi0410.github.io/blog/khumu/khumu-dev-review/thumbnail-wide.png"><meta name=twitter:title content="쿠뮤 MVP 개발기"><meta name=twitter:description content="경희대학교 커뮤니티 &#34;쿠뮤&#34;를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
 정리해보려 합니다.
-"><meta name=twitter:card content="summary_large_image">
-<meta name=twitter:image content="https://umi0410.github.io/blog/khumu/khumu-dev-review/thumbnail-wide.png">
-<link rel="shortcut icon" href=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png>
-<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-177403492-1','auto'),ga('send','pageview'))</script>
-<link rel=preconnect href=https://fonts.googleapis.com>
-<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Noto+Sans+KR:wght@400&display=swap" rel=stylesheet>
-<style>@import 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css';:root{--body-background:#fafeff;--base-font-family:Pretendard, 'Noto Sans KR', sans-serif}.site-name{--site-name-font-family:'East Sea Dokdo', cursive;font-family:var(--site-name-font-family);font-size:3.2rem!important}.left-sidebar{--sidebar-avatar-size:200px}figure.site-avatar{margin-left:auto!important;margin-right:auto!important}</style>
-</head>
-<body class="article-page has-toc">
-<script>(function(){const a='StackColorScheme';localStorage.getItem(a)||localStorage.setItem(a,"auto")})()</script><script>(function(){const b='StackColorScheme',a=localStorage.getItem(b),c=window.matchMedia('(prefers-color-scheme: dark)').matches===!0;a=='dark'||a==='auto'&&c?document.documentElement.dataset.scheme='dark':document.documentElement.dataset.scheme='light'})()</script>
-<div class="container main-container flex
-extended">
-<div id=article-toolbar>
-<a href=https://umi0410.github.io class=back-home><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18"/></svg>
-<span>Back</span>
-</a>
-</div>
-<main class="main full-width">
-<article class="has-image main-article">
-<header class=article-header>
-<div class=article-image>
-<a href=/blog/khumu/khumu-dev-review/>
-<img src=/blog/khumu/khumu-dev-review/thumbnail-wide_hu54b7b06ccaab22efd2d5450276cad720_83729_800x0_resize_box_3.png srcset="/blog/khumu/khumu-dev-review/thumbnail-wide_hu54b7b06ccaab22efd2d5450276cad720_83729_800x0_resize_box_3.png 800w, /blog/khumu/khumu-dev-review/thumbnail-wide_hu54b7b06ccaab22efd2d5450276cad720_83729_1600x0_resize_box_3.png 1600w" width=800 height=187 loading=lazy alt="Featured image of post 쿠뮤 MVP 개발기">
-</a>
-</div>
-<div class=article-details>
-<header class=article-category>
-<a href=/categories/khumu/>
-쿠뮤
-</a>
-<a href=/categories/golang/>
-Golang (Go 언어)
-</a>
-</header>
-<h2 class=article-title>
-<a href=/blog/khumu/khumu-dev-review/>쿠뮤 MVP 개발기</a>
-</h2>
-<h3 class=article-subtitle>
-경희대학교 커뮤니티 "쿠뮤"를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
-정리해보려 합니다.
-</h3>
-<footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-<time class=article-time--published>Oct 02, 2021</time>
-</footer></div>
-</header>
-<section class=article-content>
-<h2 id=시작하며>시작하며</h2>
-<p><figure style=flex-grow:87;flex-basis:210px>
-<a href=/blog/khumu/khumu-dev-review/capture-1.png data-size=1013x1155><img src=/blog/khumu/khumu-dev-review/capture-1.png srcset="/blog/khumu/khumu-dev-review/capture-1_hu433d33708cf0291dbd8161dbb824d8fb_187522_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/capture-1_hu433d33708cf0291dbd8161dbb824d8fb_187522_1024x0_resize_box_3.png 1024w" width=1013 height=1155 loading=lazy>
-</a>
-</figure>
-<figure style=flex-grow:87;flex-basis:210px>
-<a href=/blog/khumu/khumu-dev-review/capture-3.png data-size=1013x1155><img src=/blog/khumu/khumu-dev-review/capture-3.png srcset="/blog/khumu/khumu-dev-review/capture-3_hue6e8e89a961b43eadf4d283e6a162e24_87932_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/capture-3_hue6e8e89a961b43eadf4d283e6a162e24_87932_1024x0_resize_box_3.png 1024w" width=1013 height=1155 loading=lazy>
-</a>
-</figure></p>
-<ul>
-<li><a class=link href=https://github.com/khu-dev target=_blank rel=noopener>Github</a></li>
-<li><a class=link href="https://play.google.com/store/apps/details?id=com.khumu.android" target=_blank rel=noopener>PlayStore 출시</a></li>
-<li><a class=link href=https://khumu.oopy.io/ target=_blank rel=noopener>프로젝트 및 팀 소개 페이지</a></li>
-</ul>
-<p>학교 수업을 듣다보니 한 학기에 2개 3개의 프로젝트를 개발해야하는 경우가 있었습니다. 완전 개발이 처음이었던 시기에는 이러한
+"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://umi0410.github.io/blog/khumu/khumu-dev-review/thumbnail-wide.png"><link rel="shortcut icon" href=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png><script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(e,o,i,a,t,n,s){e.GoogleAnalyticsObject=t,e[t]=e[t]||function(){(e[t].q=e[t].q||[]).push(arguments)},e[t].l=1*new Date,n=o.createElement(i),s=o.getElementsByTagName(i)[0],n.async=1,n.src=a,s.parentNode.insertBefore(n,s)}(window,document,"script","https://www.google-analytics.com/analytics.js","ga"),ga("create","UA-177403492-1","auto"),ga("send","pageview"))</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Noto+Sans+KR:wght@400&display=swap" rel=stylesheet><style>@import 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css';:root{--body-background:#fafeff;--base-font-family:Pretendard, 'Noto Sans KR', sans-serif}.site-name{--site-name-font-family:'East Sea Dokdo', cursive;font-family:var(--site-name-font-family);font-size:3.2rem!important}.left-sidebar{--sidebar-avatar-size:200px}figure.site-avatar{margin-left:auto!important;margin-right:auto!important}</style></head><body class="article-page has-toc"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex
+extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-home><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18"/></svg><span>Back</span></a></div><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/blog/khumu/khumu-dev-review/><img src=/blog/khumu/khumu-dev-review/thumbnail-wide_hu54b7b06ccaab22efd2d5450276cad720_83729_800x0_resize_box_3.png srcset="/blog/khumu/khumu-dev-review/thumbnail-wide_hu54b7b06ccaab22efd2d5450276cad720_83729_800x0_resize_box_3.png 800w, /blog/khumu/khumu-dev-review/thumbnail-wide_hu54b7b06ccaab22efd2d5450276cad720_83729_1600x0_resize_box_3.png 1600w" width=800 height=187 loading=lazy alt="Featured image of post 쿠뮤 MVP 개발기"></a></div><div class=article-details><header class=article-category><a href=/categories/khumu/>쿠뮤</a>
+<a href=/categories/golang/>Golang (Go 언어)</a></header><h2 class=article-title><a href=/blog/khumu/khumu-dev-review/>쿠뮤 MVP 개발기</a></h2><h3 class=article-subtitle>경희대학교 커뮤니티 "쿠뮤"를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
+정리해보려 합니다.</h3><footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--published>Oct 02, 2021</time></footer></div></header><section class=article-content><h2 id=시작하며>시작하며</h2><p><figure style=flex-grow:87;flex-basis:210px><a href=/blog/khumu/khumu-dev-review/capture-1.png data-size=1013x1155><img src=/blog/khumu/khumu-dev-review/capture-1.png srcset="/blog/khumu/khumu-dev-review/capture-1_hu433d33708cf0291dbd8161dbb824d8fb_187522_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/capture-1_hu433d33708cf0291dbd8161dbb824d8fb_187522_1024x0_resize_box_3.png 1024w" width=1013 height=1155 loading=lazy></a></figure><figure style=flex-grow:87;flex-basis:210px><a href=/blog/khumu/khumu-dev-review/capture-3.png data-size=1013x1155><img src=/blog/khumu/khumu-dev-review/capture-3.png srcset="/blog/khumu/khumu-dev-review/capture-3_hue6e8e89a961b43eadf4d283e6a162e24_87932_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/capture-3_hue6e8e89a961b43eadf4d283e6a162e24_87932_1024x0_resize_box_3.png 1024w" width=1013 height=1155 loading=lazy></a></figure></p><ul><li><a class=link href=https://github.com/khu-dev target=_blank rel=noopener>Github</a></li><li><a class=link href="https://play.google.com/store/apps/details?id=com.khumu.android" target=_blank rel=noopener>PlayStore 출시</a></li><li><a class=link href=https://khumu.oopy.io/ target=_blank rel=noopener>프로젝트 및 팀 소개 페이지</a></li></ul><p>학교 수업을 듣다보니 한 학기에 2개 3개의 프로젝트를 개발해야하는 경우가 있었습니다. 완전 개발이 처음이었던 시기에는 이러한
 양적인 개발 속에서도 배울 점이 많았지만 어느 정도 지나고 나니 양적인 개발 속에서는 크게 배울 점이 느껴지지 않았고, 머리가 아닌
-손으로 개발을 하고 있는 느낌을 받게 되었습니다.</p>
-<p>따라서 저는 단순히 찍어내기 식의 개발을 반복하기 보다는 <strong>한 서비스를 꾸준히 개발해나가며 그 속에 많은 생각을 담아내고자</strong> 했습니다.
-처음에는 가볍게 관심있던 기술들을 자유롭게 적용해볼 수 있는 <strong>개발 놀이터</strong>를 만들고자 하는 마음에 시작했고 제가 관심있던 기술들은 다음과 같았습니다.</p>
-<ul>
-<li><code>Kubernetes</code></li>
-<li><code>Golang</code>을 이용한 서버 개발</li>
-<li><code>TDD</code></li>
-<li><code>MSA</code>, <code>DDD</code>(Domain Driven Design)</li>
-<li><code>ArgoCD</code>를 이용한 CD(Continuous deploy & delivery)</li>
-</ul>
-<p>베프 하나와 함께 시작했던 서비스에서 기존에 친분이 없던 디자이너님, 개발자님들이 추가되면서 <strong>리더로서 책임감이 조금 생겨나기도 했고,
-기간이 길어지다보니 단순히 개발 놀이터보다는 출시를 해보자는 목표</strong>를 갖게 되었습니다.</p>
-<p>그리고 대부분의 코드를 오픈소스로 관리하고 있는데 개인적으로는 학생들이 실제 프로덕션 수준의 작업에 참여해볼 수 있는 경험이
+손으로 개발을 하고 있는 느낌을 받게 되었습니다.</p><p>따라서 저는 단순히 찍어내기 식의 개발을 반복하기 보다는 <strong>한 서비스를 꾸준히 개발해나가며 그 속에 많은 생각을 담아내고자</strong> 했습니다.
+처음에는 가볍게 관심있던 기술들을 자유롭게 적용해볼 수 있는 <strong>개발 놀이터</strong>를 만들고자 하는 마음에 시작했고 제가 관심있던 기술들은 다음과 같았습니다.</p><ul><li><code>Kubernetes</code></li><li><code>Golang</code>을 이용한 서버 개발</li><li><code>TDD</code></li><li><code>MSA</code>, <code>DDD</code>(Domain Driven Design)</li><li><code>ArgoCD</code>를 이용한 CD(Continuous deploy & delivery)</li></ul><p>베프 하나와 함께 시작했던 서비스에서 기존에 친분이 없던 디자이너님, 개발자님들이 추가되면서 <strong>리더로서 책임감이 조금 생겨나기도 했고,
+기간이 길어지다보니 단순히 개발 놀이터보다는 출시를 해보자는 목표</strong>를 갖게 되었습니다.</p><p>그리고 대부분의 코드를 오픈소스로 관리하고 있는데 개인적으로는 학생들이 실제 프로덕션 수준의 작업에 참여해볼 수 있는 경험이
 많지 않은데 우리 <strong>학교 학생들은 자신이 사용하는 오픈소스 서비스인 쿠뮤에 자유롭게 기여함으로써 실제 개발에 참여해볼 수 있는 기회의 장이 되었으면</strong> 하는
-꿈이 있습니다. 아무래도 학생들이 각자 다른 개발 언어와 관심사를 갖다보니 MSA를 선택한 것이 이 부분에 있어서는 좋게 작용할 수 있을 것 같네요.</p>
-<h2 id=쿠뮤-뭐하는-서비스지>쿠뮤? 뭐하는 서비스지?</h2>
-<p><strong>쿠뮤는 공지사항 푸시 알림과 교내 커뮤니티를 주로 제공하는 서비스</strong>에요!
+꿈이 있습니다. 아무래도 학생들이 각자 다른 개발 언어와 관심사를 갖다보니 MSA를 선택한 것이 이 부분에 있어서는 좋게 작용할 수 있을 것 같네요.</p><h2 id=쿠뮤-뭐하는-서비스지>쿠뮤? 뭐하는 서비스지?</h2><p><strong>쿠뮤는 공지사항 푸시 알림과 교내 커뮤니티를 주로 제공하는 서비스</strong>에요!
 경희대학교의 흩뿌려진 공지사항을 한 곳에서 조회할 수 있고, 새로운 공지사항은 선택적으로 푸시알림을 받아볼 수 있답니다.
 또한 교내 커뮤니티로서 학교 인증이 학교 사이트와 연동되어 간편하고 다양한 주제에 걸쳐 학생들의 의견이 적극 반영될 수 있습니다.
 보통의 커뮤니티는 게시판 형태로 구현되어 게시판을 하나 하나 찾아다녀야 하지만 <strong>쿠뮤는 마치 인스타에서 해시태그들을 팔로우하듯
-게시판을 팔로우 해두면 피드에서 자신이 팔로우 해둔 게시글을 모두 모아볼 수 있어요</strong>.</p>
-<h2 id=내가-좋아하는-생각이-담긴-개발>내가 좋아하는 생각이 담긴 개발</h2>
-<p>저는 <del>단순하게 손으로 하는 개발</del>보단 이런 저런 <strong>생각들이 담겨있는 개발을 좋아하고 그에 대해 자유롭게 얘기나누는 시간을 사랑</strong>합니다.
-제가 쿠뮤를 개발하면서 했던 고민들과 그런 생각들을 어떻게 녹여냈는지 간단히 정리해보겠습니다.</p>
-<h4 id=restful하게-api를-개발해나가려면-어떻게-해야할까>&lsquo;RESTful하게 API를 개발해나가려면 어떻게 해야할까?&rsquo;</h4>
-<p><code>RESTful하다</code>는 말의 정의는 이곳 저곳 다들 다르게 표현하고들 있는 것 같지만 <strong>HTTP method로 동작</strong>을, <strong>URL로 리스소</strong>를 나타내는 점은 공통적으로 표현되는 특징인 것 같습니다.
-그래서 <code>CRUD</code>는 Post, Get, Patch, Delete 등의 메소드와 연결되죠. 근데 분명 <strong>CRUD와 깔끔히 맞아떨어지지 않는 작업들이 존재합니다!</strong></p>
-<p>관련 글</p>
-<ul>
-<li><a class=link href=https://softwareengineering.stackexchange.com/questions/323415/how-to-design-a-rest-api-to-handle-non-crud-operations target=_blank rel=noopener>How to design a REST API to handle non-CRUD operations?</a> - Stack exchange</li>
-<li><a class=link href=https://stackoverflow.com/questions/41742926/rest-api-design-for-non-crud-actions-e-g-save-deploy-execute-code target=_blank rel=noopener>REST API design for non-CRUD actions, e.g. save, deploy, execute code</a> - Stackoverflow</li>
-</ul>
-<p><figure style=flex-grow:189;flex-basis:453px>
-<a href=/blog/khumu/khumu-dev-review/toss.png data-size=2401x1270><img src=/blog/khumu/khumu-dev-review/toss.png srcset="/blog/khumu/khumu-dev-review/toss_hu81accd9c19897ba0af7fdadc906af6cb_682192_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/toss_hu81accd9c19897ba0af7fdadc906af6cb_682192_1024x0_resize_box_3.png 1024w" width=2401 height=1270 loading=lazy>
-</a>
-</figure>
-출처 - <a class=link href=https://toss.im/slash-21/sessions/1-7 target=_blank rel=noopener>https://toss.im/slash-21/sessions/1-7</a></p>
-<p>위와 같이 <strong>토스에서도 RESTful하지 않은 API들에 대해 고민</strong>을 많이 했던 것 같고 이 경우 다음과 같은 컨벤션들을 적용한 것 같습니다.</p>
-<ol>
-<li>Path의 마지막에 동작을 나타내는 동사를 적용</li>
-<li>이런 API들은 POST 메소드를 이용</li>
-</ol>
-<pre tabindex=0><code># 기존 방식
+게시판을 팔로우 해두면 피드에서 자신이 팔로우 해둔 게시글을 모두 모아볼 수 있어요</strong>.</p><h2 id=내가-좋아하는-생각이-담긴-개발>내가 좋아하는 생각이 담긴 개발</h2><p>저는 <del>단순하게 손으로 하는 개발</del>보단 이런 저런 <strong>생각들이 담겨있는 개발을 좋아하고 그에 대해 자유롭게 얘기나누는 시간을 사랑</strong>합니다.
+제가 쿠뮤를 개발하면서 했던 고민들과 그런 생각들을 어떻게 녹여냈는지 간단히 정리해보겠습니다.</p><h4 id=restful하게-api를-개발해나가려면-어떻게-해야할까>&lsquo;RESTful하게 API를 개발해나가려면 어떻게 해야할까?&rsquo;</h4><p><code>RESTful하다</code>는 말의 정의는 이곳 저곳 다들 다르게 표현하고들 있는 것 같지만 <strong>HTTP method로 동작</strong>을, <strong>URL로 리스소</strong>를 나타내는 점은 공통적으로 표현되는 특징인 것 같습니다.
+그래서 <code>CRUD</code>는 Post, Get, Patch, Delete 등의 메소드와 연결되죠. 근데 분명 <strong>CRUD와 깔끔히 맞아떨어지지 않는 작업들이 존재합니다!</strong></p><p>관련 글</p><ul><li><a class=link href=https://softwareengineering.stackexchange.com/questions/323415/how-to-design-a-rest-api-to-handle-non-crud-operations target=_blank rel=noopener>How to design a REST API to handle non-CRUD operations?</a> - Stack exchange</li><li><a class=link href=https://stackoverflow.com/questions/41742926/rest-api-design-for-non-crud-actions-e-g-save-deploy-execute-code target=_blank rel=noopener>REST API design for non-CRUD actions, e.g. save, deploy, execute code</a> - Stackoverflow</li></ul><p><figure style=flex-grow:189;flex-basis:453px><a href=/blog/khumu/khumu-dev-review/toss.png data-size=2401x1270><img src=/blog/khumu/khumu-dev-review/toss.png srcset="/blog/khumu/khumu-dev-review/toss_hu81accd9c19897ba0af7fdadc906af6cb_682192_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/toss_hu81accd9c19897ba0af7fdadc906af6cb_682192_1024x0_resize_box_3.png 1024w" width=2401 height=1270 loading=lazy></a></figure>출처 - <a class=link href=https://toss.im/slash-21/sessions/1-7 target=_blank rel=noopener>https://toss.im/slash-21/sessions/1-7</a></p><p>위와 같이 <strong>토스에서도 RESTful하지 않은 API들에 대해 고민</strong>을 많이 했던 것 같고 이 경우 다음과 같은 컨벤션들을 적용한 것 같습니다.</p><ol><li>Path의 마지막에 동작을 나타내는 동사를 적용</li><li>이런 API들은 POST 메소드를 이용</li></ol><pre tabindex=0><code># 기존 방식
 좋아요 생성 POST /likes {article: 1}
 좋아요 삭제 DELETE /likes/{{like_id}}
 
@@ -127,212 +27,38 @@ Golang (Go 언어)
 좋아요 POST /articles/1/like
 좋아요 취소 POST /articles/1/unlike
 </code></pre><p>실제 쿠뮤 작업을 예로 들자면 게시글에 대한 좋아요 작업 수행 시 위와 같이 API를 좀 더 직관적으로 개선했습니다.
-기존에는 좋아요 기능을 구현하기 위해 like라는 리소스로 이용하면서 like 리소스에 대한 생성, 삭제에 맵핑시켰습니다.</p>
-<p>하지만 이는 다소 기계적이고 API를 사용하여 개발하는 클라이언트(사람)입장에서는 와닿지 않을 수 있습니다.
-또한 클라이언트는 좋아요를 취소하려면 자신이 취소하고자 하는 좋아요 내역의 ID를 알아야하므로 불편하죠.</p>
-<p>그래서 아래와 같이 API 형태를 개선했고, 클라이언트는 좀 더 편리하게 API를 이용할 수 있어졌습니다~!</p>
-<h4 id=api의-latency를-줄이기-위해서는-어떻게-해야할까>&lsquo;API의 Latency를 줄이기 위해서는 어떻게 해야할까?&rsquo;</h4>
-<p>개발을 하다보니 데이터가 그렇게 많은 것도 아닌데 어느 순간부터 <strong>latency가 길다</strong>는 느낌을 받게 되었습니다.
+기존에는 좋아요 기능을 구현하기 위해 like라는 리소스로 이용하면서 like 리소스에 대한 생성, 삭제에 맵핑시켰습니다.</p><p>하지만 이는 다소 기계적이고 API를 사용하여 개발하는 클라이언트(사람)입장에서는 와닿지 않을 수 있습니다.
+또한 클라이언트는 좋아요를 취소하려면 자신이 취소하고자 하는 좋아요 내역의 ID를 알아야하므로 불편하죠.</p><p>그래서 아래와 같이 API 형태를 개선했고, 클라이언트는 좀 더 편리하게 API를 이용할 수 있어졌습니다~!</p><h4 id=api의-latency를-줄이기-위해서는-어떻게-해야할까>&lsquo;API의 Latency를 줄이기 위해서는 어떻게 해야할까?&rsquo;</h4><p>개발을 하다보니 데이터가 그렇게 많은 것도 아닌데 어느 순간부터 <strong>latency가 길다</strong>는 느낌을 받게 되었습니다.
 그래서 어떻게 latency를 줄일 수 있을까를 알아보게 됐죠.
 주된 원인은 <code>N+1</code> 문제라고 불리는 DB Query가 이슈였던 것 같습니다.
 게시글을 여러 개 조회한 뒤 맵핑을 할 때 <strong>게시글 하나 하나마다의 댓글 개수, 좋아요 개수, 북마크 개수 등을 순차적으로 조회하다보니
-이 부분에서 병목이 발생</strong>한 것이었어요!</p>
-<p>저는 이 부분에서 <code>redis</code>를 적용해보았고 redis를 적용하자 상황마다 다르겠지만 대체로 <strong>latency가 약 1/5로 줄어드는 효과</strong>를 얻을 수 있었습니다.
+이 부분에서 병목이 발생</strong>한 것이었어요!</p><p>저는 이 부분에서 <code>redis</code>를 적용해보았고 redis를 적용하자 상황마다 다르겠지만 대체로 <strong>latency가 약 1/5로 줄어드는 효과</strong>를 얻을 수 있었습니다.
 redis를 적용하던 당시엔 N+1 문제와 그것을 Fetch join(혹은 Eager loading)로 해결하는 방법에 대한 인지 자체가 없었어서
-redis를 적용했던 것 같은데 Fetch join으로도 글을 쓰면서 생각해보니 간단히 해결할 수 있었을 것 같긴하네요.</p>
-<p>시간이 된다면 redis 뿐만 아니라 fetch join도 적용해서 더 최적화해볼 수 있으면 좋을 것 같아요. 그래도 redis를 써보면서
-많은 것들을 배워볼 수 있었던 것 같아 재미있었습니다! ㅎㅎ</p>
-<h4 id=msa에서-관심사책임-분리를-어떻게-할-수-있을까>&lsquo;MSA에서 관심사/책임 분리를 어떻게 할 수 있을까?&rsquo;</h4>
-<p><figure style=flex-grow:157;flex-basis:378px>
-<a href=/blog/khumu/khumu-dev-review/microservice-data-share.png data-size=279x177><img src=/blog/khumu/khumu-dev-review/microservice-data-share.png srcset="/blog/khumu/khumu-dev-review/microservice-data-share_hue99fd32b7750fe5cc1fc1d45e05b3df2_4025_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/microservice-data-share_hue99fd32b7750fe5cc1fc1d45e05b3df2_4025_1024x0_resize_box_3.png 1024w" width=279 height=177 loading=lazy>
-</a>
-</figure></p>
-<p>출처: <a class=link href=https://docs.microsoft.com/ko-kr/azure/architecture/microservices/design/data-considerations target=_blank rel=noopener>마이크로 서비스에 대한 데이터 고려 사항 - 마이크로소프트 블로그</a></p>
-<p>처음 쿠뮤를 설계하면서 MSA를 도입하고자 했을 때는 어떻게 마이크로서비스를 나눠야할까에 대한 고려가 거의 없었던 것 같습니다.
+redis를 적용했던 것 같은데 Fetch join으로도 글을 쓰면서 생각해보니 간단히 해결할 수 있었을 것 같긴하네요.</p><p>시간이 된다면 redis 뿐만 아니라 fetch join도 적용해서 더 최적화해볼 수 있으면 좋을 것 같아요. 그래도 redis를 써보면서
+많은 것들을 배워볼 수 있었던 것 같아 재미있었습니다! ㅎㅎ</p><h4 id=msa에서-관심사책임-분리를-어떻게-할-수-있을까>&lsquo;MSA에서 관심사/책임 분리를 어떻게 할 수 있을까?&rsquo;</h4><p><figure style=flex-grow:157;flex-basis:378px><a href=/blog/khumu/khumu-dev-review/microservice-data-share.png data-size=279x177><img src=/blog/khumu/khumu-dev-review/microservice-data-share.png srcset="/blog/khumu/khumu-dev-review/microservice-data-share_hue99fd32b7750fe5cc1fc1d45e05b3df2_4025_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/microservice-data-share_hue99fd32b7750fe5cc1fc1d45e05b3df2_4025_1024x0_resize_box_3.png 1024w" width=279 height=177 loading=lazy></a></figure></p><p>출처: <a class=link href=https://docs.microsoft.com/ko-kr/azure/architecture/microservices/design/data-considerations target=_blank rel=noopener>마이크로 서비스에 대한 데이터 고려 사항 - 마이크로소프트 블로그</a></p><p>처음 쿠뮤를 설계하면서 MSA를 도입하고자 했을 때는 어떻게 마이크로서비스를 나눠야할까에 대한 고려가 거의 없었던 것 같습니다.
 지금은 DDD를 공부하며 높은 응집도와 독립성을 취하면서 서비스를 나누는 게 좋겠다는 생각이 들지만 당시엔 그냥 나누고 싶은 대로 나눠버렸던 것 같습니다.
 약간 오버 엔지니어링이 될 수 있는 설계를 한 것은 그렇다치고 그 속에서 서비스들을 구현해 나갈 때에도 실수했던 것이 하나 있습니다. 바로 위의 사진처럼 다른 서비스가 하나의 DB를
-바라보면 안된다는 원칙을 어긴 것인데요.</p>
-<p><figure style=flex-grow:162;flex-basis:391px>
-<a href=/blog/khumu/khumu-dev-review/comment-capture.png data-size=1079x662><img src=/blog/khumu/khumu-dev-review/comment-capture.png srcset="/blog/khumu/khumu-dev-review/comment-capture_hucb87beda3a5f625f0903c63dddfd736f_86804_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/comment-capture_hucb87beda3a5f625f0903c63dddfd736f_86804_1024x0_resize_box_3.png 1024w" width=1079 height=662 loading=lazy>
-</a>
-</figure></p>
-<p>예를 들어 <strong>게시글 서비스와 댓글 서비스가 분리되어 있을 때 위의 이미지와 같이 어떤 댓글의 작성자가 해당 게시글의 작성자와 일치하는지에 대한 정보가 필요하다</strong>고 가정해봅시다.
+바라보면 안된다는 원칙을 어긴 것인데요.</p><p><figure style=flex-grow:162;flex-basis:391px><a href=/blog/khumu/khumu-dev-review/comment-capture.png data-size=1079x662><img src=/blog/khumu/khumu-dev-review/comment-capture.png srcset="/blog/khumu/khumu-dev-review/comment-capture_hucb87beda3a5f625f0903c63dddfd736f_86804_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/comment-capture_hucb87beda3a5f625f0903c63dddfd736f_86804_1024x0_resize_box_3.png 1024w" width=1079 height=662 loading=lazy></a></figure></p><p>예를 들어 <strong>게시글 서비스와 댓글 서비스가 분리되어 있을 때 위의 이미지와 같이 어떤 댓글의 작성자가 해당 게시글의 작성자와 일치하는지에 대한 정보가 필요하다</strong>고 가정해봅시다.
 기존에는 댓글 서비스가 게시글 DB를 직접 조회해서 <code>article.author</code>와 <code>comment.author</code>를 비교했습니다. 하지만 이렇게 <strong>분리된 서로 다른 서비스가
-같은 데이터에 접근하는 형태는 MSA에서는 매우 안 좋게 평가되는 안티 패턴</strong>입니다.</p>
-<p>따라서 저는 댓글을 조회할 때 게시글 서비스에게 게시글 정보를 조회해 <code>article.author</code>와 <code>comment.author</code>를 비교할 수 있도록 했습니다.
-만약 <strong>게시글 서비스가 비정상으로 동작하더라도 댓글 서비스에는 큰 타격 없이 댓글 작성자가 게시글 작성자와 일치하는지 정보만 false로 처리</strong>될 뿐입니다.</p>
-<p>아마 더 고도화된 형태는 댓글 서비스에서 자기 서비스만이 이용할 게시글 작성자 정보 테이블을 설계하거나 덜 정규화한다면 댓글마다 게시글의 작성자 id도 기입하는 방식을 이용할 수 있을 것 같아요.
-하지만 그런 형태를 적용하기 이전에 우선은 좀 더 latency가 길 수는 있지만 간단히 마이크로서비스간에 동기적으로 통신(게시글 작성자 정보를 댓글 서비스가 API로 직접 호출)하는 방식을 적용해봤습니다.</p>
-<h4 id=어떤-서비스를-이용해-빌드배포를-자동화할까>&lsquo;어떤 서비스를 이용해 빌드/배포를 자동화할까?&rsquo;</h4>
-<p><figure style=flex-grow:95;flex-basis:228px>
-<a href=/blog/khumu/khumu-dev-review/argocd.png data-size=1236x1297><img src=/blog/khumu/khumu-dev-review/argocd.png srcset="/blog/khumu/khumu-dev-review/argocd_hu7e5d5c219024186f3afda580f81ab780_197051_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/argocd_hu7e5d5c219024186f3afda580f81ab780_197051_1024x0_resize_box_3.png 1024w" width=1236 height=1297 loading=lazy>
-</a>
-</figure></p>
-<p>과거에는 배포 도구로서 <code>Spinnaker</code>를 주로 사용했지만 Spinnaker는 그 관리 리소스가 만만치 않게 든다는 생각이 들었습니다. <code>Jenkins</code>나 그 외의 서비스들과 연동시켜 하나의 Pipeline을
-만드는 데에는 Spinnaker가 적합했지만 꼭 그런 연동 작업이 필요가 없다면 굳이 Spinnaker를 사용할 필요가 없을 것 같았습니다.</p>
-<ul>
-<li><a class=link href=https://tech.kakao.com/2021/07/16/devops-for-msa/ target=_blank rel=noopener>실용주의 데브옵스 for MSA - 카카오테크</a></li>
-<li><a class=link href=https://mesh.dev/20210208-dev-notes-002-ci-cd/ target=_blank rel=noopener>CI/CD 도구 및 방법론 도입기 - 메쉬코리아, VROONG</a></li>
-</ul>
-<p>그래서 위의 글들에도 소개되는 평소 관심 있던 <strong><code>ArgoCD</code>를 배포 도구로 선택</strong>했고, 오픈소스로서 관리되는 프로젝트이다보니 Github 내에서 많은 작업이 이루어지므로
-<strong>CI는 <code>Github Action</code>을 이용</strong>하기로 결정했습니다.</p>
-<p>그리고 Spinnaker를 사용했을 땐 Helm 차트를 통한 배포가 막 지원되던 시기였어서 버전 문제인지 버그인지 Helm 차트가 잘 적용이 안됐던 이슈가 있어
+같은 데이터에 접근하는 형태는 MSA에서는 매우 안 좋게 평가되는 안티 패턴</strong>입니다.</p><p>따라서 저는 댓글을 조회할 때 게시글 서비스에게 게시글 정보를 조회해 <code>article.author</code>와 <code>comment.author</code>를 비교할 수 있도록 했습니다.
+만약 <strong>게시글 서비스가 비정상으로 동작하더라도 댓글 서비스에는 큰 타격 없이 댓글 작성자가 게시글 작성자와 일치하는지 정보만 false로 처리</strong>될 뿐입니다.</p><p>아마 더 고도화된 형태는 댓글 서비스에서 자기 서비스만이 이용할 게시글 작성자 정보 테이블을 설계하거나 덜 정규화한다면 댓글마다 게시글의 작성자 id도 기입하는 방식을 이용할 수 있을 것 같아요.
+하지만 그런 형태를 적용하기 이전에 우선은 좀 더 latency가 길 수는 있지만 간단히 마이크로서비스간에 동기적으로 통신(게시글 작성자 정보를 댓글 서비스가 API로 직접 호출)하는 방식을 적용해봤습니다.</p><h4 id=어떤-서비스를-이용해-빌드배포를-자동화할까>&lsquo;어떤 서비스를 이용해 빌드/배포를 자동화할까?&rsquo;</h4><p><figure style=flex-grow:95;flex-basis:228px><a href=/blog/khumu/khumu-dev-review/argocd.png data-size=1236x1297><img src=/blog/khumu/khumu-dev-review/argocd.png srcset="/blog/khumu/khumu-dev-review/argocd_hu7e5d5c219024186f3afda580f81ab780_197051_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/argocd_hu7e5d5c219024186f3afda580f81ab780_197051_1024x0_resize_box_3.png 1024w" width=1236 height=1297 loading=lazy></a></figure></p><p>과거에는 배포 도구로서 <code>Spinnaker</code>를 주로 사용했지만 Spinnaker는 그 관리 리소스가 만만치 않게 든다는 생각이 들었습니다. <code>Jenkins</code>나 그 외의 서비스들과 연동시켜 하나의 Pipeline을
+만드는 데에는 Spinnaker가 적합했지만 꼭 그런 연동 작업이 필요가 없다면 굳이 Spinnaker를 사용할 필요가 없을 것 같았습니다.</p><ul><li><a class=link href=https://tech.kakao.com/2021/07/16/devops-for-msa/ target=_blank rel=noopener>실용주의 데브옵스 for MSA - 카카오테크</a></li><li><a class=link href=https://mesh.dev/20210208-dev-notes-002-ci-cd/ target=_blank rel=noopener>CI/CD 도구 및 방법론 도입기 - 메쉬코리아, VROONG</a></li></ul><p>그래서 위의 글들에도 소개되는 평소 관심 있던 <strong><code>ArgoCD</code>를 배포 도구로 선택</strong>했고, 오픈소스로서 관리되는 프로젝트이다보니 Github 내에서 많은 작업이 이루어지므로
+<strong>CI는 <code>Github Action</code>을 이용</strong>하기로 결정했습니다.</p><p>그리고 Spinnaker를 사용했을 땐 Helm 차트를 통한 배포가 막 지원되던 시기였어서 버전 문제인지 버그인지 Helm 차트가 잘 적용이 안됐던 이슈가 있어
 정말 아쉬웠는데요. <strong><code>ArgoCD</code>는 kustomize나 Helm을 적극적으로 지원하고 있는 것 같아 Helm으로 배포하는 것도 너무나 편리</strong>했어요.
-지금은 Kubernetes의 <code>Nginx Ingress Controller</code>나 <code>ArgoCD Notification</code> 같은 서비스들은 Helm으로 배포/관리하고 있답니다.</p>
-<h2 id=프로젝트-리드와-팀원들간의-의사소통>프로젝트 리드와 팀원들간의 의사소통</h2>
-<p><figure style=flex-grow:75;flex-basis:181px>
-<a href=/blog/khumu/khumu-dev-review/communication-1.png data-size=470x622><img src=/blog/khumu/khumu-dev-review/communication-1.png srcset="/blog/khumu/khumu-dev-review/communication-1_hue4b7e4c1e1817810425969ce1c3a7179_42435_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/communication-1_hue4b7e4c1e1817810425969ce1c3a7179_42435_1024x0_resize_box_3.png 1024w" width=470 height=622 loading=lazy>
-</a>
-</figure>
-<figure style=flex-grow:67;flex-basis:162px>
-<a href=/blog/khumu/khumu-dev-review/communication-2.png data-size=449x662><img src=/blog/khumu/khumu-dev-review/communication-2.png srcset="/blog/khumu/khumu-dev-review/communication-2_huf596a4e544c0801f3e39d454f12567e3_55887_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/communication-2_huf596a4e544c0801f3e39d454f12567e3_55887_1024x0_resize_box_3.png 1024w" width=449 height=662 loading=lazy>
-</a>
-</figure>
-<figure style=flex-grow:69;flex-basis:166px>
-<a href=/blog/khumu/khumu-dev-review/communication-3.png data-size=492x711><img src=/blog/khumu/khumu-dev-review/communication-3.png srcset="/blog/khumu/khumu-dev-review/communication-3_hu317daaf62cded970db4953d604885a3e_47905_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/communication-3_hu317daaf62cded970db4953d604885a3e_47905_1024x0_resize_box_3.png 1024w" width=492 height=711 loading=lazy>
-</a>
-</figure>
-<figure style=flex-grow:65;flex-basis:156px>
-<a href=/blog/khumu/khumu-dev-review/communication-4.png data-size=632x970><img src=/blog/khumu/khumu-dev-review/communication-4.png srcset="/blog/khumu/khumu-dev-review/communication-4_huaacae8203291a385a45481847c7ec533_104242_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/communication-4_huaacae8203291a385a45481847c7ec533_104242_1024x0_resize_box_3.png 1024w" width=632 height=970 loading=lazy>
-</a>
-</figure></p>
-<p>저희 팀은 주로 노션을 통해 회의 내용 기록 및 진행 사항 공유를 하고, 회의는 디스코드로 진행했습니다.
-이렇게 보니 해당 페이지에 기록하기 전까지 합하면 딱 <strong>1년</strong> 정도 된 것 같네요 벌써..! 시간이 참 빠른 것 같아요 ㅎㅎ</p>
-<p><figure style=flex-grow:60;flex-basis:144px>
-<a href=/blog/khumu/khumu-dev-review/collabo-1.png data-size=1080x1799><img src=/blog/khumu/khumu-dev-review/collabo-1.png srcset="/blog/khumu/khumu-dev-review/collabo-1_hu4ce9c2bf6390846cdc287259d15975c0_1578099_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/collabo-1_hu4ce9c2bf6390846cdc287259d15975c0_1578099_1024x0_resize_box_3.png 1024w" width=1080 height=1799 loading=lazy>
-</a>
-</figure>
-<figure style=flex-grow:66;flex-basis:159px>
-<a href=/blog/khumu/khumu-dev-review/collabo-2.png data-size=1080x1628><img src=/blog/khumu/khumu-dev-review/collabo-2.png srcset="/blog/khumu/khumu-dev-review/collabo-2_hu377b174bcab257d212aa47a01287c09d_539505_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/collabo-2_hu377b174bcab257d212aa47a01287c09d_539505_1024x0_resize_box_3.png 1024w" width=1080 height=1628 loading=lazy>
-</a>
-</figure></p>
-<p>디스코드로 회의하기 힘든 상황엔 자유롭게 카톡으로 이슈를 공유하기도 합니다. 얼마 전에 운영 환경을 구축하면서 <code>S3</code> + <code>CloudFront</code>를 구축할 때
+지금은 Kubernetes의 <code>Nginx Ingress Controller</code>나 <code>ArgoCD Notification</code> 같은 서비스들은 Helm으로 배포/관리하고 있답니다.</p><h2 id=프로젝트-리드와-팀원들간의-의사소통>프로젝트 리드와 팀원들간의 의사소통</h2><p><figure style=flex-grow:75;flex-basis:181px><a href=/blog/khumu/khumu-dev-review/communication-1.png data-size=470x622><img src=/blog/khumu/khumu-dev-review/communication-1.png srcset="/blog/khumu/khumu-dev-review/communication-1_hue4b7e4c1e1817810425969ce1c3a7179_42435_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/communication-1_hue4b7e4c1e1817810425969ce1c3a7179_42435_1024x0_resize_box_3.png 1024w" width=470 height=622 loading=lazy></a></figure><figure style=flex-grow:67;flex-basis:162px><a href=/blog/khumu/khumu-dev-review/communication-2.png data-size=449x662><img src=/blog/khumu/khumu-dev-review/communication-2.png srcset="/blog/khumu/khumu-dev-review/communication-2_huf596a4e544c0801f3e39d454f12567e3_55887_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/communication-2_huf596a4e544c0801f3e39d454f12567e3_55887_1024x0_resize_box_3.png 1024w" width=449 height=662 loading=lazy></a></figure><figure style=flex-grow:69;flex-basis:166px><a href=/blog/khumu/khumu-dev-review/communication-3.png data-size=492x711><img src=/blog/khumu/khumu-dev-review/communication-3.png srcset="/blog/khumu/khumu-dev-review/communication-3_hu317daaf62cded970db4953d604885a3e_47905_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/communication-3_hu317daaf62cded970db4953d604885a3e_47905_1024x0_resize_box_3.png 1024w" width=492 height=711 loading=lazy></a></figure><figure style=flex-grow:65;flex-basis:156px><a href=/blog/khumu/khumu-dev-review/communication-4.png data-size=632x970><img src=/blog/khumu/khumu-dev-review/communication-4.png srcset="/blog/khumu/khumu-dev-review/communication-4_huaacae8203291a385a45481847c7ec533_104242_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/communication-4_huaacae8203291a385a45481847c7ec533_104242_1024x0_resize_box_3.png 1024w" width=632 height=970 loading=lazy></a></figure></p><p>저희 팀은 주로 노션을 통해 회의 내용 기록 및 진행 사항 공유를 하고, 회의는 디스코드로 진행했습니다.
+이렇게 보니 해당 페이지에 기록하기 전까지 합하면 딱 <strong>1년</strong> 정도 된 것 같네요 벌써..! 시간이 참 빠른 것 같아요 ㅎㅎ</p><p><figure style=flex-grow:60;flex-basis:144px><a href=/blog/khumu/khumu-dev-review/collabo-1.png data-size=1080x1799><img src=/blog/khumu/khumu-dev-review/collabo-1.png srcset="/blog/khumu/khumu-dev-review/collabo-1_hu4ce9c2bf6390846cdc287259d15975c0_1578099_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/collabo-1_hu4ce9c2bf6390846cdc287259d15975c0_1578099_1024x0_resize_box_3.png 1024w" width=1080 height=1799 loading=lazy></a></figure><figure style=flex-grow:66;flex-basis:159px><a href=/blog/khumu/khumu-dev-review/collabo-2.png data-size=1080x1628><img src=/blog/khumu/khumu-dev-review/collabo-2.png srcset="/blog/khumu/khumu-dev-review/collabo-2_hu377b174bcab257d212aa47a01287c09d_539505_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/collabo-2_hu377b174bcab257d212aa47a01287c09d_539505_1024x0_resize_box_3.png 1024w" width=1080 height=1628 loading=lazy></a></figure></p><p>디스코드로 회의하기 힘든 상황엔 자유롭게 카톡으로 이슈를 공유하기도 합니다. 얼마 전에 운영 환경을 구축하면서 <code>S3</code> + <code>CloudFront</code>를 구축할 때
 겪은 이슈 관련 톡을 가져와 봤습니다. 특히 서로 포지션이 다른 경우 <strong>이슈에 대해 자세히 묘사</strong>하려 노력하고 <strong>팀원의 작업에 항상 감사</strong>를 표하는 걸 잊지 않으려
 노력하고 있어요. 코로나와 거리 상의 문제로 한 번도 뵙지 못한 팀원들도 계시지만 나름 내적 친밀감이 많이 쌓인 것 같아요 ㅎㅎ
-꼭 쿠뮤가 아니라도 기회가 된다면 앞으로도 같이 작업하거나 만나뵙고 싶기도 합니다.</p>
-<h2 id=앞으로의-미래>앞으로의 미래..?</h2>
-<p><figure style=flex-grow:100;flex-basis:240px>
-<a href=/blog/khumu/khumu-dev-review/lion.png data-size=600x600><img src=/blog/khumu/khumu-dev-review/lion.png srcset="/blog/khumu/khumu-dev-review/lion_hud65daaf114658cf17a9f778455969ffb_26332_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/lion_hud65daaf114658cf17a9f778455969ffb_26332_1024x0_resize_box_3.png 1024w" width=600 height=600 loading=lazy>
-</a>
-</figure></p>
-<p>사실 개발 놀이터로 시작한 주제라서 그렇게 참신하지도 않고, 대학생 커뮤니티에는 에브리타임이라는 큰 장벽이 있어서 우리 서비스의 미래가 어떻게 될 지는 모르겠습니다.
+꼭 쿠뮤가 아니라도 기회가 된다면 앞으로도 같이 작업하거나 만나뵙고 싶기도 합니다.</p><h2 id=앞으로의-미래>앞으로의 미래..?</h2><p><figure style=flex-grow:100;flex-basis:240px><a href=/blog/khumu/khumu-dev-review/lion.png data-size=600x600><img src=/blog/khumu/khumu-dev-review/lion.png srcset="/blog/khumu/khumu-dev-review/lion_hud65daaf114658cf17a9f778455969ffb_26332_480x0_resize_box_3.png 480w, /blog/khumu/khumu-dev-review/lion_hud65daaf114658cf17a9f778455969ffb_26332_1024x0_resize_box_3.png 1024w" width=600 height=600 loading=lazy></a></figure></p><p>사실 개발 놀이터로 시작한 주제라서 그렇게 참신하지도 않고, 대학생 커뮤니티에는 에브리타임이라는 큰 장벽이 있어서 우리 서비스의 미래가 어떻게 될 지는 모르겠습니다.
 처음엔 커뮤니티 기능을 주기능으로 밀어붙여 개발했던 반면 활성 유저가 별로 없을 경우를 고려하니 커뮤니티보다는 공지사항과 학사일정을 편리하게 전달할 수 있는 기능이
 더 우선시 되어야할 것 같았어요. 그래서 그 부분들을 보완하여 MVP를 출시 준비 중이고 이후 다양한 피드백을 받아보면서
-계속해서 디벨롭해나갈지 유지만 할 지 팀원들과 상의해봐야할 것 같긴 합니다.</p>
-<p>그래도 대학교를 졸업하기 전에 이렇게 길게 한 프로젝트를 진행해볼 수 있었던 것도 뿌듯하고 팀원들과 꾸준히 협업해나가는
-경험을 할 수 있었던 점, 다양한 이슈를 맞이하고 해결할 수 있었던 점에서 서비스의 미래가 어떻게 되든 소중한 경험을 한 것 같습니다.</p>
-<p>쿠뮤 팀원들 모두 꽃길 걷고 행복했으면 좋겠습니다~! 화이팅!!!</p>
-</section>
-<footer class=article-footer>
-<section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
-<span>Licensed under CC BY-NC-SA 4.0</span>
-</section>
-</footer>
-</article>
-<aside class=related-contents--wrapper>
-<h2 class=section-title>관련 글</h2>
-<div class=related-contents>
-<div class="flex article-list--tile">
-<article class=has-image>
-<a href=/blog/optimizing-count-query-strategy/>
-<div class=article-image>
-<img src=/blog/optimizing-count-query-strategy/index.394a40dc143e4a54313c56e057fa65b9_hu2e0266c55b356006b8efd84bbe6e386e_394889_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-OUpA3BQ+SlQxPFbgV/pluQ==">
-</div>
-<div class=article-details>
-<h2 class=article-title>쿼리 최적화하기 - 조회수와 같은 Count 성격의 작업 최적화하기 (N+1 문제 관련, feat. Redis)</h2>
-</div>
-</a>
-</article>
-</div>
-</div>
-</aside>
-<div class=disqus-container>
-<div id=disqus_thread></div>
-<script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return}var b=document,a=b.createElement('script');a.async=!0,a.src='//umi0410.disqus.com/embed.js',a.setAttribute('data-timestamp',+new Date),(b.head||b.body).appendChild(a)})()</script>
-<noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript>
-<a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a>
-</div>
-<style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style>
-<script>window.addEventListener('onColorSchemeChange',a=>{DISQUS&&DISQUS.reset({reload:!0})})</script>
-<footer class=site-footer>
-<section class=copyright>
-&copy;
+계속해서 디벨롭해나갈지 유지만 할 지 팀원들과 상의해봐야할 것 같긴 합니다.</p><p>그래도 대학교를 졸업하기 전에 이렇게 길게 한 프로젝트를 진행해볼 수 있었던 것도 뿌듯하고 팀원들과 꾸준히 협업해나가는
+경험을 할 수 있었던 점, 다양한 이슈를 맞이하고 해결할 수 있었던 점에서 서비스의 미래가 어떻게 되든 소중한 경험을 한 것 같습니다.</p><p>쿠뮤 팀원들 모두 꽃길 걷고 행복했으면 좋겠습니다~! 화이팅!!!</p></section><footer class=article-footer><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-contents--wrapper><h2 class=section-title>관련 글</h2><div class=related-contents><div class="flex article-list--tile"><article class=has-image><a href=/blog/optimizing-count-query-strategy/><div class=article-image><img src=/blog/optimizing-count-query-strategy/index.394a40dc143e4a54313c56e057fa65b9_hu2e0266c55b356006b8efd84bbe6e386e_394889_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-OUpA3BQ+SlQxPFbgV/pluQ=="></div><div class=article-details><h2 class=article-title>쿼리 최적화하기 - 조회수와 같은 Count 성격의 작업 최적화하기 (N+1 문제 관련, feat. Redis)</h2></div></a></article></div></div></aside><div class=disqus-container><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//umi0410.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div><style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style><script>window.addEventListener("onColorSchemeChange",e=>{DISQUS&&DISQUS.reset({reload:!0})})</script><footer class=site-footer><section class=copyright>&copy;
 2020 -
-2022 Jinsu Playground
-</section>
-<section class=powerby>
-<a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a>로 만듦 <br>
-<a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a>의 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=2.4.0>Stack</a></b> 테마 사용 중
-</section>
-</footer>
-<div class=pswp tabindex=-1 role=dialog aria-hidden=true>
-<div class=pswp__bg></div>
-<div class=pswp__scroll-wrap>
-<div class=pswp__container>
-<div class=pswp__item></div>
-<div class=pswp__item></div>
-<div class=pswp__item></div>
-</div>
-<div class="pswp__ui pswp__ui--hidden">
-<div class=pswp__top-bar>
-<div class=pswp__counter></div>
-<button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+2022 Jinsu Playground</section><section class=powerby><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a>로 만듦<br><a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a>의 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=2.4.0>Stack</a></b> 테마 사용 중</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
 <button class="pswp__button pswp__button--share" title=Share></button>
 <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-<div class=pswp__preloader>
-<div class=pswp__preloader__icn>
-<div class=pswp__preloader__cut>
-<div class=pswp__preloader__donut></div>
-</div>
-</div>
-</div>
-</div>
-<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-<div class=pswp__share-tooltip></div>
-</div>
-<button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-</button>
-<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-</button>
-<div class=pswp__caption>
-<div class=pswp__caption__center></div>
-</div>
-</div>
-</div>
-</div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css integrity="sha256-c0uckgykQ9v5k+IqViZOZKc47Jn7KQil4/MP3ySA3F8=" crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE=" crossorigin=anonymous>
-</main>
-<aside class="sidebar right-sidebar sticky">
-<section class="widget archives">
-<div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
-</div>
-<h2 class="widget-title section-title">Table of contents</h2>
-<div class=widget--toc>
-<nav id=TableOfContents>
-<ol>
-<li><a href=#시작하며>시작하며</a></li>
-<li><a href=#쿠뮤-뭐하는-서비스지>쿠뮤? 뭐하는 서비스지?</a></li>
-<li><a href=#내가-좋아하는-생각이-담긴-개발>내가 좋아하는 생각이 담긴 개발</a>
-<ol>
-<li>
-<ol>
-<li><a href=#restful하게-api를-개발해나가려면-어떻게-해야할까>&lsquo;RESTful하게 API를 개발해나가려면 어떻게 해야할까?&rsquo;</a></li>
-<li><a href=#api의-latency를-줄이기-위해서는-어떻게-해야할까>&lsquo;API의 Latency를 줄이기 위해서는 어떻게 해야할까?&rsquo;</a></li>
-<li><a href=#msa에서-관심사책임-분리를-어떻게-할-수-있을까>&lsquo;MSA에서 관심사/책임 분리를 어떻게 할 수 있을까?&rsquo;</a></li>
-<li><a href=#어떤-서비스를-이용해-빌드배포를-자동화할까>&lsquo;어떤 서비스를 이용해 빌드/배포를 자동화할까?&rsquo;</a></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><a href=#프로젝트-리드와-팀원들간의-의사소통>프로젝트 리드와 팀원들간의 의사소통</a></li>
-<li><a href=#앞으로의-미래>앞으로의 미래..?</a></li>
-</ol>
-</nav>
-</div>
-</section>
-</aside>
-</div>
-<script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g=" crossorigin=anonymous defer></script><script type=text/javascript src=/ts/main.js defer></script>
-<script>(function(){const a=document.createElement('link');a.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",a.type="text/css",a.rel="stylesheet",document.head.appendChild(a)})()</script>
-</body>
-</html>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css integrity="sha256-c0uckgykQ9v5k+IqViZOZKc47Jn7KQil4/MP3ySA3F8=" crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE=" crossorigin=anonymous></main><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#시작하며>시작하며</a></li><li><a href=#쿠뮤-뭐하는-서비스지>쿠뮤? 뭐하는 서비스지?</a></li><li><a href=#내가-좋아하는-생각이-담긴-개발>내가 좋아하는 생각이 담긴 개발</a><ol><li><ol><li><a href=#restful하게-api를-개발해나가려면-어떻게-해야할까>&lsquo;RESTful하게 API를 개발해나가려면 어떻게 해야할까?&rsquo;</a></li><li><a href=#api의-latency를-줄이기-위해서는-어떻게-해야할까>&lsquo;API의 Latency를 줄이기 위해서는 어떻게 해야할까?&rsquo;</a></li><li><a href=#msa에서-관심사책임-분리를-어떻게-할-수-있을까>&lsquo;MSA에서 관심사/책임 분리를 어떻게 할 수 있을까?&rsquo;</a></li><li><a href=#어떤-서비스를-이용해-빌드배포를-자동화할까>&lsquo;어떤 서비스를 이용해 빌드/배포를 자동화할까?&rsquo;</a></li></ol></li></ol></li><li><a href=#프로젝트-리드와-팀원들간의-의사소통>프로젝트 리드와 팀원들간의 의사소통</a></li><li><a href=#앞으로의-미래>앞으로의 미래..?</a></li></ol></nav></div></section></aside></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g=" crossorigin=anonymous defer></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
