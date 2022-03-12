@@ -4,7 +4,7 @@ chapter: true
 date: 2020-09-04T11:27:30+09:00
 weight: 10
 noDisqus: true
-draft: true
+draft: false
 ---
 # Computer Science
 
