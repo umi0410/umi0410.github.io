@@ -15,7 +15,7 @@
 &lt;p>Key-Value Database는 간단한 형태의 DB이기 때문에 테이블이나 그래프로 복잡한 관계를 나타내려는 경우에는 부적합하다. 단순 저장과 키를 바탕으로한 조회로 충분한 경우에 가볍게 사용하기 좋다.&lt;/p>
 &lt;p>아무래도 단순함은 빠른 속도와도 연관이 되기 때문에 속도가 빠른 편이고 대표적인 예시가 Redis이다. 단순한 동작에 In-Memory Database라는 특징으로 인해 Redis는 엄청난 속도를 자랑한다.&lt;/p>
 &lt;p>단, 메모리 같이 작은 크기의 저장소를 이용할 때는 저장소가 가득 차지 않도록 주의해야한다! 주로 이를 위해 주로 eviction policy라는 저장소가 가득 차기전에 데이터를 적절히 삭제하는 정책을 설정한다. 주로 인-메모리 저장소는 캐시로 사용되고, 캐시는 지역성을 근거로 하기 때문에 시간 지역성을 바탕으로한 LRU 관련 정책이 많이 사용된다.&lt;/p>
-&lt;p>Key-Value Database를 언제 사용하는지 알아보자. 만약 어떤 유저의 최근 알림 내역 정보를 Key-Value DB 중 하나인 Redis에 저장한다고 해보자.&lt;/p>
+&lt;p>Key-Value DB는 Key를 바탕으로 조회가 가능하기 때문에 Key에 조회 조건이 포함되어야 한다. 만약 어떤 유저의 최근 알림 내역 정보를 Key-Value DB 중 하나인 Redis에 저장한다고 해보자.&lt;/p>
 &lt;pre tabindex="0">&lt;code>recent_notifications:{{username}} = [{{json string}}, {{json stirng}}]
 예를 들어 유저가 umi0410이라면
 아래와 같이 Redis에 해당 유저의 최근 알림 내역 정보를 저장할 수 있을 것이다.
