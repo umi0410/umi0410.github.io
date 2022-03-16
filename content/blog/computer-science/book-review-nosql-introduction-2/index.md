@@ -1,5 +1,5 @@
 ---
-title: "(도서) “NoSQL 철저 입문” - Key-Value 데이터베이스, 문서 데이터베이스"
+title: "(도서) \"NoSQL 철저 입문\" - Key-Value 데이터베이스, 문서 데이터베이스"
 date: 2022-03-12T15:30:54+09:00
 chapter: false
 pre: "<b></b>"
