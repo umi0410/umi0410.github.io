@@ -158,9 +158,10 @@ Application이 가장 중요해요~! Private repository를 이용하기 전까�
 ArgoCD에서 등장하는 대부분의 리소스는 쿠버네티스 CRD로 관리되고 그 외의 것들도 configmap에 설정을 기입함으로써 설정할 수 있습니다!
 
 따라서 우리는 ArgoCD CRD 중 하나인 Application을 만들어볼 거에요. 공식 문서의 Getting Started에서는 직접 ArgoCD CLI로 Application을 만들지만
-ArgoCD CLI로 Application을 만들게 되면 추후에 yaml을 작성하기 힘들기 때문에 직접 Application을 작성해서 적용해주겠습니다.
+ArgoCD CLI나 콘솔 화면을 통해 Application을 만들게 되면 추후에 Application을 yaml 코드로 나타내어 선언적으로 이용하려는 경우 기존의 Application을 코드로 나타내려면 어떻게 해야하는지 혼란스러우실 수도 있습니다.
+따라서 저는 **직접 Application을 yaml로 작성해서 적용**해주겠습니다.
 
-처음에는 단순히 콘솔에서 직접 Application을 생성하는 방법도 추천드립니다. 이후 어떤 설정들이 있는지 감을 잡아보시고 그런 설정들을 어떻게 CRD(Yaml)로 나타내는지를
+하지만 만약 아직 ArgoCD가 낯서시다면 단순히 콘솔에서 직접 Application을 생성하는 방법도 추천드립니다. 이후 어떤 설정들이 있는지 감을 잡아보시고 그런 설정들을 어떻게 CRD(yaml)로 나타내는지를
 찾아나가며 IaC로 관리하는 것도 하나의 방법이라고 생각합니다.
 
 제가 본 게시글을 위해 만들어놓은 Repository(https://github.com/umi0410/declarative-argocd)를 **Fork하셔서** 사용하시면 되겠습니다. 그리고 **아래 항목들을 잘 수행해주세요.**
@@ -169,6 +170,8 @@ ArgoCD CLI로 Application을 만들게 되면 추후에 yaml을 작성하기 힘
 * ⚠️ fork 뜬 Repository의 `getting-started/argocd/application.yml` 파일에서 `spec.source.repoURL` 값을 자신의 fork 뜬 Repository URL로 올바르게 수정하기
 
 **fork를 뜨는 이유**는 이후에 **GitOps 방식으로 CD하기 위해 image tag를 변경해서 푸시**한 뒤 업데이트 되는 모습을 보기 위함이에요!
+
+저희는 **샘플 프로젝트로 Guestbook(방명록) 프로젝트를 배포하고 확인**해볼거에요.
 
 ```console
 $ kubectl apply -n argocd -f https://raw.githubusercontent.com/umi0410/declarative-argocd/master/getting-started/argocd/application.yml
@@ -227,6 +230,7 @@ Forwarding from [::1]:8888 -> 80
 
 ![공식문서에서도 관련 내용을 찾아볼 수 있어요.](app-of-app.png)
 
+![예를 들어 App of App 패턴을 이용하면 다음과 같이 다른 앱들을 관리할 수 있게 돼요.](app-of-app-example.png)
 그럼 위에서 2번으로 언급한 문제는 어느 정도 해결할 수 있지만, 그럼 그 우두머리 App은 어떻게 생성/관리할 것인가(1번 문제)가 여전히 문제에요.
 
 저는 이 문제를 우리가 직접 App을 생성/관리하는 것이 아니라 ArgoCD helm chart의 추가적인 설정을 통해 선언적으로 관리함으로써 해결하려합니다.
