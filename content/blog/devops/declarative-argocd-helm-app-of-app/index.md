@@ -6,7 +6,7 @@ categories:
   - DevOps
 image: logo.png
 ---
-# 시작하며
+## 시작하며
 
 **취준생 기간을 마무리**하고 **데브옵스 엔지니어로서 커리어를 시작**하게 됐습니다! 🎉
 
@@ -32,7 +32,7 @@ ArgoCD나 GitOps의 개념 자체 같은 내용보다는 새로운 기술(ArgoCD
 
 해당 과정들을 실습해보고 싶으신 분들은 제가 작성해둔 Repository(https://github.com/umi0410/declarative-argocd)를 포크한 뒤 작업하시면 편하실 것 같습니다.
 
-# Glossary (용어 사전)
+## Glossary (용어 사전)
 
 간단하게 이번 글에서 다루게 될 용어들을 정리해보겠습니다. 자세한 내용이 궁금하시다면 따로 찾아보시는 것을 추천드리겠습니다.
 이번 글에서 전부를 다루긴 힘들기 때문이에요 ㅜㅅㅜ
@@ -48,7 +48,7 @@ ArgoCD나 GitOps의 개념 자체 같은 내용보다는 새로운 기술(ArgoCD
 * **Chart** - Helm을 통해 배포되는 것. Chart는 다양한 k8s 리소스들을 패키징한 형태이다.
 * **선언적**(Declarative) - 절차적(Procedural) 혹은 명령적(Imperative) 방식과 달리 과정을 생략하고 간결하게 Desired State를 선언적으로 정의하는 것.
 
-# ArgoCD를 구축하고 관리하는 방법
+## ArgoCD를 구축하고 관리하는 방법
 
 쿠버네티스에서는 어떤 서비스를 배포하고 관리해나가는 데에는 다음과 같은 방법들이 있습니다.
 
@@ -72,9 +72,9 @@ Plain k8s manifest yaml은 실제 업무나 프로젝트에서는 거의 사용�
 
 그래서! **이번 글에서는 `ArgoCD`를 `Helm`으로 배포**해보려 합니다.
 
-# Helm으로 간단하게 구축해보기
+## Helm으로 간단하게 구축해보기
 
-## ArgoCD Helm Chart 설치
+### ArgoCD Helm Chart 설치
 
 Helm 으로 ArgoCD를 설치하는 방법은 [ArgoCD Helm Chart Github](https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd)에서 확인하실 수 있습니다.
 참 간단합니다.
@@ -121,7 +121,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 나머지 - admin과 랜덤 패스워드에 대한 설명이에요.
 
-## 브라우저로 로그인해보기
+### 브라우저로 로그인해보기
 
 자동으로 생성된 admin 비밀번호를 얻은 뒤 콘솔에 접속하기 위해 Port forward한 뒤 접속해볼게요.
 
@@ -142,7 +142,7 @@ TLS 설정을 올바르게 해주지 않았기 떄문에 브라우저에서 인�
 
 🎉 짜잔~! **ArgoCD 콘솔 화면이 등장**했어요!!!
 
-## Application을 통해 CD 동작을 테스트해보기
+### Application을 통해 CD 동작을 테스트해보기
 
 ArgoCD에는 `Repository`, `AppProject`, `Application` 과 같은 개념들이 존재합니다.
 
@@ -212,7 +212,7 @@ Forwarding from [::1]:8888 -> 80
 
 기존에는 **검정색 타이틀의 "Guestbook"** 이었지만 이제는 **알록달록한 "Fancy Guestbook"** 이 된 것을 확인할 수 있어요~!
 
-## 이런 식의 작업 방식에서 불편한 점들
+### 이런 식의 작업 방식에서 불편한 점들
 
 성공적으로 CD 작업을 수행할 수 있었습니다. 하지만 실제로 ArgoCD를 도입하고 꾸준히 사용하기 위해서는 방금과 같은 방식으로
 작업하게 되면 몇 가지 불편 사항들이 존재할 수 있어요.
@@ -223,7 +223,7 @@ Forwarding from [::1]:8888 -> 80
    * 우리는 GitOps의 형태로 ArgoCD를 통해 `Deployment`, `Service`, `Configmap` 등을 관리하고 있지만
     `Application`은 직접 `kubectl`로 관리하고 있어요.
 
-# App of App 패턴을 통해 좀 더 선언적으로 관리하기
+## App of App 패턴을 통해 좀 더 선언적으로 관리하기
 
 따라서 위와 같은 불편 사항들을 해소하기 위해서 ArgoCD에는 `App of App`이라는 패턴이 존재합니다.
 `App of App 패턴`이란 **ArgoCD로 관리할 Application들을 관리하는 우두머리 Application을 두는 패턴**을 말해요.
@@ -298,7 +298,7 @@ helm install이 완료되면 동일한 방법으로 새로운 Admin 패스워드
 
 🎉 와우.. 새로운 클러스터에서도 **우리가 선언적으로 작성한 코드들만 있다면 위와 같이 기존과 동일한 상태로 구축이 가능**하네요! 좋습니다 좋아요~
 
-# 마치며
+## 마치며
 
 1. ArgoCD를 Helm으로 install 해보기
 2. Application을 생성하고 guestbook 프로젝트를 통해 CD 테스트해보기
