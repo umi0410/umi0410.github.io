@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Fri, 22 Apr 2022 14:11:07 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>ArgoCD 선언적으로 이용해나가기 - Helm, App of App</title><link>https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/</link><pubDate>Fri, 22 Apr 2022 14:11:07 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/logo.png" alt="Featured image of post ArgoCD 선언적으로 이용해나가기 - Helm, App of App" />&lt;h1 id="시작하며">시작하며&lt;/h1>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Fri, 22 Apr 2022 14:11:07 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>ArgoCD 선언적으로 이용해나가기 - Helm, App of App</title><link>https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/</link><pubDate>Fri, 22 Apr 2022 14:11:07 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/logo.png" alt="Featured image of post ArgoCD 선언적으로 이용해나가기 - Helm, App of App" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>&lt;strong>취준생 기간을 마무리&lt;/strong>하고 &lt;strong>데브옵스 엔지니어로서 커리어를 시작&lt;/strong>하게 됐습니다! 🎉&lt;/p>
 &lt;p>근무를 시작하기 전까지 기간이 좀 남아있어서 그 전까지 뭘 해보면 재밌을까 고민하던 중에
 새로 생긴 클라우드 동아리인 &lt;strong>Cloud Club&lt;/strong>에서 클라우드와 인프라에 관한 주제로 발표할 기회가 주어져 ArgoCD를 토픽으로 발표를 해보려합니다.
@@ -19,7 +19,7 @@ ArgoCD나 GitOps의 개념 자체 같은 내용보다는 새로운 기술(ArgoCD
 &lt;/ol>
 &lt;p>해당 과정들을 실습해보고 싶으신 분들은 제가 작성해둔 Repository(&lt;a class="link" href="https://github.com/umi0410/declarative-argocd" target="_blank" rel="noopener"
 >https://github.com/umi0410/declarative-argocd&lt;/a>)를 포크한 뒤 작업하시면 편하실 것 같습니다.&lt;/p>
-&lt;h1 id="glossary-용어-사전">Glossary (용어 사전)&lt;/h1>
+&lt;h2 id="glossary-용어-사전">Glossary (용어 사전)&lt;/h2>
 &lt;p>간단하게 이번 글에서 다루게 될 용어들을 정리해보겠습니다. 자세한 내용이 궁금하시다면 따로 찾아보시는 것을 추천드리겠습니다.
 이번 글에서 전부를 다루긴 힘들기 때문이에요 ㅜㅅㅜ&lt;/p>
 &lt;ul>
@@ -36,7 +36,7 @@ ArgoCD나 GitOps의 개념 자체 같은 내용보다는 새로운 기술(ArgoCD
 &lt;li>&lt;strong>Chart&lt;/strong> - Helm을 통해 배포되는 것. Chart는 다양한 k8s 리소스들을 패키징한 형태이다.&lt;/li>
 &lt;li>&lt;strong>선언적&lt;/strong>(Declarative) - 절차적(Procedural) 혹은 명령적(Imperative) 방식과 달리 과정을 생략하고 간결하게 Desired State를 선언적으로 정의하는 것.&lt;/li>
 &lt;/ul>
-&lt;h1 id="argocd를-구축하고-관리하는-방법">ArgoCD를 구축하고 관리하는 방법&lt;/h1>
+&lt;h2 id="argocd를-구축하고-관리하는-방법">ArgoCD를 구축하고 관리하는 방법&lt;/h2>
 &lt;p>쿠버네티스에서는 어떤 서비스를 배포하고 관리해나가는 데에는 다음과 같은 방법들이 있습니다.&lt;/p>
 &lt;ul>
 &lt;li>Plain k8s manifest yaml&lt;/li>
@@ -54,8 +54,8 @@ Plain k8s manifest yaml은 실제 업무나 프로젝트에서는 거의 사용�
 그 manifest 파일들을 하나 하나 비교하는 것도 너무 힘들죠. 그래서 저는 보통 &lt;code>Nginx Ingress Controller&lt;/code>, &lt;code>Cert manager&lt;/code>, &lt;code>ArgoCD&lt;/code> 와 같은 오픈소스들은 Helm으로 관리하는 것을 선호합니다.&lt;/p>
 &lt;p>반면 우리 팀 서비스를 배포하는 경우 대부분 Image tag만 변경하면 되는데 이런 케이스에는 가볍게 &lt;code>Kustomize&lt;/code>를 사용하는 것이 적절하다고 생각됩니다.&lt;/p>
 &lt;p>그래서! &lt;strong>이번 글에서는 &lt;code>ArgoCD&lt;/code>를 &lt;code>Helm&lt;/code>으로 배포&lt;/strong>해보려 합니다.&lt;/p>
-&lt;h1 id="helm으로-간단하게-구축해보기">Helm으로 간단하게 구축해보기&lt;/h1>
-&lt;h2 id="argocd-helm-chart-설치">ArgoCD Helm Chart 설치&lt;/h2>
+&lt;h2 id="helm으로-간단하게-구축해보기">Helm으로 간단하게 구축해보기&lt;/h2>
+&lt;h3 id="argocd-helm-chart-설치">ArgoCD Helm Chart 설치&lt;/h3>
 &lt;p>Helm 으로 ArgoCD를 설치하는 방법은 &lt;a class="link" href="https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd" target="_blank" rel="noopener"
 >ArgoCD Helm Chart Github&lt;/a>에서 확인하실 수 있습니다.
 참 간단합니다.&lt;/p>
@@ -93,7 +93,7 @@ Plain k8s manifest yaml은 실제 업무나 프로젝트에서는 거의 사용�
 &lt;p>1번 - 브라우저에서 ArgoCD를 열기 위한 Port forwarding 설명이에요.&lt;/p>
 &lt;p>2번 - Ingress나 TLS Termination 관련 설명이에요.&lt;/p>
 &lt;p>나머지 - admin과 랜덤 패스워드에 대한 설명이에요.&lt;/p>
-&lt;h2 id="브라우저로-로그인해보기">브라우저로 로그인해보기&lt;/h2>
+&lt;h3 id="브라우저로-로그인해보기">브라우저로 로그인해보기&lt;/h3>
 &lt;p>자동으로 생성된 admin 비밀번호를 얻은 뒤 콘솔에 접속하기 위해 Port forward한 뒤 접속해볼게요.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> kubectl -n argocd get secret argocd-initial-admin-secret -o &lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;{.data.password}&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> base64 -d
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="go">5VYjI5YcfOo6XMHx
@@ -124,7 +124,7 @@ alt="콘솔 화면">
 &lt;figcaption>콘솔 화면&lt;/figcaption>
 &lt;/figure>&lt;/p>
 &lt;p>🎉 짜잔~! &lt;strong>ArgoCD 콘솔 화면이 등장&lt;/strong>했어요!!!&lt;/p>
-&lt;h2 id="application을-통해-cd-동작을-테스트해보기">Application을 통해 CD 동작을 테스트해보기&lt;/h2>
+&lt;h3 id="application을-통해-cd-동작을-테스트해보기">Application을 통해 CD 동작을 테스트해보기&lt;/h3>
 &lt;p>ArgoCD에는 &lt;code>Repository&lt;/code>, &lt;code>AppProject&lt;/code>, &lt;code>Application&lt;/code> 과 같은 개념들이 존재합니다.&lt;/p>
 &lt;ul>
 &lt;li>&lt;strong>Repository&lt;/strong> - Private Repository 및 다양한 Repository에 대한 설정들을 담당해요.&lt;/li>
@@ -213,7 +213,7 @@ alt="ks-guestbook-demo:0.2">
 &lt;figcaption>ks-guestbook-demo:0.2&lt;/figcaption>
 &lt;/figure>&lt;/p>
 &lt;p>기존에는 &lt;strong>검정색 타이틀의 &amp;ldquo;Guestbook&amp;rdquo;&lt;/strong> 이었지만 이제는 &lt;strong>알록달록한 &amp;ldquo;Fancy Guestbook&amp;rdquo;&lt;/strong> 이 된 것을 확인할 수 있어요~!&lt;/p>
-&lt;h2 id="이런-식의-작업-방식에서-불편한-점들">이런 식의 작업 방식에서 불편한 점들&lt;/h2>
+&lt;h3 id="이런-식의-작업-방식에서-불편한-점들">이런 식의 작업 방식에서 불편한 점들&lt;/h3>
 &lt;p>성공적으로 CD 작업을 수행할 수 있었습니다. 하지만 실제로 ArgoCD를 도입하고 꾸준히 사용하기 위해서는 방금과 같은 방식으로
 작업하게 되면 몇 가지 불편 사항들이 존재할 수 있어요.&lt;/p>
 &lt;ol>
@@ -229,7 +229,7 @@ alt="ks-guestbook-demo:0.2">
 &lt;/ul>
 &lt;/li>
 &lt;/ol>
-&lt;h1 id="app-of-app-패턴을-통해-좀-더-선언적으로-관리하기">App of App 패턴을 통해 좀 더 선언적으로 관리하기&lt;/h1>
+&lt;h2 id="app-of-app-패턴을-통해-좀-더-선언적으로-관리하기">App of App 패턴을 통해 좀 더 선언적으로 관리하기&lt;/h2>
 &lt;p>따라서 위와 같은 불편 사항들을 해소하기 위해서 ArgoCD에는 &lt;code>App of App&lt;/code>이라는 패턴이 존재합니다.
 &lt;code>App of App 패턴&lt;/code>이란 &lt;strong>ArgoCD로 관리할 Application들을 관리하는 우두머리 Application을 두는 패턴&lt;/strong>을 말해요.&lt;/p>
 &lt;p>&lt;figure style="flex-grow: 401; flex-basis: 963px">
@@ -335,7 +335,7 @@ alt="선언적으로 관리된 guestbook">
 &lt;figcaption>선언적으로 관리된 guestbook&lt;/figcaption>
 &lt;/figure>&lt;/p>
 &lt;p>🎉 와우.. 새로운 클러스터에서도 &lt;strong>우리가 선언적으로 작성한 코드들만 있다면 위와 같이 기존과 동일한 상태로 구축이 가능&lt;/strong>하네요! 좋습니다 좋아요~&lt;/p>
-&lt;h1 id="마치며">마치며&lt;/h1>
+&lt;h2 id="마치며">마치며&lt;/h2>
 &lt;ol>
 &lt;li>ArgoCD를 Helm으로 install 해보기&lt;/li>
 &lt;li>Application을 생성하고 guestbook 프로젝트를 통해 CD 테스트해보기&lt;/li>
