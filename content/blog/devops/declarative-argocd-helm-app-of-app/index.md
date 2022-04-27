@@ -48,6 +48,17 @@ ArgoCD나 GitOps의 개념 자체 같은 내용보다는 새로운 기술(ArgoCD
 * **Chart** - Helm을 통해 배포되는 것. Chart는 다양한 k8s 리소스들을 패키징한 형태이다.
 * **선언적**(Declarative) - 절차적(Procedural) 혹은 명령적(Imperative) 방식과 달리 과정을 생략하고 간결하게 Desired State를 선언적으로 정의하는 것.
 
+## Requirements
+
+* minikube
+  * `brew install minikube && minikube start`
+* kubectl
+  * `brew install kubectl && kubectl version`
+* helm
+  * `brew install helm && helm version`
+* Github account
+  * 예시 코드 레포(https://github.com/umi0410/declarative-argocd)를 포크뜬 뒤 자신의 레포를 통해 Continuouse Deploy하기 위함
+
 ## ArgoCD를 구축하고 관리하는 방법
 
 쿠버네티스에서는 어떤 서비스를 배포하고 관리해나가는 데에는 다음과 같은 방법들이 있습니다.
@@ -82,10 +93,15 @@ Helm 으로 ArgoCD를 설치하는 방법은 [ArgoCD Helm Chart Github](https://
 대신 저는 namespace를 `argocd`로 고정하여 설치할게요! 그렇지 않으면 `default` namespace에 설치더라구요. Release name은 `argocd-demo`로 하겠습니다.
 
 ```console
-$ helm repo add argo https://argoproj.github.io/argo-helm
-"argo" has been added to your repositories
+
+$ minikube start
+😄  minikube v1.25.2 on Darwin 12.2 (arm64)
+...
 
 $ kubectl create ns argocd
+
+$ helm repo add argo https://argoproj.github.io/argo-helm
+"argo" has been added to your repositories
 
 $ helm install -n argocd argocd-demo argo/argo-cd
 NAME: argocd-demo
@@ -155,7 +171,7 @@ Application이 가장 중요해요~! Private repository를 이용하기 전까�
 
 다만 Application은 필수로 새로 생성해야 CD 동작을 확인해볼 수 있어요!
 
-ArgoCD에서 등장하는 대부분의 리소스는 쿠버네티스 CRD로 관리되고 그 외의 것들도 configmap에 설정을 기입함으로써 설정할 수 있습니다!
+ArgoCD에서 쓰이는 대부분의 리소스는 쿠버네티스 CRD(e.g. Repository, AppProject, Application)로 관리되고 그 외의 것들도 configmap에 설정을 기입함으로써 설정할 수 있습니다!
 
 따라서 우리는 ArgoCD CRD 중 하나인 Application을 만들어볼 거에요. 공식 문서의 Getting Started에서는 직접 ArgoCD CLI로 Application을 만들지만
 ArgoCD CLI나 콘솔 화면을 통해 Application을 만들게 되면 추후에 Application을 yaml 코드로 나타내어 선언적으로 이용하려는 경우 기존의 Application을 코드로 나타내려면 어떻게 해야하는지 혼란스러우실 수도 있습니다.
