@@ -1,4 +1,217 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Fri, 22 Apr 2022 14:11:07 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>ArgoCD 선언적으로 이용해나가기 - Helm, App of App</title><link>https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/</link><pubDate>Fri, 22 Apr 2022 14:11:07 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/logo.png" alt="Featured image of post ArgoCD 선언적으로 이용해나가기 - Helm, App of App" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sat, 07 May 2022 22:00:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>ArgoCD 선언적으로 이용해나가기 - Github을 통한 SSO 및 RBAC</title><link>https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/</link><pubDate>Sat, 07 May 2022 22:00:00 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/logo.png" alt="Featured image of post ArgoCD 선언적으로 이용해나가기 - Github을 통한 SSO 및 RBAC" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>저번 글(&lt;a class="link" href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/" target="_blank" rel="noopener"
+>&amp;ldquo;ArgoCD 선언적으로 이용해나가기 - Helm, App of App&amp;rdquo;&lt;/a>)에서는
+&lt;code>Helm&lt;/code>과 &lt;code>App of App&lt;/code> 패턴을 이용해 ArgoCD를 선언적으로 이용해나가는 방법을 다뤘습니다.&lt;/p>
+&lt;p>바~로 ArgoCD를 좀 더 선언적으로 이용해나가는 것과 관련된 팁부터 글을 적어나가기는 좀 무리가 있을 것 같아 해당 글에서는&lt;/p>
+&lt;p>배경지식들에 대한 간략한 정리와 핸즈온 같은 느낌의 내용들도 많이 포함하게 됐던 것 같아요.&lt;/p>
+&lt;p>이번 글에서는 &lt;strong>ArgoCD를 실제로 이용하기 위해 필요할만한 이런 저런 설정들을 어떻게 선언적으로 정의해볼 수 있을지&lt;/strong>를 소개해보려해요!&lt;/p>
+&lt;p>그리고 그 예시로 &lt;code>RBAC 설정&lt;/code>을 해보겠습니다. 이번 글에서 수행해볼 작업은 &lt;strong>Github 계정을 ArgoCD와 연동시켜 역할(Role) 기반으로 ArgoCD의 권한을 제어&lt;/strong>하는 것이에요.&lt;/p>
+&lt;p>&amp;lsquo;&lt;em>왜 RBAC을 ArgoCD 커스터마이징의 예시로 했는가?&lt;/em>&amp;lsquo;는 제가 사이드 프로젝트에서 ArgoCD를 이용하면서 Local user(ArgoCD의 자체 계정)을 이용하는 데에 불편이 있었기 때문이에요.
+저는 &lt;strong>ArgoCD와 Github 계정을 연동해 RBAC을 이용함으로써 해결&lt;/strong>했습니다. 이제는 Admin 계정의 패스워드를 암기할 필요도 새로운 팀원에게 새 계정을 생성해 전달할 일도 필요가 없어졌습니다! 또한 Github 계정 별로 권한을 갖도록 (e.g. readonly) 설정할 수도 있어졌습니다.&lt;/p>
+&lt;p>그리고 글의 내용은 &amp;lsquo;&lt;em>제 글만 무조건 따라하면 됩니다&lt;/em>&amp;lsquo;보다는 &amp;lsquo;&lt;em>저는 이런 식으로 자료를 찾았고 이렇게 적용해봤어요.&lt;/em>&amp;lsquo;식의 내용들을 다뤄보겠습니다.&lt;/p>
+&lt;h3 id="본-글에서-사용하는-환경">본 글에서 사용하는 환경&lt;/h3>
+&lt;ul>
+&lt;li>핸즈온 과정 참고 레포지토리 - &lt;a class="link" href="https://github.com/umi0410/declarative-argocd/tree/master/configuring-rbac" target="_blank" rel="noopener"
+>https://github.com/umi0410/declarative-argocd/tree/master/configuring-rbac&lt;/a>&lt;/li>
+&lt;li>Minikube를 이용한 K8s Cluster&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd" target="_blank" rel="noopener"
+>ArgoCD Helm Chart&lt;/a>를 이용해 argocd namespace에 배포한 ArgoCD&lt;/li>
+&lt;/ul>
+&lt;h2 id="rbac이란">RBAC이란?&lt;/h2>
+&lt;p>&lt;code>RBAC&lt;/code>은 &lt;code>Role-Based Access Contol&lt;/code>의 약자로 쉽게 말하자면 그냥 역할 기반 권한 제어입니다.&lt;/p>
+&lt;p>속성 기반으로 나름 복잡한 로직에 의해 어떤 유저가 어떤 리소스에 어떤 작업을 수행할 수 있는지를 정의하는 &lt;code>ABAC(Attribute-Base Access Control)&lt;/code>에 비해 그저 간단히 역할에 권한들을 부여하고 유저들은 그 역할을 부여받음으로써 권한을 체크하게 됩니다.&lt;/p>
+&lt;p>개인적으로는 많은 경우에 간단히 RBAC만으로도 권한 제어가 충분한 경우가 많은 것 같습니다. 그리고 많은 솔루션들이 RBAC 기능을 지원하는 것 같았어요. ArgoCD 또한 마찬가지로 RBAC을 지원하고 있습니다.&lt;/p>
+&lt;h2 id="github-organization--team으로-argocd-rbac-이용하기">Github organization + team으로 ArgoCD RBAC 이용하기&lt;/h2>
+&lt;p>자, 그럼 Github의 Organization, Team을 통해 ArgoCD에서 RBAC을 이용해보는 과정을 진행해봅시다!&lt;/p>
+&lt;h3 id="1-argocd에-rbac-설정하기">1. ArgoCD에 RBAC 설정하기&lt;/h3>
+&lt;p>요즘 인기있는 솔루션들은 &lt;code>RBAC&lt;/code> 및 기타 권한 제어 기능이 대부분 존재합니다. 보안과 권한 관리는 아주 중요하기 때문입니다. 그리고 그런 권한 제어의 방법 중 가장 대중적인 방법은 바로 &lt;code>RBAC&lt;/code> 입니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 136; flex-basis: 327px">
+&lt;a href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/rbac.png" data-size="1204x883">&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/rbac.png"
+srcset="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/rbac_hu8a1d47df067db6e35deb191bf75329be_273516_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/rbac_hu8a1d47df067db6e35deb191bf75329be_273516_1024x0_resize_box_3.png 1024w"
+width="1204"
+height="883"
+loading="lazy"
+alt="공식 문서 속 RBAC 설명">
+&lt;/a>
+&lt;figcaption>공식 문서 속 RBAC 설명&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>공식 문서는 언제나 가장 좋은 교과서입니다. 자세한 방법은 &lt;a class="link" href="https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/" target="_blank" rel="noopener"
+>공식 문서&lt;/a>에서 찾아보실 수 있습니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 1705; flex-basis: 4092px">
+&lt;a href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/helm-chart-rbac.png" data-size="1262x74">&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/helm-chart-rbac.png"
+srcset="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/helm-chart-rbac_hu21132895ae0aab5f81e1c0650669ee11_33874_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/helm-chart-rbac_hu21132895ae0aab5f81e1c0650669ee11_33874_1024x0_resize_box_3.png 1024w"
+width="1262"
+height="74"
+loading="lazy"
+alt="ArgoCD Helm Chart 속 Configuration">
+&lt;/a>
+&lt;figcaption>ArgoCD Helm Chart 속 Configuration&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 193; flex-basis: 464px">
+&lt;a href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/default-values.png" data-size="1109x573">&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/default-values.png"
+srcset="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/default-values_hu2c68e4165a00fec2142fab308f6a57c0_319110_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/default-values_hu2c68e4165a00fec2142fab308f6a57c0_319110_1024x0_resize_box_3.png 1024w"
+width="1109"
+height="573"
+loading="lazy"
+alt="default values.yaml">
+&lt;/a>
+&lt;figcaption>default values.yaml&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>또한 제가 사용한 &lt;a class="link" href="https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd" target="_blank" rel="noopener"
+>ArgoCD Helm Chart에서 제공하는 README.md&lt;/a> 속 Configuration 부분과 &lt;a class="link" href="https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/values.yaml" target="_blank" rel="noopener"
+>default values.yaml&lt;/a> 보면&lt;/p>
+&lt;p>Helm Chart를 통해 배포한 ArgoCD의 경우 어떻게 values.yaml을 통해 rbac을 설정할 수 있는지 나와있습니다.&lt;/p>
+&lt;p>기본 원리는 다음과 같습니다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>p, &amp;lt;role/user/group&amp;gt;, &amp;lt;resource&amp;gt;, &amp;lt;action&amp;gt;, &amp;lt;appproject&amp;gt;/&amp;lt;object&amp;gt;&lt;/code> - AppProject에 속한 Object(e.g. Application)에 대한 권한을 정의한다.&lt;/li>
+&lt;li>&lt;code>p, &amp;lt;role/user/group&amp;gt;, &amp;lt;resource&amp;gt;, &amp;lt;action&amp;gt;, &amp;lt;object&amp;gt;&lt;/code> - AppProject에 속하지 않는 Object(e.g. Clusters, AppProject, Repositories, &amp;hellip;)에 대한 권한을 정의한다.&lt;/li>
+&lt;/ul>
+&lt;p>그리고 위에서 말하는 Resource나 Action은 다음과 같습니다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Resources&lt;/strong>: &lt;code>clusters&lt;/code>, &lt;code>projects&lt;/code>, &lt;code>applications&lt;/code>, &lt;code>repositories&lt;/code>, &lt;code>certificates&lt;/code>, &lt;code>accounts&lt;/code>, &lt;code>gpgkeys&lt;/code>&lt;/li>
+&lt;li>&lt;strong>Actions&lt;/strong>: &lt;code>get&lt;/code>, &lt;code>create&lt;/code>, &lt;code>update&lt;/code>, &lt;code>delete&lt;/code>, &lt;code>sync&lt;/code>, &lt;code>override&lt;/code>, &lt;code>action&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>공식 문서의 설명이 좀 부족하긴하지만 Github SSO를 이용해 인증하는 경우 RBAC은 다음과 같이 설정할 수 있다고 합니다.&lt;/p>
+&lt;pre tabindex="0">&lt;code class="language-csv" data-lang="csv">p, role:org-admin, applications, *, */*, allow
+p, role:org-admin, clusters, get, *, allow
+p, role:org-admin, repositories, get, *, allow
+p, role:org-admin, repositories, create, *, allow
+p, role:org-admin, repositories, update, *, allow
+p, role:org-admin, repositories, delete, *, allow
+g, your-github-org:your-team, role:org-admin
+&lt;/code>&lt;/pre>&lt;ul>
+&lt;li>의미: org-admin이라는 Role이 갖는 권한들을 정의하고 해당 &lt;!-- raw HTML omitted -->:&lt;!-- raw HTML omitted -->에 속하는 Github user로 로그인한 경우 org-admin Role에 허용된 권한들을 갖는다.&lt;/li>
+&lt;/ul>
+&lt;p>그리고 저는 다음과 같은 요구사항을 가정하려합니다.&lt;/p>
+&lt;p>&lt;strong>RBAC 요구사항&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>나의 Github Organization &lt;code>khu-dev&lt;/code>의 &lt;code>khumu-devops&lt;/code> 팀의 유저들은 admin 권한을 갖는다.&lt;/li>
+&lt;li>나의 Github Organization &lt;code>khu-dev&lt;/code>의 &lt;code>khumu-devops&lt;/code> 팀의 유저들은 readonly 권한을 갖는다.&lt;/li>
+&lt;/ul>
+&lt;p>그 경우 저는 다음과 같이 values.yaml을 작성한 뒤 helm release를 update 해주면 됩니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># values.yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">server&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">rbacConfig&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">policy.csv&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> g, khu-dev:khumu-developer, role:readonly
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> g, khu-dev:khumu-devops, role:admin&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>readonly&lt;/code>와 &lt;code>admin&lt;/code>이라는 Role은 공식문서에도 나와있듯 &lt;code>builtin-policy&lt;/code>로서 &lt;a class="link" href="https://github.com/argoproj/argo-cd/blob/master/assets/builtin-policy.csv" target="_blank" rel="noopener"
+>이곳&lt;/a>에 작성되어 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> helm upgrade -n argocd argocd &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span>&lt;span class="go"> argo/argo-cd -f values.yaml
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>그럼 위의 커맨드를 통해 RBAC 설정을 적용시켜주겠습니다.&lt;/p>
+&lt;h3 id="2-argocd에-github을-통한-sso-설정하기">2. ArgoCD에 Github을 통한 SSO 설정하기&lt;/h3>
+&lt;p>ArgoCD는 &lt;a class="link" href="https://github.com/dexidp/dex" target="_blank" rel="noopener"
+>Dex&lt;/a>라는 인증 관련 각종 기능을 담당하는 컴포넌트를 함께 제공하고 있습니다. &lt;code>Github&lt;/code>의 &lt;code>OAuth2&lt;/code>를 이용해 &lt;code>SSO(Single Sign On)&lt;/code>을 이용하는 과정은 &lt;a class="link" href="https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#dex" target="_blank" rel="noopener"
+>공식문서 Dex 부분&lt;/a>에도
+소개되어있고, 사실 이대로 따라만하면 됩니다. ㅎㅎ&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 84; flex-basis: 203px">
+&lt;a href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/github-oauth-app.png" data-size="660x777">&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/github-oauth-app.png"
+srcset="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/github-oauth-app_hu395b1c716fc41f43b835749ac9fe7844_64355_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/github-oauth-app_hu395b1c716fc41f43b835749ac9fe7844_64355_1024x0_resize_box_3.png 1024w"
+width="660"
+height="777"
+loading="lazy"
+alt="Github OAuth app 생성하기">
+&lt;/a>
+&lt;figcaption>Github OAuth app 생성하기&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;code>Organization&lt;/code> - &lt;code>Settings&lt;/code> - &lt;code>Developer Settings&lt;/code> - &lt;code>OAuth Apps&lt;/code> 에서 위와 같이 OAuth App을 만들어주고 이후 생성되는 &lt;code>Client ID&lt;/code>와 &lt;code>Client Secret&lt;/code>을 다음과 같이 &lt;code>dex.config&lt;/code>에 전달하면 됩니다.
+(사실 Organization이 아니라 개인 계정에서 App을 생성해도 동작합니다.)&lt;/p>
+&lt;p>단, &lt;code>dex.config&lt;/code>는 &lt;code>argocd-cm&lt;/code>이라는 Configmap의 &lt;code>.data&lt;/code>의 필드로 존재하기 때문에 우리는 Helm chart의 values.yaml에 &lt;code>dex.config&lt;/code>를 올바르게 전달해야합니다.
+이를 위해선 &lt;code>server.config.dex.config&lt;/code>를 다음과 같이 작성해주면 됩니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">server&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dex.config&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> connectors:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> # Github OAuth를 통해 SSO하려는 경우
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> - type: github
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> id: github # 상관 없을 듯 뭘로 하든
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> name: GitHub # 상관 없을 듯 뭘로 하든
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> config:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> clientID: &amp;lt;your github oauth app client id&amp;gt;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> clientSecret: &amp;lt;your github oauth app client secret&amp;gt;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> orgs:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> - name: &amp;lt;your github organization name&amp;gt; # e.g. khu-dev&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>server.config.dex.config에 작성해야한다는 것은 어떻게 알 수 있는가?&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#quick-reference" target="_blank" rel="noopener"
+>ArgoCD의 공식 문서&lt;/a>에서는 &lt;code>argocd-cm.yaml&lt;/code>을 &amp;lsquo;General Argo CD configuration&amp;rsquo;로 소개하고 있습니다.&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd" target="_blank" rel="noopener"
+>ArgoCD Helm Chart Github&lt;/a>에서는 &lt;code>values.yaml&lt;/code> 속 &lt;code>server.config&lt;/code>를 동일하게 &amp;lsquo;General Argo CD configuration&amp;rsquo;로 소개하고 있습니다.&lt;/li>
+&lt;li>따라서 &lt;code>values.yaml&lt;/code> 속 &lt;code>server.config&lt;/code>에 정의하는 내용이 곧 &lt;code>argocd-cm.yaml&lt;/code>의 &lt;code>.data&lt;/code>가 됨을 유추할 수 있습니다.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-console" data-lang="console">&lt;span class="line">&lt;span class="cl">&lt;span class="gp">$&lt;/span> helm upgrade -n argocd argocd &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span>&lt;span class="go"> argo/argo-cd -f values.yaml
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>한 번 더 위의 커맨드를 통해 RBAC 설정을 적용시켜주겠습니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 167; flex-basis: 401px">
+&lt;a href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/login-via-github.png" data-size="1534x916">&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/login-via-github.png"
+srcset="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/login-via-github_hu9c113ddcd41c506471c69869b28b5ba9_827681_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/login-via-github_hu9c113ddcd41c506471c69869b28b5ba9_827681_1024x0_resize_box_3.png 1024w"
+width="1534"
+height="916"
+loading="lazy"
+alt="LOG IN VIA GITHUB 버튼이 추가된 모습">
+&lt;/a>
+&lt;figcaption>LOG IN VIA GITHUB 버튼이 추가된 모습&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>성공적으로 Github을 통한 SSO가 활성화되면 ArgoCD에 접속할 때 위와 같이 &lt;code>LOG IN VIA GITHUB&lt;/code> 버튼이 추가된 것을 확인할 수 있습니다.&lt;/p>
+&lt;p>그럼 요구사항대로 &lt;code>khu-dev&lt;/code>라는 Github Organization의 &lt;code>khumu-developer&lt;/code> Team에 속한 계정으로 ArgoCD에 로그인해보겠습니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 175; flex-basis: 421px">
+&lt;a href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/user-info.png" data-size="823x469">&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/user-info.png"
+srcset="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/user-info_hucef4272cca453302126c4eebb9e78a82_85359_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/user-info_hucef4272cca453302126c4eebb9e78a82_85359_1024x0_resize_box_3.png 1024w"
+width="823"
+height="469"
+loading="lazy"
+alt="User info">
+&lt;/a>
+&lt;figcaption>User info&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>성공적으로 로그인한 뒤 &lt;code>&amp;lt;your argocd url&amp;gt;/user-info&lt;/code>로 이동하면 위와 같이 &lt;!-- raw HTML omitted -->:&lt;!-- raw HTML omitted --> 이라는 이름의 그룹에 속한 모습을 볼 수 있습니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 78; flex-basis: 189px">
+&lt;a href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/permission-denied.png" data-size="730x925">&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/permission-denied.png"
+srcset="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/permission-denied_hua5411c757f7472ef3825c63a839272be_139750_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/permission-denied_hua5411c757f7472ef3825c63a839272be_139750_1024x0_resize_box_3.png 1024w"
+width="730"
+height="925"
+loading="lazy"
+alt="Permission denied">
+&lt;/a>
+&lt;figcaption>Permission denied&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>이후 만약 어떤 Application을 Sync하려해도 현재 속한 그룹인 &lt;code>khu-dev:khumu-developer&lt;/code>는 &lt;code>readonly&lt;/code> Role을 부여받았기에 어떠한 App도 Sync할 권한이 없어 위와 같이 Permission Denied 라는 에러를
+맞이하게 됩니다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 175; flex-basis: 420px">
+&lt;a href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/user-info-2.png" data-size="826x471">&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/user-info-2.png"
+srcset="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/user-info-2_hu2b0412c75c988732975fb3f78c2d2f2f_85455_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/user-info-2_hu2b0412c75c988732975fb3f78c2d2f2f_85455_1024x0_resize_box_3.png 1024w"
+width="826"
+height="471"
+loading="lazy"
+alt="User info">
+&lt;/a>
+&lt;figcaption>User info&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>🎉🎉🎉 하지만 위와 같이 &lt;code>khu-dev:khumu-devops&lt;/code>에 속한 계정으로 로그인한 뒤 동일하게 어떤 App을 Sync해보면 이번에는 성공적으로 App이 Sync되는 모습을 볼 수 있습니다. &lt;code>khu-dev:khumu-devops&lt;/code> 그룹은 admin Role을 부여받았기 때문입니다!&lt;/p>
+&lt;p>자, 그럼 이제는 admin 계정을 비롯한 username, password 기반의 계정을 이용할 필요 없이 Github을 이용해 ArgoCD의 인증/인가를 수행할 수 있습니다 ㅎㅎ&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>새로운 회사에 입사하고 행복하게 적응해나가면서 운동, 취미, 업무까지 챙기다보니 글을 작성해놓고 마무리를 오랜 시간 동안 짓지 못하다가 급히 지방선거일을 기회 삼아 글을 마무리 지어봤습니다.
+우선은 ArgoCD를 Helm chart와 함께 선언적으로 이용해나가는 내용은 이 글을 끝으로 2편으로 마무리 지어보려합니다. 사이드 프로젝트에서 ArgoCD를 이용하면서 ArgoCD는 선언적으로 관리가 가능하다는 장점을 많이
+써먹지 못하고 좀 더러운 형태로 억지로 사용하다보니 번거롭게 느껴졌던 경우가 많았는데 저 스스로도 이를 선언적인 형태로 개선하면서 많이 편해졌고, 그 과정들을 이렇게 글로 기록하고나니 나름 뿌듯합니다.&lt;/p>
+&lt;p>ArgoCD 관련한 또 다른 내용으로는 &lt;a class="link" href="https://argocd-applicationset.readthedocs.io/en/stable/" target="_blank" rel="noopener"
+>Applpicaitonset&lt;/a>에 관해 추후에 기회가 되면 다뤄볼까 생각 중입니다.&lt;/p>
+&lt;p>몇 년 전에 처음 데브옵스 엔지니어 인턴으로서 이쪽 일을 시작했을 때 제가 알던 ArgoCD는 &amp;lsquo;ArgoCD라고 요즘 쿠버네티스 환경에서 쓸만한 CD 툴이 있다더라&amp;rsquo; 정도의 도구였던 것 같은데 이제는 자체 CD툴만을 사용하는 기업을 제외하면
+쿠버네티스를 사용하는 경우는 대부분이 ArgoCD를 이용할 정도로 대중적인 기술이 된 것 같고, 그 시절보다 많은 기능들을 편리하게 제공하는 기술이 된 것 같아 새삼 기특하단 생각이 들었습니다 ㅎㅎ.&lt;/p>
+&lt;p>데브옵스로 입사하면서 거대한 규모의 클라우드 인프라를 다루다보니 네트워크 관련된 내용을 자주 접하게 되고, 이론적으로는 제가 약한 부분이라고 생각이 들어서 앞으로는 DevOps 서비스들보다는 네트워크 공부를 우선적으로 해볼까합니다!
+곧 자취를 시작할텐데 라즈베리 파이로 자취방에서 재밌는 무언가를 해볼 수 있을까 싶은 생각도 있구요 ㅎㅎ.
+시간이 되면 관련 내용을 틈틈이 기록해보겠습니다! 감사합니다.&lt;/p>
+&lt;h2 id="참고자료">참고자료&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.okta.com/kr/identity-101/role-based-access-control-vs-attribute-based-access-control/" target="_blank" rel="noopener"
+>RBAC vs ABAC - Okta&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://argo-cd.readthedocs.io/en/stable/" target="_blank" rel="noopener"
+>ArgoCD 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd" target="_blank" rel="noopener"
+>ArgoCD Helm Chart&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>ArgoCD 선언적으로 이용해나가기 - Helm, App of App</title><link>https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/</link><pubDate>Fri, 22 Apr 2022 14:11:07 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/logo.png" alt="Featured image of post ArgoCD 선언적으로 이용해나가기 - Helm, App of App" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>&lt;strong>취준생 기간을 마무리&lt;/strong>하고 &lt;strong>데브옵스 엔지니어로서 커리어를 시작&lt;/strong>하게 됐습니다! 🎉&lt;/p>
 &lt;p>근무를 시작하기 전까지 기간이 좀 남아있어서 그 전까지 뭘 해보면 재밌을까 고민하던 중에
 새로 생긴 클라우드 동아리인 &lt;strong>Cloud Club&lt;/strong>에서 클라우드와 인프라에 관한 주제로 발표할 기회가 주어져 ArgoCD를 토픽으로 발표를 해보려합니다.
@@ -38,22 +251,22 @@ ArgoCD나 GitOps의 개념 자체 같은 내용보다는 새로운 기술(ArgoCD
 &lt;/ul>
 &lt;h2 id="requirements">Requirements&lt;/h2>
 &lt;ul>
-&lt;li>minikube
+&lt;li>&lt;strong>minikube&lt;/strong>
 &lt;ul>
 &lt;li>&lt;code>brew install minikube &amp;amp;&amp;amp; minikube start&lt;/code>&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>kubectl
+&lt;li>&lt;strong>kubectl&lt;/strong>
 &lt;ul>
 &lt;li>&lt;code>brew install kubectl &amp;amp;&amp;amp; kubectl version&lt;/code>&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>helm
+&lt;li>&lt;strong>helm&lt;/strong>
 &lt;ul>
 &lt;li>&lt;code>brew install helm &amp;amp;&amp;amp; helm version&lt;/code>&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>Github account
+&lt;li>&lt;strong>Github account&lt;/strong>
 &lt;ul>
 &lt;li>예시 코드 레포(&lt;a class="link" href="https://github.com/umi0410/declarative-argocd" target="_blank" rel="noopener"
 >https://github.com/umi0410/declarative-argocd&lt;/a>)를 포크뜬 뒤 자신의 레포를 통해 Continuouse Deploy하기 위함&lt;/li>
