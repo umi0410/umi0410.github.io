@@ -50,13 +50,13 @@ ArgoCD나 GitOps의 개념 자체 같은 내용보다는 새로운 기술(ArgoCD
 
 ## Requirements
 
-* minikube
+* **minikube**
   * `brew install minikube && minikube start`
-* kubectl
+* **kubectl**
   * `brew install kubectl && kubectl version`
-* helm
+* **helm**
   * `brew install helm && helm version`
-* Github account
+* **Github account**
   * 예시 코드 레포(https://github.com/umi0410/declarative-argocd)를 포크뜬 뒤 자신의 레포를 통해 Continuouse Deploy하기 위함
 
 ## ArgoCD를 구축하고 관리하는 방법
