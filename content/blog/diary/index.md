@@ -314,6 +314,7 @@ OK
 
 그럼 결과를 확인해보자.
 
+{{<youtube gfkeh1Si_no>}}
 <iframe width="560" height="315" src="[https://www.youtube.com/embed/gfkeh1Si_no](https://www.youtube.com/embed/gfkeh1Si_no)" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 🎉 귀엽게 디버깅을 도와줘는 “미스터 디버거 우미"를 만나볼 수 있었다. 🥳
