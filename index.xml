@@ -24,8 +24,8 @@ alt="Clova AI 스피커">
 &lt;p>&lt;em>이번 글은 그냥 일기장 같은 느낌으로 CS 지식은 일부 제외하고 적어보려합니다.&lt;/em>&lt;/p>
 &lt;/blockquote>
 &lt;blockquote>
-&lt;p>_이번 글에서 사용한 소스코드는 &lt;a class="link" href="https://github.com/umi0410/umi-mrdebugger" target="_blank" rel="noopener"
->Github umi0410/umi-mrdebugger&lt;/a>에서 찾아보실 수 있습니다.&lt;/p>
+&lt;p>&lt;em>이번 글에서 사용한 소스코드는 Github &lt;a class="link" href="https://github.com/umi0410/umi-mrdebugger" target="_blank" rel="noopener"
+>umi0410/umi-mrdebugger&lt;/a>에서 찾아보실 수 있습니다.&lt;/em>&lt;/p>
 &lt;/blockquote>
 &lt;h2 id="환경-및-버전-정보">환경 및 버전 정보&lt;/h2>
 &lt;table>
@@ -223,6 +223,8 @@ alt="Clova AI 스피커">
 &lt;ul>
 &lt;li>Gateway는 CRD이고, ingress gateway는 자신을 selector로 설정한 Gateway를 보고 해당 설정을 적용한다.&lt;/li>
 &lt;li>마치 Ingress와 Nginx Ingress Controller 같은 느낌이랄까&lt;/li>
+&lt;/ul>
+&lt;/li>
 &lt;li>istio ingress gateway는 보통 istio-system 네임스페이스에 존재한다.&lt;/li>
 &lt;li>Gateway는 아무 네임스페이스에 만들어도 된다.&lt;/li>
 &lt;li>VirtualSevice 또한 아무 네임스페이스에 만들어도 된다.
@@ -232,8 +234,6 @@ alt="Clova AI 스피커">
 &lt;/ul>
 &lt;/li>
 &lt;li>Service, Deployment, Pod, … 또한 아무 네임스페이스에 만들어도 된다.&lt;/li>
-&lt;/ul>
-&lt;/li>
 &lt;/ul>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">umi-mrdebugger $ kubectl create ns mrdebugger
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">namespace/mrdebugger created
