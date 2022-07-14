@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Wed, 13 Jul 2022 23:00:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>쿠버네티스를 이용해 Clova AI Custom Extension 배포하기</title><link>https://umi0410.github.io/blog/diary/</link><pubDate>Wed, 13 Jul 2022 23:00:00 +0900</pubDate><guid>https://umi0410.github.io/blog/diary/</guid><description>&lt;img src="https://umi0410.github.io/blog/diary/preview.png" alt="Featured image of post 쿠버네티스를 이용해 Clova AI Custom Extension 배포하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Wed, 13 Jul 2022 23:00:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>쿠버네티스로 Clova AI Custom Extension 배포하기 (feat. Istio, Cert Manager)</title><link>https://umi0410.github.io/blog/clova-ai-on-k8s/</link><pubDate>Wed, 13 Jul 2022 23:00:00 +0900</pubDate><guid>https://umi0410.github.io/blog/clova-ai-on-k8s/</guid><description>&lt;img src="https://umi0410.github.io/blog/clova-ai-on-k8s/preview.png" alt="Featured image of post 쿠버네티스로 Clova AI Custom Extension 배포하기 (feat. Istio, Cert Manager)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>&lt;figure style="flex-grow: 149; flex-basis: 357px">
-&lt;a href="https://umi0410.github.io/blog/diary/preview.png" data-size="827x555">&lt;img src="https://umi0410.github.io/blog/diary/preview.png"
-srcset="https://umi0410.github.io/blog/diary/preview_hu0de35698344aa28c3f5141b2d5dcaef6_812038_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/diary/preview_hu0de35698344aa28c3f5141b2d5dcaef6_812038_1024x0_resize_box_3.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/clova-ai-on-k8s/preview.png" data-size="827x555">&lt;img src="https://umi0410.github.io/blog/clova-ai-on-k8s/preview.png"
+srcset="https://umi0410.github.io/blog/clova-ai-on-k8s/preview_hu0de35698344aa28c3f5141b2d5dcaef6_812038_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/clova-ai-on-k8s/preview_hu0de35698344aa28c3f5141b2d5dcaef6_812038_1024x0_resize_box_3.png 1024w"
 width="827"
 height="555"
 loading="lazy"
@@ -17,11 +17,15 @@ alt="Clova AI 스피커">
 &lt;li>🎸 &lt;strong>기타&lt;/strong>를 꾸준히 다니고 있다.&lt;/li>
 &lt;/ul>
 &lt;p>그런 변화들 속에서 자취방에 인터넷 설치를 하게 됐는데 &lt;strong>클로바 AI 스피커&lt;/strong>를 공짜로 주더라.&lt;/p>
-&lt;p>본가에 있을 때도 쓰긴 했는데 딱히 관심 없다가 직접 클로바 앱을 깔아서 이것저것 써보니 &amp;lsquo;&lt;em>전보다 재밌네..? ㅎㅎ&lt;/em>&amp;rsquo; 싶었고, &amp;lsquo;&lt;em>아니 이거 직접 만들지는 못하나&lt;/em>&amp;lsquo;하는 생각이 들던 참에 “스킬 스토어”라는 게 눈에 띄었다. 스킬 스토어에는 개별 개발사들이 개발한 자기네 기능들이 소개되어있었다.&lt;/p>
+&lt;p>본가에 있을 때도 쓰긴 했는데 딱히 관심 없다가 직접 클로바 앱을 깔아서 이것저것 써보니 &amp;lsquo;전보다 재밌네..? ㅎㅎ&amp;rsquo; 싶었고, &amp;lsquo;아니 이거 직접 만들지는 못하나&amp;rsquo;하는 생각이 들던 참에 &amp;ldquo;스킬 스토어”라는 게 눈에 띄었다. 스킬 스토어에는 개별 개발사들이 개발한 자기네 기능들이 소개되어있었다.&lt;/p>
 &lt;p>요즘 재미있게 딥한 영역을 공부해나가고 있긴 하지만 너무 딥한 것만 하다보니 심심풀이 작업 좀 즐기고 싶은 마음에 나도 하나 스킬을 만들어보고자 했다. 마침 요즘 &lt;code>istio&lt;/code>에도 관심이 많이 갔고 적용해보고 싶었는데 갖고 있던 k8s 클러스터에 istio는 배포해놓은 상태였고, &lt;code>Gateway&lt;/code>, &lt;code>VirtualService&lt;/code> 등의 &lt;code>CRD&lt;/code>와 &lt;code>인증서&lt;/code>만 잘 만져주면 스킬을 공개할 수 있을 것 같았다.&lt;/p>
-&lt;p>그리하여 &amp;ldquo;&lt;strong>우미, 미스터 디버거&lt;/strong>&amp;ldquo;라는 스킬을 개발하고자 했고 이 녀석의 기능은 사용자가 &amp;ldquo;&lt;em>디버거, 디버깅 팁 좀 알려줘&lt;/em>&amp;ldquo;라는 식으로 요청하면 미리 정의해놓은 디버깅 팁(e.g. &amp;ldquo;&lt;em>환경변수가 잘 설정되어있나요?&lt;/em>&amp;rdquo;) 중에서 랜덤으로 팁을 알려주는 것이다.&lt;/p>
+&lt;p>그리하여 &amp;ldquo;&lt;strong>우미, 미스터 디버거&lt;/strong>&amp;ldquo;라는 스킬을 개발하고자 했고 이 녀석의 기능은 사용자가 &amp;ldquo;디버거, 디버깅 팁 좀 알려줘&amp;quot;라는 식으로 요청하면 미리 정의해놓은 디버깅 팁(e.g. &amp;ldquo;환경변수가 잘 설정되어있나요?&amp;rdquo;) 중에서 랜덤으로 팁을 알려주는 것이다.&lt;/p>
 &lt;blockquote>
-&lt;p>&lt;em>이번 글은 그냥 일기장 같은 느낌으로 CS 지식은 일부 제외하고 적어보려한다.&lt;/em>&lt;/p>
+&lt;p>&lt;em>이번 글은 그냥 일기장 같은 느낌으로 CS 지식은 일부 제외하고 적어보려합니다.&lt;/em>&lt;/p>
+&lt;/blockquote>
+&lt;blockquote>
+&lt;p>_이번 글에서 사용한 소스코드는 &lt;a class="link" href="https://github.com/umi0410/umi-mrdebugger" target="_blank" rel="noopener"
+>Github umi0410/umi-mrdebugger&lt;/a>에서 찾아보실 수 있습니다.&lt;/p>
 &lt;/blockquote>
 &lt;h2 id="환경-및-버전-정보">환경 및 버전 정보&lt;/h2>
 &lt;table>
@@ -46,21 +50,21 @@ alt="Clova AI 스피커">
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
-&lt;p>실제로 실무를 다루고 최신 기술들을 이용하다보니 &lt;strong>최근 버전으로 인한 삽질이 잦았다&lt;/strong>. 따라서 혹시 참고하실 분이 계실까 싶어 내 클러스터의 환경 및 버전 정보를 정리해봤다. &lt;strong>버전은 침 중요하다&lt;/strong>. 각 도구들의 호환성을 잘 확인해봐야한다.&lt;/p>
+&lt;p>실제로 실무를 다루고 최신 기술들을 이용하다보니 &lt;strong>최근 버전으로 인한 삽질이 잦았다&lt;/strong>. 따라서 혹시 참고하실 분이 계실까 싶어 내 클러스터의 환경 및 버전 정보를 정리해봤다. &lt;strong>버전은 참 중요하다&lt;/strong>. 각 도구들의 호환성을 잘 확인해봐야한다.&lt;/p>
 &lt;p>나는 클러스터를 한동안 업그레이드 해주지 않아 2022년 7월 기준으로 그냥 저냥 최신은 아닌 &lt;a class="link" href="https://kubernetes.io/releases/patch-releases/#1-22" target="_blank" rel="noopener"
 >1.22 버전&lt;/a>의 k8s 클러스터를 갖고 있었고 istio는 k8s 1.22와 호환되는 버전 중 가장 오래된 minor 버전의 &lt;a class="link" href="https://istio.io/latest/docs/releases/supported-releases/" target="_blank" rel="noopener"
 >1.11.8&lt;/a>을 사용했다. istio를 최대한 구버전으로 이용해본 이유는 istio를 업그레이드해나가면서 istio의 변경사항, 역사등을 공부하면 좋을 것 같기 때문이었다. 때로는 업그레이드 작업을 실제로 진행해야할 수도 있고 말이다.&lt;/p>
-&lt;p>cert-manager는 가끔 CRD api version이 변경되는 경우가 있어서 그냥 기록해놨다.&lt;/p>
-&lt;p>k8s는 GKE를 이용 중이고 istio는 istioctl로, cert-manager는 Helm3로 관리 중이다.&lt;/p>
+&lt;p>&lt;code>cert-manager&lt;/code>는 가끔 CRD api version이 변경되는 경우가 있어서 그냥 기록해놨다.&lt;/p>
+&lt;p>&lt;code>k8s&lt;/code>는 &lt;code>GKE&lt;/code>를 이용 중이고 &lt;code>istio&lt;/code>는 &lt;code>istioct&lt;/code>l로, &lt;code>cert-manager&lt;/code>는 &lt;code>Helm3&lt;/code>로 관리 중이다.&lt;/p>
 &lt;h2 id="서버-개발하기">서버 개발하기&lt;/h2>
 &lt;p>서버 개발은 별거 없다. 그냥 HTTP Post 요청 분석 후 응답을 주면 된다. 실제로 정말 그 정도 수준이라 퇴근 후 몇 시간 만에 개발 → 배포까지 완료할 수 있었다. 생각보다 금방이었다.&lt;/p>
-&lt;p>어린이집 애기들과 동년배 정도 되어보이는 &lt;a class="link" href="https://developers.naver.com/docs/clova/custom_ext/Develop/Guides/Build_Custom_Extension.md" target="_blank" rel="noopener"
+&lt;p>직상된 지 몇 년은 된 듯하면서 &lt;a class="link" href="https://developers.naver.com/docs/clova/custom_ext/Develop/Guides/Build_Custom_Extension.md" target="_blank" rel="noopener"
 >그닥 친절하진 않은 공식 문서&lt;/a>와 &lt;a class="link" href="https://developers.naver.com/docs/clova/custom_ext/Develop/Examples/Extension_Examples.md#CoinHelper" target="_blank" rel="noopener"
 >예시 프로젝트(코인헬퍼)&lt;/a>를 참고하면 쉽게 만들어볼 수 있다. 나는 예시 프로젝트인 코인헬퍼 레포지토리를 포크 떠서 개발했다.&lt;/p>
-&lt;p>“우미, 미스터 디버거&amp;rdquo; 레포지토리: &lt;a class="link" href="https://github.com/umi0410/umi-mrdebugger" target="_blank" rel="noopener"
+&lt;p>&amp;ldquo;우미, 미스터 디버거&amp;rdquo; 레포지토리: &lt;a class="link" href="https://github.com/umi0410/umi-mrdebugger" target="_blank" rel="noopener"
 >https://github.com/umi0410/umi-mrdebugger&lt;/a>&lt;/p>
-&lt;p>일기장스러운 글이므로 코드를 해석하진 않겠습니다.&lt;/p>
-&lt;p>많은 예시 프로젝트 중 코인헬퍼를 골라 개발해나간 이유는 유일하게 Go언어로 개발된 예시 프로젝트였기 때문일 뿐이었다. 실제로는 그냥 타입 선언이랑 유틸 함수 정도만 가져오고 나머진 다 재구현하게 되긴 했다. 기존엔 내장 http package를 사용했는데 fiber을 이용하도록 변경하는 등..&lt;/p>
+&lt;p>(&lt;em>일기장스러운 글이므로 코드를 해석하진 않겠습니다.&lt;/em>)&lt;/p>
+&lt;p>많은 예시 프로젝트 중 코인헬퍼를 골라 개발해나간 이유는 유일하게 Go언어로 개발된 예시 프로젝트였기 때문일 뿐이었다. 실제로는 그냥 타입 선언이랑 유틸 함수 정도만 가져오고 나머진 다 재구현하게 되긴 했다. 기존엔 내장 &lt;code>http&lt;/code> package를 사용했는데 &lt;code>fiber&lt;/code>라는 웹프레임워크 이용하도록 변경하는 등..&lt;/p>
 &lt;h2 id="쿠버네티스에-배포하기">쿠버네티스에 배포하기&lt;/h2>
 &lt;p>쿠버네티스에 배포된 istio를 통해 외부에서 서버 Pod로 접속 가능하게끔 해줄 것이고, cert-manager를 통해 인증서 발급 후 해당 인증서와 관련된 시크릿을 istio가 가져가서 tls를 제공한다.&lt;/p>
 &lt;p>&lt;em>(k8s manifest file 또한 앞서 언급했듯 &lt;a class="link" href="https://github.com/umi0410/umi-mrdebugger" target="_blank" rel="noopener"
@@ -92,7 +96,7 @@ alt="Clova AI 스피커">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">http01&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ingress&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">class&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">istio&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>cert-manager가 Let’s Encrypt로 인증서를 발급받을 수 있게 해주는 ClusterIssuer를 작성한다. 아마 Certificate와 동일 네임스페이스를 이용한다면 ClusterIssuer가 아닌 Issuer여도 괜찮을 것이다.&lt;/p>
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>cert-manager가 Let&amp;rsquo;s Encrypt로 인증서를 발급받을 수 있게 해주는 ClusterIssuer를 작성한다. 아마 Certificate와 동일 네임스페이스를 이용한다면 ClusterIssuer가 아닌 Issuer여도 괜찮을 것이다.&lt;/p>
 &lt;p>그리고 기존에는 Challenge 방식을 DNS01로 했었는데 DNS01 방식이 약간 가물 가물해져서 우선은 HTTP01 방식으로 도메인을 인증하기로 했다.&lt;/p>
 &lt;p>참고로 HTTP01 방식을 이용하는 경우 인증서를 발급받기 전부터 미리 HTTP → HTTPS 를 설정해두면 Challenge가 성공적으로 이루어지지 않는 듯하다. 아마 HTTPS로 리다이렉트 되는데 인증서가 없다보니 HTTPS 통신이 원활하지 않아서겠다.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># certificate.yaml&lt;/span>&lt;span class="w">
@@ -244,7 +248,7 @@ alt="Clova AI 스피커">
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gateway.networking.istio.io/mrdebugger created
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">service/mrdebugger created
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">virtualservice.networking.istio.io/mrdebugger created
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>한 번에 리소스가 빵 떠서 잘 연결되면 좋겠지만,,, 현실은 그렇진 않다. 🥲&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>한 번에 리소스가 빵 떠서 잘 연결되면 좋겠지만,,, 당연히도 현실실은 그렇진 않다. 🥲&lt;/p>
 &lt;p>자잘한 이슈들을 해결해주고 나면 다음과 같이 서버에게 성공적으로 응답을 받을 수 있다.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 인증서가 READY 되었다!&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ kubectl get cert -n istio-system mrdebugger-cert
@@ -255,8 +259,8 @@ alt="Clova AI 스피커">
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>🎉 굿. 좋당!&lt;/p>
 &lt;h2 id="clova-ai-console에서-custom-extension-등록하기">Clova AI Console에서 Custom Extension 등록하기&lt;/h2>
 &lt;p>&lt;figure style="flex-grow: 226; flex-basis: 543px">
-&lt;a href="https://umi0410.github.io/blog/diary/clova-extension.png" data-size="2644x1168">&lt;img src="https://umi0410.github.io/blog/diary/clova-extension.png"
-srcset="https://umi0410.github.io/blog/diary/clova-extension_hu30a22d310386de55f6d8e7b01bdb85ec_145585_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/diary/clova-extension_hu30a22d310386de55f6d8e7b01bdb85ec_145585_1024x0_resize_box_3.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/clova-ai-on-k8s/clova-extension.png" data-size="2644x1168">&lt;img src="https://umi0410.github.io/blog/clova-ai-on-k8s/clova-extension.png"
+srcset="https://umi0410.github.io/blog/clova-ai-on-k8s/clova-extension_hu30a22d310386de55f6d8e7b01bdb85ec_145585_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/clova-ai-on-k8s/clova-extension_hu30a22d310386de55f6d8e7b01bdb85ec_145585_1024x0_resize_box_3.png 1024w"
 width="2644"
 height="1168"
 loading="lazy"
@@ -267,8 +271,8 @@ alt="Clova AI Console">
 &lt;p>&lt;a class="link" href="https://developers.naver.com/console/clova/cek/#/list" target="_blank" rel="noopener"
 >Clova AI Console&lt;/a>에 가서 자신의 Extension을 생성하면 된다. 만드는 과정은 별건 없다.&lt;/p>
 &lt;p>&lt;figure style="flex-grow: 254; flex-basis: 611px">
-&lt;a href="https://umi0410.github.io/blog/diary/invoke-name.png" data-size="988x388">&lt;img src="https://umi0410.github.io/blog/diary/invoke-name.png"
-srcset="https://umi0410.github.io/blog/diary/invoke-name_huecd3aea919113a87c5572f6224b5da9d_24552_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/diary/invoke-name_huecd3aea919113a87c5572f6224b5da9d_24552_1024x0_resize_box_3.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/clova-ai-on-k8s/invoke-name.png" data-size="988x388">&lt;img src="https://umi0410.github.io/blog/clova-ai-on-k8s/invoke-name.png"
+srcset="https://umi0410.github.io/blog/clova-ai-on-k8s/invoke-name_huecd3aea919113a87c5572f6224b5da9d_24552_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/clova-ai-on-k8s/invoke-name_huecd3aea919113a87c5572f6224b5da9d_24552_1024x0_resize_box_3.png 1024w"
 width="988"
 height="388"
 loading="lazy"
@@ -276,10 +280,10 @@ alt="호출 이름 설정">
 &lt;/a>
 &lt;figcaption>호출 이름 설정&lt;/figcaption>
 &lt;/figure>&lt;/p>
-&lt;p>이것만 잘 설정해주면 되는데 보통 &amp;ldquo;&lt;em>{{호출 이름}} 시작해줘&lt;/em>&amp;ldquo;로 스킬이 시작되는 것 같다. 그 이후는 세션이 끊어지지 않으면 세션의 컨텍스트를 살려 대화할 수는 있는듯 하다.&lt;/p>
+&lt;p>이것만 잘 설정해주면 되는데 보통 &amp;ldquo;{{호출 이름}} 시작해줘&amp;quot;로 스킬이 시작되는 것 같다. 그 이후는 세션이 끊어지지 않으면 세션의 컨텍스트를 살려 대화할 수는 있는듯 하다.&lt;/p>
 &lt;p>&lt;figure style="flex-grow: 141; flex-basis: 338px">
-&lt;a href="https://umi0410.github.io/blog/diary/build-interaction.png" data-size="1822x1292">&lt;img src="https://umi0410.github.io/blog/diary/build-interaction.png"
-srcset="https://umi0410.github.io/blog/diary/build-interaction_hu5f82ae87db59611aea885b4d853686af_141265_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/diary/build-interaction_hu5f82ae87db59611aea885b4d853686af_141265_1024x0_resize_box_3.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/clova-ai-on-k8s/build-interaction.png" data-size="1822x1292">&lt;img src="https://umi0410.github.io/blog/clova-ai-on-k8s/build-interaction.png"
+srcset="https://umi0410.github.io/blog/clova-ai-on-k8s/build-interaction_hu5f82ae87db59611aea885b4d853686af_141265_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/clova-ai-on-k8s/build-interaction_hu5f82ae87db59611aea885b4d853686af_141265_1024x0_resize_box_3.png 1024w"
 width="1822"
 height="1292"
 loading="lazy"
@@ -290,8 +294,8 @@ alt="Interaction 모델 빌드">
 &lt;p>그리고 나선 Interaction 모델 설정에 들어가 빌드를 해줘야한다. 자신이 Custom Intent를 사용하지 않는다해도 무조건 한 번은 빌드를 해줘야한다. 문서 상으로는 3~5분 정도 소요된다고 하는데 체감상 한 10분은 걸린듯하다… 최초 1번이 오래 걸리는 것 같고 그 이후로는 금방 되는 듯? (사이트 UI가 그닥 친절하진 않다. 약간은 버려진 느낌…?)&lt;/p>
 &lt;p>그러고 나면 테스터 ID를 등록해줘야한다. 보통은 심사, 실제 퍼블리시까지는 귀찮기 때문에… 혼자만 쓸 거라던가 그냥 재미삼아 만들어본 경우에는 뭐 테스터만으로 사용하는 것도 충분할 것 같다. 네이버 API 등등은 주로 이렇게 출시 심사 전까지 테스트 ID를 사용할 수 있게 해주더라.&lt;/p>
 &lt;p>&lt;figure style="flex-grow: 47; flex-basis: 113px">
-&lt;a href="https://umi0410.github.io/blog/diary/on-skill-store.png" data-size="1080x2280">&lt;img src="https://umi0410.github.io/blog/diary/on-skill-store.png"
-srcset="https://umi0410.github.io/blog/diary/on-skill-store_huaaaec7118a99371c40755dcdb78fc351_364049_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/diary/on-skill-store_huaaaec7118a99371c40755dcdb78fc351_364049_1024x0_resize_box_3.png 1024w"
+&lt;a href="https://umi0410.github.io/blog/clova-ai-on-k8s/on-skill-store.png" data-size="1080x2280">&lt;img src="https://umi0410.github.io/blog/clova-ai-on-k8s/on-skill-store.png"
+srcset="https://umi0410.github.io/blog/clova-ai-on-k8s/on-skill-store_huaaaec7118a99371c40755dcdb78fc351_364049_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/clova-ai-on-k8s/on-skill-store_huaaaec7118a99371c40755dcdb78fc351_364049_1024x0_resize_box_3.png 1024w"
 width="1080"
 height="2280"
 loading="lazy"
@@ -299,7 +303,7 @@ loading="lazy"
 &lt;/a>
 &lt;/figure>&lt;/p>
 &lt;p>테스터 아이디를 등록한 뒤 네이버 클로바 앱에 자신의 네이버 아이디로 로그인하면 스킬 스토어 페이지에서 위와 같이 자신이 등록한 스킬을 볼 수 있다. 문서상으론 시간이 꽤 걸릴 수도 있다고 했는데 아마 바로 보였던 것 같다.&lt;/p>
-&lt;p>그럼 아마 아까 콘솔에서 설정한 &amp;ldquo;&lt;em>{{호출 이름}} 시작해줘&lt;/em>&amp;ldquo;로 스킬을 시작할 수 있을 것이다. 나는 끝에 &amp;ldquo;&lt;em>시작해줘&lt;/em>&amp;ldquo;를 안 붙여도 되는 줄 알고 호출 이름을 &amp;ldquo;&lt;em>디버깅 도와줘&lt;/em>&amp;ldquo;로 했는데 고생을 좀 했다. 호출 이름이 &amp;ldquo;디버깅 도와줘&amp;quot;인 경우 실제로는 &amp;ldquo;&lt;em>디버깅 도와줘 시작해줘&lt;/em>&amp;rdquo; 이런 식으로 말해야 실행이 되기 때문이다… ㅜㅜ&lt;/p>
+&lt;p>그럼 아마 아까 콘솔에서 설정한 &amp;ldquo;{{호출 이름}} 시작해줘&amp;quot;로 스킬을 시작할 수 있을 것이다. 나는 끝에 &amp;ldquo;시작해줘&amp;quot;를 안 붙여도 되는 줄 알고 호출 이름을 &amp;ldquo;디버깅 도와줘&amp;quot;로 했는데 고생을 좀 했다. 호출 이름이 &amp;ldquo;디버깅 도와줘&amp;quot;인 경우 실제로는 &amp;ldquo;디버깅 도와줘 시작해줘&amp;rdquo; 이런 식으로 말해야 실행이 되기 때문이다… ㅜㅜ&lt;/p>
 &lt;p>그럼 결과를 확인해보자.&lt;/p>
 &lt;div class="video-wrapper">
 &lt;iframe loading="lazy"
@@ -309,14 +313,13 @@ title="YouTube Video"
 >
 &lt;/iframe>
 &lt;/div>
-&lt;!-- raw HTML omitted -->
 &lt;p>🎉 귀엽게 디버깅을 도와줘는 &amp;ldquo;&lt;strong>미스터 디버거 우미&lt;/strong>&amp;ldquo;를 만나볼 수 있었다. 🥳&lt;/p>
 &lt;h2 id="마치며">마치며&lt;/h2>
 &lt;p>오랜만에 딥한 기술을 탐구하는 것에서 벗어나 유흥스러운 개발을 해보았다. 사이드 프로젝트를 시작으로 가꾸게 됐던 GKE 클러스터에 &lt;strong>istio를 구축만 해놓고 제대로 도입은 못해본 상태였는데 이번 서버 배포를 진행하면서 한 번 데모처럼 istio를 사용해볼 수 있었어서 좋았다&lt;/strong>. istio를 도입해본 걸 생각하면 그닥 유흥스럽다기 보단 기술 탐구스러웠을지도..? ㅎㅎ&lt;/p>
 &lt;p>새로 회사를 들어가고나서는 궁금한 것, 공부하고 싶은 것이 넘쳐나고 재미있게 공부해나가고 있지만 다소 블로그에 정리하긴 어려운 내용들이 많은 것 같다. 어려운 내용들이다보니 공부는 했더라도 1번의 공부만으로 의미있는 글을 담아내긴 어렵기도 했다.&lt;/p>
-&lt;p>하지만 바쁘기도 한데다가 뭔가 깊이 있는 글을 쓰려다보니 요즘 블로그에 글을 오히려 안 쓰게 되고 &amp;lsquo;&lt;em>아 이것도 써보고 싶은데 저것도 써보고 싶은데…&lt;/em>&amp;rsquo; 생각만 하다 벌써 마지막으로 글을 쓴지도 엄청 오래된 것 같다.&lt;/p>
+&lt;p>하지만 바쁘기도 한데다가 뭔가 깊이 있는 글을 쓰려다보니 요즘 블로그에 글을 오히려 안 쓰게 되고 &amp;lsquo;아 이것도 써보고 싶은데 저것도 써보고 싶은데…&amp;rsquo; 생각만 하다 벌써 마지막으로 글을 쓴지도 엄청 오래된 것 같다.&lt;/p>
 &lt;p>그래서 앞으로는 CS 지식이나 정확한 정보는 아니더라도 가끔 이렇게 개발 일기스러운 글도 적어볼까한다. 그런 글은 남에게 정보를 전달하려는 목적보단 나를 기록하는 용도기 때문에 &amp;lsquo;&lt;em>…입니다.&lt;/em>&amp;rsquo; 체보다는 &amp;lsquo;&lt;em>…이다&lt;/em>&amp;rsquo; 체로 그냥 가볍게 적어나가려한다.&lt;/p>
-&lt;p>그럼, 다음에 또 만나용.&lt;/p></description></item><item><title>ArgoCD 선언적으로 이용해나가기 - Github을 통한 SSO 및 RBAC</title><link>https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/</link><pubDate>Sat, 07 May 2022 22:00:00 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/logo.png" alt="Featured image of post ArgoCD 선언적으로 이용해나가기 - Github을 통한 SSO 및 RBAC" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>&lt;em>그럼, 다음에 또 만나용.&lt;/em>&lt;/p></description></item><item><title>ArgoCD 선언적으로 이용해나가기 - Github을 통한 SSO 및 RBAC</title><link>https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/</link><pubDate>Sat, 07 May 2022 22:00:00 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/declarative-argocd-helm-rbac/logo.png" alt="Featured image of post ArgoCD 선언적으로 이용해나가기 - Github을 통한 SSO 및 RBAC" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>저번 글(&lt;a class="link" href="https://umi0410.github.io/blog/devops/declarative-argocd-helm-app-of-app/" target="_blank" rel="noopener"
 >&amp;ldquo;ArgoCD 선언적으로 이용해나가기 - Helm, App of App&amp;rdquo;&lt;/a>)에서는
 &lt;code>Helm&lt;/code>과 &lt;code>App of App&lt;/code> 패턴을 이용해 ArgoCD를 선언적으로 이용해나가는 방법을 다뤘습니다.&lt;/p>
