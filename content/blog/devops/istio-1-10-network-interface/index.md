@@ -53,7 +53,7 @@ On-premise나 non-k8s 환경에서는 보통 `lo` 에 서버를 띄우는 경우
 
 ## minikube를 통해 k8s 1.20.15 환경 구축하기
 
-```
+```bash
 $ minikube start --profile k8s-1-20 --kubernetes-version 1.20.15
 ```
 
@@ -71,16 +71,15 @@ istioctl의 버전에 맞게 istio가 설치되기 때문에 그때 그때 편�
 
 istioctl을 통해 istio를 클러스터에 배포할 때에는 미리 정의되어있는 profile이라는 것을 이용해 좀 더 편리하게 설정을 해줄 수 있습니다. 이번 작업에서 gateway들은 필요 없기 때문에 저는 minimal profile을 통해 설치해주겠습니다.
 
-```
+```bash
 asdf plugin-add istioctl https://github.com/virtualstaticvoid/asdf-istioctl.git && \
 asdf install istioctl 1.9.9 && \
 asdf install istioctl 1.10.6
-
 ```
 
 위의 명령어를 통해 istioctl 1.9.9와 1.10.6 두 버전을 모두 설치할 수 있습니다.
 
-```
+```bash
 $ asdf global istioctl 1.9.9 && istioctl version
 no running Istio pods in "istio-system"
 1.9.9
@@ -88,7 +87,7 @@ no running Istio pods in "istio-system"
 
 istioctl 1.9.9를 이용하도록 설정합니다.
 
-```
+```bash
 istioctl install --set profile=minimal --set revision=1-9 --set values.global.proxy.holdApplicationUntilProxyStarts=true
 ! values.global.proxy.holdApplicationUntilProxyStarts is deprecated; use meshConfig.defaultConfig.holdApplicationUntilProxyStarts instead
 ! Istio is being downgraded from 1.9.0 -> 1.9.9.This will install the Istio 1.9.9 minimal profile with ["Istio core" "Istiod"] components into the cluster. Proceed? (y/N) y
@@ -105,7 +104,7 @@ istio 1.9.9를 `1-9`라는 revision으로 깔아줍니다.
 
 만약 envoy proxy가 완전히 준비되기 전에 다른 컨테이너에서 네트워크 작업을 수행하면 해당 작업은 성공적으로 수행되지 않을 것입니다.  
 
-```
+```bash
 $ asdf global istioctl 1.10.6 && istioctl version
 client version: 1.10.6
 control plane version: 1.9.9
@@ -114,7 +113,7 @@ data plane version: none
 
 istioctl 1.10.6을 이용하도록 설정합니다.
 
-```
+```bash
 $ istioctl install --set profile=minimal --set revision=1-10 --set meshConfig.defaultConfig.holdApplicationUntilProxyStarts=true
 WARNING: Istio is being upgraded from 1.9.9 -> 1.10.6.
 WARNING: Before upgrading, you may wish to use 'istioctl analyze' to check forIST0002 and IST0135 deprecation warnings.
@@ -128,7 +127,7 @@ istio 1.10.6을 `1-10`이라는 revision으로 깔아줍니다.
 
 워닝이 떠있긴 하지만 그닥 상관은 없습니다.
 
-```
+```bash
 $ kubectl get pod -n istio-system
 NAME                           READY   STATUS    RESTARTS   AGE
 istiod-1-10-5cd4d5b44d-b98xm   1/1     Running   0          84s
@@ -153,7 +152,7 @@ istiod-1-9-6b549b9d87-9f76b    1/1     Running   0          2m56s
 
 **(netcat 서버 Pod는 8080 포트에 요청이 TCP 커넥션이 형성되면 “pong”으로 응답하는 Pod입니다.)**
 
-```
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -347,7 +346,7 @@ spec:
     app: rev-1-10-eth0
 ```
 
-```
+```bash
 $ kubectl apply -f tmp.yaml
 namespace/rev-1-9 created
 namespace/rev-1-10 created
@@ -364,7 +363,7 @@ service/eth0 created
 
 위의 명령어들을 이용해 sidecar가 injected될 netcat 서버와 클라이언트 Pod를 배포해줍니다.
 
-```
+```bash
 $ kubectl get pod -A
 NAMESPACE      NAME                               READY   STATUS    RESTARTS   AGE
 default        netcat-client                      1/1     Running   0          15m
@@ -394,7 +393,7 @@ rev-1-9        lo            ClusterIP   10.100.228.64    <none>        8080/TCP
 
 kubectl exec와 netcat 명령어를 통해 `netcat-client` 의 이름으로 배포한 Pod로 각 Service들을 거쳐 각 Pod에게 요청을 보내볼 것입니다.
 
-```
+```bash
 $ kubectl exec -n default netcat-client -- bash -c "echo 'ping' | nc lo.rev-1-9 8080"
 pong
 $ kubectl exec -n default netcat-client -- bash -c "echo 'ping' | nc eth0.rev-1-9 8080"
@@ -408,7 +407,7 @@ command terminated with exit code 1
 
 `eth0`의 IP에 서버를 띄운 Pod를 목적지로 하는 Service에게 요청을 보낼 경우 해당 목적지 Pod가 istio 1.9에 의해 sidecar injection 되었다면 Pod 내의 서버는 올바르게 요청을 전달받을 수 없습니다.
 
-```
+```bash
 $ kubectl exec -n default netcat-client -- bash -c "echo 'ping' | nc lo.rev-1-10 8080"
 Ncat: Connection reset by peer.
 command terminated with exit code 1
