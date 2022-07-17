@@ -4,271 +4,271 @@
 바로 envoy proxy가 eth0에 대한 요청을 넘겨주는 container의 network interface가 lo 에서 eth0 로 변경되었다는 점입니다. 네트워크에 대해, 그 중에서도 특히 네트워크 인터페이스에 대해 잘 몰랐던 때에는 이 변경사항에 그닥 관심이 안 갔을 것 같은데 최근 네트워크 인터페이스에 대해 공부를 해서인지 이 변경사항에 관심이 갔습니다."><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://umi0410.github.io/blog/devops/istio-1-10-network-interface/preview.png"><link rel="shortcut icon" href=https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png><script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(e,t,n,s,o,i,a){e.GoogleAnalyticsObject=o,e[o]=e[o]||function(){(e[o].q=e[o].q||[]).push(arguments)},e[o].l=1*new Date,i=t.createElement(n),a=t.getElementsByTagName(n)[0],i.async=1,i.src=s,a.parentNode.insertBefore(i,a)}(window,document,"script","https://www.google-analytics.com/analytics.js","ga"),ga("create","UA-177403492-1","auto"),ga("send","pageview"))</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Noto+Sans+KR:wght@400&display=swap" rel=stylesheet><style>@import 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css';:root{--body-background:#fafeff;--base-font-family:Pretendard, 'Noto Sans KR', sans-serif}.site-name{--site-name-font-family:'East Sea Dokdo', cursive;font-family:var(--site-name-font-family);font-size:3.2rem!important}.left-sidebar{--sidebar-avatar-size:200px}figure.site-avatar{margin-left:auto!important;margin-right:auto!important}</style></head><body class="article-page has-toc"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex
 extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-home><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18"/></svg><span>Back</span></a></div><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/blog/devops/istio-1-10-network-interface/><img src=/blog/devops/istio-1-10-network-interface/preview_hu29fb6a1fc6668bac997912987ebc8bfc_15975_800x0_resize_box_3.png srcset="/blog/devops/istio-1-10-network-interface/preview_hu29fb6a1fc6668bac997912987ebc8bfc_15975_800x0_resize_box_3.png 800w, /blog/devops/istio-1-10-network-interface/preview_hu29fb6a1fc6668bac997912987ebc8bfc_15975_1600x0_resize_box_3.png 1600w" width=800 height=358 loading=lazy alt="Featured image of post istio의 envoy proxy를 통해 경험해보는 네트워크 인터페이스 (istio 1.10)"></a></div><div class=article-details><header class=article-category><a href=/categories/devops/>devops</a>
 <a href=/categories/istio/>istio</a>
-<a href=/categories/network/>Network</a></header><h2 class=article-title><a href=/blog/devops/istio-1-10-network-interface/>istio의 envoy proxy를 통해 경험해보는 네트워크 인터페이스 (istio 1.10)</a></h2><footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--published>Jul 17, 2022</time></footer></div></header><section class=article-content><h2 id=시작하며>시작하며</h2><p>요즘 istio를 공부하던 중 istio가 변화해온 과정에 대해서도 흥미가 생겨 지난 버전들의 릴리즈 노트들도 읽어보고 있습니다. 그러던 중 현 시점(2022년 7월)에는 이미 공식적인 End of Life가 지난 <strong>2021년 3월 처음 릴리즈된 istio 1.10의 릴리즈 노트를 보다가 재미있는 점을 하나 발견</strong>할 수 있었는데요.</p><p>바로 <strong>envoy proxy가 <code>eth0</code>에 대한 요청을 넘겨주는 container의 network interface가 <code>lo</code> 에서 <code>eth0</code> 로 변경되었다</strong>는 점입니다. 네트워크에 대해, 그 중에서도 특히 네트워크 인터페이스에 대해 잘 몰랐던 때에는 이 변경사항에 그닥 관심이 안 갔을 것 같은데 최근 네트워크 인터페이스에 대해 공부를 해서인지 이 변경사항에 관심이 갔습니다.</p><p>그래서 이번 글에서는 네트워크 인터페이스와 관련된 <code>istio</code> <code>1.9</code> → <code>1.10</code>의 변경사항을 실제 작업을 통해 확인해보려합니다. 실제 작업은 다음과 같습니다.</p><ul><li><strong>istio 1.9</strong> - 서버를 <code>lo</code> (루프백 인터페이스)의 IP(127.0.0.1)로 띄운 경우 Service에 요청을 보내 성공적인 응답을 받을 수 있음을 확인</li><li><strong>istio 1.9</strong> - 서버를 <code>eth0</code> 의 IP로 띄운 경우 Service에 요청을 보내도 요청이 제대로 전달되지 않음을 확인</li><li><strong>istio 1.10</strong> - 서버를 <code>lo</code> (루프백 인터페이스)의 IP(127.0.0.1)로 띄운 경우 Service에 요청을 보내도 요청이 제대로 전달되지 않음을 확인</li><li><strong>istio 1.10</strong> - 서버를 <code>eth0</code> 의 IP로 띄운 경우 Service에 요청을 보내 성공적인 응답을 받을 수 있음을 확인</li></ul><p><figure style=flex-grow:366;flex-basis:879px><a href=/blog/devops/istio-1-10-network-interface/version-compatibility.png data-size=2602x710><img src=/blog/devops/istio-1-10-network-interface/version-compatibility.png srcset="/blog/devops/istio-1-10-network-interface/version-compatibility_hu9ee91d2674eb5146d2a8fafcbb1eff3a_90034_480x0_resize_box_3.png 480w, /blog/devops/istio-1-10-network-interface/version-compatibility_hu9ee91d2674eb5146d2a8fafcbb1eff3a_90034_1024x0_resize_box_3.png 1024w" width=2602 height=710 loading=lazy alt="istio <-> k8s 버전 호환성"></a><figcaption>istio &lt;-> k8s 버전 호환성</figcaption></figure></p><p><code>k8s</code> 버전은 istio 1.9와 istio 1.10 모두와 호환되는 k8s <code>1.20</code> 을 이용할 것이고 k8s는 <code>minikube</code>를 통해 로컬에서 구성할 것입니다.</p><p>⚠️ 참고로 M1 맥북의 minikube에선 envoy proxy가 동작하지 않아서인지 istio를 제대로 이용할 수 없습니다. 따라서 저는 ubuntu에서 minikube를 통해 작업했습니다.</p><h2 id=istio-19--110-변경사항-중-재미있는-점>istio 1.9 → 1.10 변경사항 중 재미있는 점</h2><p><figure style=flex-grow:235;flex-basis:564px><a href=/blog/devops/istio-1-10-network-interface/networking-change.png data-size=2280x970><img src=/blog/devops/istio-1-10-network-interface/networking-change.png srcset="/blog/devops/istio-1-10-network-interface/networking-change_hu6fe6d6382b53ebbea105f054157c1f5e_208679_480x0_resize_box_3.png 480w, /blog/devops/istio-1-10-network-interface/networking-change_hu6fe6d6382b53ebbea105f054157c1f5e_208679_1024x0_resize_box_3.png 1024w" width=2280 height=970 loading=lazy alt="1.10 릴리즈 노트"></a><figcaption>1.10 릴리즈 노트</figcaption></figure></p><p>(참고: <a class=link href=https://istio.io/latest/news/releases/1.10.x/announcing-1.10/ target=_blank rel=noopener>https://istio.io/latest/news/releases/1.10.x/announcing-1.10/</a>)</p><p>1.10 버전의 변경사항에 대해 좀 더 자세히 알아보겠습니다. 이전 버전에서는 Sidecar Envoy Proxy가 <code>eth0</code>으로 들어온 요청을 <code>lo</code>로 넘겨줘왔는데 이번 버전(1.10)에서부터는 <code>eth0</code>로 들어온 요청을 eth0로 넘겨준다는 것입니다.</p><p>대부분 서버를 띄울 때 <code>0.0.0.0</code>을 통해 loopback interface와 ethernet interface 모두에 서버를 띄우는 경우가 많아 해당 내용이 큰 변화를 가져오진 않을 수 있습니다.</p><p>하지만 만약 기존에 특정 interface의 IP만을 지정해서 서버를 띄우는 경우가 있었다면 이 변경사항으로 인해 통신 장애가 발생할 수 있습니다.</p><ul><li>loopback interface의 IP로만 서버를 띄운 경우 → Pod IP로 보낸 요청을 sidecar를 거쳐 요청을 받을 수 있던 컨테이너가 요청을 받을 수 없어짐.</li><li>eth0 interface의 IP로만 서버를 띠운 경우 → Pod IP로 보낸 요청을 sidecar를 거쳐 요청을 받을 수 있어짐.</li></ul><p><strong>이러한 변경 사항이 추가된 이유는?</strong></p><p>On-premise나 non-k8s 환경에서는 보통 <code>lo</code> 에 서버를 띄우는 경우는 외부에서의 접속을 막으려는 경우일 것입니다. 반면 <code>eth0</code> 에 서버를 띄우는 경우는 외부에서의 접속을 허용하려는 경우일 것입니다.</p><p>하지만 이전에는 이러한 기존 환경에서 istio를 도입하게 되면 기존의 의도와 반대되게 오히려 <code>lo</code> 에 서버를 띄운 경우 오히려 envoy sidecar에게 요청을 전달받을 수 있어지고, <code>eth0</code> 에 서버를 띄운 경우는 오히려 enovy sidecar에게 요청을 전달받을 수 없었던 모순된 상황이 발생했다고 합니다.</p><p>따라서 이러한 모순된 상황들을 방지하고자 이러한 변경사항이 추가되었다고 합니다.</p><h2 id=minikube를-통해-k8s-12015-환경-구축하기>minikube를 통해 k8s 1.20.15 환경 구축하기</h2><pre tabindex=0><code>$ minikube start --profile k8s-1-20 --kubernetes-version 1.20.15
-</code></pre><p>위의 명령어를 통해 특정 k8s 버전(1.20.15)의 환경을 로컬에 구축할 수 있습니다.</p><h2 id=k8s에-istio-19와-110-설치하기>k8s에 istio 1.9와 1.10 설치하기</h2><p>istioctl을 통해 두 버전의 istio를 k8s cluster에 배포해줄 것입니다.</p><p>istioctl의 버전에 맞게 istio가 설치되기 때문에 그때 그때 편리하게 istioctl의 버전을 변경해야합니다. 따라서 저는 <a class=link href=https://github.com/asdf-vm/asdf target=_blank rel=noopener>asdf</a>라는 도구를 사용했습니다. 스타 수는 적지만 <a class=link href=https://github.com/virtualstaticvoid/asdf-istioctl target=_blank rel=noopener>asdf의 istioctl plugin</a>을 이용하기도 했습니다.</p><p><figure style=flex-grow:546;flex-basis:1312px><a href=/blog/devops/istio-1-10-network-interface/istioctl-profiles.png data-size=3182x582><img src=/blog/devops/istio-1-10-network-interface/istioctl-profiles.png srcset="/blog/devops/istio-1-10-network-interface/istioctl-profiles_huc2f3f759952870d04254f07cdea3bebc_60119_480x0_resize_box_3.png 480w, /blog/devops/istio-1-10-network-interface/istioctl-profiles_huc2f3f759952870d04254f07cdea3bebc_60119_1024x0_resize_box_3.png 1024w" width=3182 height=582 loading=lazy alt="미리 정의되어 있는 Profile 목록"></a><figcaption>미리 정의되어 있는 Profile 목록</figcaption></figure></p><p>참고: <a class=link href=https://istio.io/latest/docs/setup/additional-setup/config-profiles/ target=_blank rel=noopener>https://istio.io/latest/docs/setup/additional-setup/config-profiles/</a></p><p>istioctl을 통해 istio를 클러스터에 배포할 때에는 미리 정의되어있는 profile이라는 것을 이용해 좀 더 편리하게 설정을 해줄 수 있습니다. 이번 작업에서 gateway들은 필요 없기 때문에 저는 minimal profile을 통해 설치해주겠습니다.</p><pre tabindex=0><code>asdf plugin-add istioctl https://github.com/virtualstaticvoid/asdf-istioctl.git &amp;&amp; \
-asdf install istioctl 1.9.9 &amp;&amp; \
-asdf install istioctl 1.10.6
-</code></pre><p>위의 명령어를 통해 istioctl 1.9.9와 1.10.6 두 버전을 모두 설치할 수 있습니다.</p><pre tabindex=0><code>$ asdf global istioctl 1.9.9 &amp;&amp; istioctl version
-no running Istio pods in &#34;istio-system&#34;
-1.9.9
-</code></pre><p>istioctl 1.9.9를 이용하도록 설정합니다.</p><pre tabindex=0><code>istioctl install --set profile=minimal --set revision=1-9 --set values.global.proxy.holdApplicationUntilProxyStarts=true
-! values.global.proxy.holdApplicationUntilProxyStarts is deprecated; use meshConfig.defaultConfig.holdApplicationUntilProxyStarts instead
-! Istio is being downgraded from 1.9.0 -&gt; 1.9.9.This will install the Istio 1.9.9 minimal profile with [&#34;Istio core&#34; &#34;Istiod&#34;] components into the cluster. Proceed? (y/N) y
-✔ Istio core installed
-✔ Istiod installed
-✔ Installation complete
-</code></pre><p>istio 1.9.9를 <code>1-9</code>라는 revision으로 깔아줍니다.</p><p><code>values.global.proxy.holdApplicationUntilProxyStarts</code>와 <code>meshConfig.defaultConfig.holdApplicationUntilProxyStarts</code>는 envoy proxy가 준비된 뒤에
+<a href=/categories/network/>Network</a></header><h2 class=article-title><a href=/blog/devops/istio-1-10-network-interface/>istio의 envoy proxy를 통해 경험해보는 네트워크 인터페이스 (istio 1.10)</a></h2><footer class=article-time><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--published>Jul 17, 2022</time></footer></div></header><section class=article-content><h2 id=시작하며>시작하며</h2><p>요즘 istio를 공부하던 중 istio가 변화해온 과정에 대해서도 흥미가 생겨 지난 버전들의 릴리즈 노트들도 읽어보고 있습니다. 그러던 중 현 시점(2022년 7월)에는 이미 공식적인 End of Life가 지난 <strong>2021년 3월 처음 릴리즈된 istio 1.10의 릴리즈 노트를 보다가 재미있는 점을 하나 발견</strong>할 수 있었는데요.</p><p>바로 <strong>envoy proxy가 <code>eth0</code>에 대한 요청을 넘겨주는 container의 network interface가 <code>lo</code> 에서 <code>eth0</code> 로 변경되었다</strong>는 점입니다. 네트워크에 대해, 그 중에서도 특히 네트워크 인터페이스에 대해 잘 몰랐던 때에는 이 변경사항에 그닥 관심이 안 갔을 것 같은데 최근 네트워크 인터페이스에 대해 공부를 해서인지 이 변경사항에 관심이 갔습니다.</p><p>그래서 이번 글에서는 네트워크 인터페이스와 관련된 <code>istio</code> <code>1.9</code> → <code>1.10</code>의 변경사항을 실제 작업을 통해 확인해보려합니다. 실제 작업은 다음과 같습니다.</p><ul><li><strong>istio 1.9</strong> - 서버를 <code>lo</code> (루프백 인터페이스)의 IP(127.0.0.1)로 띄운 경우 Service에 요청을 보내 성공적인 응답을 받을 수 있음을 확인</li><li><strong>istio 1.9</strong> - 서버를 <code>eth0</code> 의 IP로 띄운 경우 Service에 요청을 보내도 요청이 제대로 전달되지 않음을 확인</li><li><strong>istio 1.10</strong> - 서버를 <code>lo</code> (루프백 인터페이스)의 IP(127.0.0.1)로 띄운 경우 Service에 요청을 보내도 요청이 제대로 전달되지 않음을 확인</li><li><strong>istio 1.10</strong> - 서버를 <code>eth0</code> 의 IP로 띄운 경우 Service에 요청을 보내 성공적인 응답을 받을 수 있음을 확인</li></ul><p><figure style=flex-grow:366;flex-basis:879px><a href=/blog/devops/istio-1-10-network-interface/version-compatibility.png data-size=2602x710><img src=/blog/devops/istio-1-10-network-interface/version-compatibility.png srcset="/blog/devops/istio-1-10-network-interface/version-compatibility_hu9ee91d2674eb5146d2a8fafcbb1eff3a_90034_480x0_resize_box_3.png 480w, /blog/devops/istio-1-10-network-interface/version-compatibility_hu9ee91d2674eb5146d2a8fafcbb1eff3a_90034_1024x0_resize_box_3.png 1024w" width=2602 height=710 loading=lazy alt="istio <-> k8s 버전 호환성"></a><figcaption>istio &lt;-> k8s 버전 호환성</figcaption></figure></p><p><code>k8s</code> 버전은 istio 1.9와 istio 1.10 모두와 호환되는 k8s <code>1.20</code> 을 이용할 것이고 k8s는 <code>minikube</code>를 통해 로컬에서 구성할 것입니다.</p><p>⚠️ 참고로 M1 맥북의 minikube에선 envoy proxy가 동작하지 않아서인지 istio를 제대로 이용할 수 없습니다. 따라서 저는 ubuntu에서 minikube를 통해 작업했습니다.</p><h2 id=istio-19--110-변경사항-중-재미있는-점>istio 1.9 → 1.10 변경사항 중 재미있는 점</h2><p><figure style=flex-grow:235;flex-basis:564px><a href=/blog/devops/istio-1-10-network-interface/networking-change.png data-size=2280x970><img src=/blog/devops/istio-1-10-network-interface/networking-change.png srcset="/blog/devops/istio-1-10-network-interface/networking-change_hu6fe6d6382b53ebbea105f054157c1f5e_208679_480x0_resize_box_3.png 480w, /blog/devops/istio-1-10-network-interface/networking-change_hu6fe6d6382b53ebbea105f054157c1f5e_208679_1024x0_resize_box_3.png 1024w" width=2280 height=970 loading=lazy alt="1.10 릴리즈 노트"></a><figcaption>1.10 릴리즈 노트</figcaption></figure></p><p>(참고: <a class=link href=https://istio.io/latest/news/releases/1.10.x/announcing-1.10/ target=_blank rel=noopener>https://istio.io/latest/news/releases/1.10.x/announcing-1.10/</a>)</p><p>1.10 버전의 변경사항에 대해 좀 더 자세히 알아보겠습니다. 이전 버전에서는 Sidecar Envoy Proxy가 <code>eth0</code>으로 들어온 요청을 <code>lo</code>로 넘겨줘왔는데 이번 버전(1.10)에서부터는 <code>eth0</code>로 들어온 요청을 eth0로 넘겨준다는 것입니다.</p><p>대부분 서버를 띄울 때 <code>0.0.0.0</code>을 통해 loopback interface와 ethernet interface 모두에 서버를 띄우는 경우가 많아 해당 내용이 큰 변화를 가져오진 않을 수 있습니다.</p><p>하지만 만약 기존에 특정 interface의 IP만을 지정해서 서버를 띄우는 경우가 있었다면 이 변경사항으로 인해 통신 장애가 발생할 수 있습니다.</p><ul><li>loopback interface의 IP로만 서버를 띄운 경우 → Pod IP로 보낸 요청을 sidecar를 거쳐 요청을 받을 수 있던 컨테이너가 요청을 받을 수 없어짐.</li><li>eth0 interface의 IP로만 서버를 띠운 경우 → Pod IP로 보낸 요청을 sidecar를 거쳐 요청을 받을 수 있어짐.</li></ul><p><strong>이러한 변경 사항이 추가된 이유는?</strong></p><p>On-premise나 non-k8s 환경에서는 보통 <code>lo</code> 에 서버를 띄우는 경우는 외부에서의 접속을 막으려는 경우일 것입니다. 반면 <code>eth0</code> 에 서버를 띄우는 경우는 외부에서의 접속을 허용하려는 경우일 것입니다.</p><p>하지만 이전에는 이러한 기존 환경에서 istio를 도입하게 되면 기존의 의도와 반대되게 오히려 <code>lo</code> 에 서버를 띄운 경우 오히려 envoy sidecar에게 요청을 전달받을 수 있어지고, <code>eth0</code> 에 서버를 띄운 경우는 오히려 enovy sidecar에게 요청을 전달받을 수 없었던 모순된 상황이 발생했다고 합니다.</p><p>따라서 이러한 모순된 상황들을 방지하고자 이러한 변경사항이 추가되었다고 합니다.</p><h2 id=minikube를-통해-k8s-12015-환경-구축하기>minikube를 통해 k8s 1.20.15 환경 구축하기</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ minikube start --profile k8s-1-20 --kubernetes-version 1.20.15
+</span></span></code></pre></div><p>위의 명령어를 통해 특정 k8s 버전(1.20.15)의 환경을 로컬에 구축할 수 있습니다.</p><h2 id=k8s에-istio-19와-110-설치하기>k8s에 istio 1.9와 1.10 설치하기</h2><p>istioctl을 통해 두 버전의 istio를 k8s cluster에 배포해줄 것입니다.</p><p>istioctl의 버전에 맞게 istio가 설치되기 때문에 그때 그때 편리하게 istioctl의 버전을 변경해야합니다. 따라서 저는 <a class=link href=https://github.com/asdf-vm/asdf target=_blank rel=noopener>asdf</a>라는 도구를 사용했습니다. 스타 수는 적지만 <a class=link href=https://github.com/virtualstaticvoid/asdf-istioctl target=_blank rel=noopener>asdf의 istioctl plugin</a>을 이용하기도 했습니다.</p><p><figure style=flex-grow:546;flex-basis:1312px><a href=/blog/devops/istio-1-10-network-interface/istioctl-profiles.png data-size=3182x582><img src=/blog/devops/istio-1-10-network-interface/istioctl-profiles.png srcset="/blog/devops/istio-1-10-network-interface/istioctl-profiles_huc2f3f759952870d04254f07cdea3bebc_60119_480x0_resize_box_3.png 480w, /blog/devops/istio-1-10-network-interface/istioctl-profiles_huc2f3f759952870d04254f07cdea3bebc_60119_1024x0_resize_box_3.png 1024w" width=3182 height=582 loading=lazy alt="미리 정의되어 있는 Profile 목록"></a><figcaption>미리 정의되어 있는 Profile 목록</figcaption></figure></p><p>참고: <a class=link href=https://istio.io/latest/docs/setup/additional-setup/config-profiles/ target=_blank rel=noopener>https://istio.io/latest/docs/setup/additional-setup/config-profiles/</a></p><p>istioctl을 통해 istio를 클러스터에 배포할 때에는 미리 정의되어있는 profile이라는 것을 이용해 좀 더 편리하게 설정을 해줄 수 있습니다. 이번 작업에서 gateway들은 필요 없기 때문에 저는 minimal profile을 통해 설치해주겠습니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>asdf plugin-add istioctl https://github.com/virtualstaticvoid/asdf-istioctl.git <span class=o>&amp;&amp;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>asdf install istioctl 1.9.9 <span class=o>&amp;&amp;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>asdf install istioctl 1.10.6
+</span></span></code></pre></div><p>위의 명령어를 통해 istioctl 1.9.9와 1.10.6 두 버전을 모두 설치할 수 있습니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ asdf global istioctl 1.9.9 <span class=o>&amp;&amp;</span> istioctl version
+</span></span><span class=line><span class=cl>no running Istio pods in <span class=s2>&#34;istio-system&#34;</span>
+</span></span><span class=line><span class=cl>1.9.9
+</span></span></code></pre></div><p>istioctl 1.9.9를 이용하도록 설정합니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>istioctl install --set <span class=nv>profile</span><span class=o>=</span>minimal --set <span class=nv>revision</span><span class=o>=</span>1-9 --set values.global.proxy.holdApplicationUntilProxyStarts<span class=o>=</span><span class=nb>true</span>
+</span></span><span class=line><span class=cl>! values.global.proxy.holdApplicationUntilProxyStarts is deprecated<span class=p>;</span> use meshConfig.defaultConfig.holdApplicationUntilProxyStarts instead
+</span></span><span class=line><span class=cl>! Istio is being downgraded from 1.9.0 -&gt; 1.9.9.This will install the Istio 1.9.9 minimal profile with <span class=o>[</span><span class=s2>&#34;Istio core&#34;</span> <span class=s2>&#34;Istiod&#34;</span><span class=o>]</span> components into the cluster. Proceed? <span class=o>(</span>y/N<span class=o>)</span> y
+</span></span><span class=line><span class=cl>✔ Istio core installed
+</span></span><span class=line><span class=cl>✔ Istiod installed
+</span></span><span class=line><span class=cl>✔ Installation <span class=nb>complete</span>
+</span></span></code></pre></div><p>istio 1.9.9를 <code>1-9</code>라는 revision으로 깔아줍니다.</p><p><code>values.global.proxy.holdApplicationUntilProxyStarts</code>와 <code>meshConfig.defaultConfig.holdApplicationUntilProxyStarts</code>는 envoy proxy가 준비된 뒤에
 우리가 정의한 실제 컨테이너를 시작하는 옵션입니다. 전자는 Deprecated 되었다고 경고가 뜨지만 적용해본 결과 1.9 버전 대에서는 여전히 전자를 사용하는 것 같더라구요.
-따라서 저는 1.9.9 버전에서는 전자의 인자를, 1.10.6 버전에서는 후자의 인자를 적용해주었습니다.</p><p>만약 envoy proxy가 완전히 준비되기 전에 다른 컨테이너에서 네트워크 작업을 수행하면 해당 작업은 성공적으로 수행되지 않을 것입니다.</p><pre tabindex=0><code>$ asdf global istioctl 1.10.6 &amp;&amp; istioctl version
-client version: 1.10.6
-control plane version: 1.9.9
-data plane version: none
-</code></pre><p>istioctl 1.10.6을 이용하도록 설정합니다.</p><pre tabindex=0><code>$ istioctl install --set profile=minimal --set revision=1-10 --set meshConfig.defaultConfig.holdApplicationUntilProxyStarts=true
-WARNING: Istio is being upgraded from 1.9.9 -&gt; 1.10.6.
-WARNING: Before upgrading, you may wish to use &#39;istioctl analyze&#39; to check forIST0002 and IST0135 deprecation warnings.
-This will install the Istio 1.10.6 minimal profile with [&#34;Istio core&#34; &#34;Istiod&#34;] components into the cluster. Proceed? (y/N) y
-✔ Istio core installed
-✔ Istiod installed
-✔ Installation complete                                                      Thank you for installing Istio 1.10.  Please take a few minutes to tell us about your install/upgrade experience!  https://forms.gle/KjkrDnMPByq7akrYA
-</code></pre><p>istio 1.10.6을 <code>1-10</code>이라는 revision으로 깔아줍니다.</p><p>워닝이 떠있긴 하지만 그닥 상관은 없습니다.</p><pre tabindex=0><code>$ kubectl get pod -n istio-system
-NAME                           READY   STATUS    RESTARTS   AGE
-istiod-1-10-5cd4d5b44d-b98xm   1/1     Running   0          84s
-istiod-1-9-6b549b9d87-9f76b    1/1     Running   0          2m56s
-</code></pre><p>잘 깔렸다면 위와 같이 Pod들이 성공적으로 떴을 것입니다.</p><h2 id=istio-sidecar가-injected된-netcat-server--client-pod-배포하기>istio sidecar가 injected된 netcat server & client Pod 배포하기</h2><p>이제 netcat server이자 client가 될 Pod 들을 배포해줄 것입니다.</p><p>배포할 리소스들은 모두 다음과 같습니다.</p><ul><li><strong>Namespace rev-1-9</strong> - istio 1.9의 sidecar inject를 받을 Namespace</li><li><strong>Namespace rev-1-10</strong> - istio 1.10의 sidecar inject를 받을 Namespace</li><li><strong>Pod netcat-client</strong> - <code>default</code> Namespace에서 각 Service를 통해 netcat 요청을 날려줄 client</li><li><strong>Pod netcat-lo</strong> - <code>lo</code> 인터페이스의 IP 에 netcat 서버를 띄우는 Pod.</li><li><strong>Pod netcat-eth0</strong> - <code>eth0</code> 인터페이스의 IP에 netcat 서버를 띄우는 Pod.</li><li><strong>Service lo</strong> - <code>lo</code> 인터페이스의 IP에 netcat 서버를 띄운 Pod를 노출시켜줄 Service</li><li><strong>Service eth0</strong> - <code>eth0</code> 인터페이스의 IP에 netcat 서버를 띄운 Pod를 노출시켜줄 Service</li></ul><p><strong>(netcat 서버 Pod는 8080 포트에 요청이 TCP 커넥션이 형성되면 “pong”으로 응답하는 Pod입니다.)</strong></p><pre tabindex=0><code>apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    istio.io/rev: 1-9
-  name: rev-1-9
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    istio.io/rev: 1-10
-  name: rev-1-10
----
-apiVersion: v1
-kind: Pod
-metadata:
-  namespace: default
-  name: netcat-client
-spec:
-  containers:
-  - image: ubuntu:22.04
-    command:
-      - &#34;/bin/bash&#34;
-      - &#34;-c&#34;
-    args:
-    - |
-      apt update &amp;&amp; apt install -y ncat
-      while true;
-      do sleep 60;
-      done;
-    imagePullPolicy: IfNotPresent
-    name: netcat-client
-  restartPolicy: Always
----
-apiVersion: v1
-kind: Pod
-metadata:
-  namespace: rev-1-9
-  name: netcat-lo
-  labels:
-    app: rev-1-9-lo
-spec:
-  containers:
-  - image: ubuntu:22.04
-    command:
-      - &#34;/bin/bash&#34;
-      - &#34;-c&#34;
-    args:
-    - |
-      apt update &amp;&amp; apt install -y net-tools ncat
-      ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;
-      while true
-      do echo &#39;pong&#39; | nc -l 127.0.0.1 8080
-      sleep 1
-      done
-    imagePullPolicy: IfNotPresent
-    name: ubuntu
-    ports:
-    - containerPort: 8080
-  restartPolicy: Always
----
-apiVersion: v1
-kind: Pod
-metadata:
-  namespace: rev-1-10
-  name: netcat-lo
-  labels:
-    istio.io/rev: 1-10
-    app: rev-1-10-lo
-spec:
-  containers:
-  - image: ubuntu:22.04
-    command:
-      - &#34;/bin/bash&#34;
-      - &#34;-c&#34;
-    args:
-    - |
-      apt update &amp;&amp; apt install -y net-tools ncat
-      while true
-      do echo &#39;pong&#39; | nc -l 127.0.0.1 8080
-      sleep 1
-      done
-    imagePullPolicy: IfNotPresent
-    name: ubuntu
-    ports:
-    - containerPort: 8080
-  restartPolicy: Always
----
-apiVersion: v1
-kind: Pod
-metadata:
-  namespace: rev-1-9
-  name: netcat-eth0
-  labels:
-    istio.io/rev: 1-9
-    app: rev-1-9-eth0
-spec:
-  containers:
-  - image: ubuntu:22.04
-    command:
-      - &#34;/bin/bash&#34;
-      - &#34;-c&#34;
-    args:
-    - |
-      apt update &amp;&amp; apt install -y net-tools ncat
-      ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;
-      while true
-      do echo &#39;pong&#39; | nc -l $(ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;)  8080
-      sleep 1
-      done
-    imagePullPolicy: IfNotPresent
-    name: ubuntu
-    ports:
-    - containerPort: 8080
-  restartPolicy: Always
----
-apiVersion: v1
-kind: Pod
-metadata:
-  namespace: rev-1-10
-  name: netcat-eth0
-  labels:
-    istio.io/rev: 1-10
-    app: rev-1-10-eth0
-spec:
-  containers:
-  - image: ubuntu:22.04
-    command:
-      - &#34;/bin/bash&#34;
-      - &#34;-c&#34;
-    args:
-    - |
-      apt update &amp;&amp; apt install -y net-tools ncat
-      ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;
-      while true
-      do echo &#39;pong&#39; | nc -l $(ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;)  8080
-      done
-    imagePullPolicy: IfNotPresent
-    name: ubuntu
-    ports:
-    - containerPort: 8080
-  restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: rev-1-9
-  name: lo
-spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-  selector:
-    app: rev-1-9-lo
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: rev-1-9
-  name: eth0
-spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-  selector:
-    app: rev-1-9-eth0
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: rev-1-10
-  name: lo
-spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-  selector:
-    app: rev-1-10-lo
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: rev-1-10
-  name: eth0
-spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-  selector:
-    app: rev-1-10-eth0
-</code></pre><pre tabindex=0><code>$ kubectl apply -f tmp.yaml
-namespace/rev-1-9 created
-namespace/rev-1-10 created
-pod/netcat-client created
-pod/netcat-lo created
-pod/netcat-lo created
-pod/netcat-eth0 created
-pod/netcat-eth0 created
-service/lo created
-service/eth0 created
-service/lo created
-service/eth0 created
-</code></pre><p>위의 명령어들을 이용해 sidecar가 injected될 netcat 서버와 클라이언트 Pod를 배포해줍니다.</p><pre tabindex=0><code>$ kubectl get pod -A
-NAMESPACE      NAME                               READY   STATUS    RESTARTS   AGE
-default        netcat-client                      1/1     Running   0          15m
-istio-system   istiod-1-10-5cd4d5b44d-8lv2h       1/1     Running   0          145m
-istio-system   istiod-1-9-5ccbd888d8-scdzz        1/1     Running   0          107m
-...
-rev-1-10       netcat-eth0                        2/2     Running   0          18m
-rev-1-10       netcat-lo                          2/2     Running   0          18m
-rev-1-9        netcat-eth0                        2/2     Running   1          17m
-rev-1-9        netcat-lo                          2/2     Running   1          17m
-
-$ kubectl get svc -A
-NAMESPACE      NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                 AGE
-default        kubernetes    ClusterIP   10.96.0.1        &lt;none&gt;        443/TCP                                 3h10m
-istio-system   istiod-1-10   ClusterIP   10.110.227.112   &lt;none&gt;        15010/TCP,15012/TCP,443/TCP,15014/TCP   3h3m
-istio-system   istiod-1-9    ClusterIP   10.107.205.100   &lt;none&gt;        15010/TCP,15012/TCP,443/TCP,15014/TCP   145m
-kube-system    kube-dns      ClusterIP   10.96.0.10       &lt;none&gt;        53/UDP,53/TCP,9153/TCP                  3h10m
-rev-1-10       eth0          ClusterIP   10.111.38.103    &lt;none&gt;        8080/TCP                                35m
-rev-1-10       lo            ClusterIP   10.106.100.209   &lt;none&gt;        8080/TCP                                35m
-rev-1-9        eth0          ClusterIP   10.105.29.177    &lt;none&gt;        8080/TCP                                35m
-rev-1-9        lo            ClusterIP   10.100.228.64    &lt;none&gt;        8080/TCP                                35m
-</code></pre><p>성공적으로 배포했다면 위와 같을 것입니다.</p><h2 id=netcat-서버들에게-요청-보내보기>netcat 서버들에게 요청 보내보기</h2><p>kubectl exec와 netcat 명령어를 통해 <code>netcat-client</code> 의 이름으로 배포한 Pod로 각 Service들을 거쳐 각 Pod에게 요청을 보내볼 것입니다.</p><pre tabindex=0><code>$ kubectl exec -n default netcat-client -- bash -c &#34;echo &#39;ping&#39; | nc lo.rev-1-9 8080&#34;
-pong
-$ kubectl exec -n default netcat-client -- bash -c &#34;echo &#39;ping&#39; | nc eth0.rev-1-9 8080&#34;
-Ncat: Connection reset by peer.
-command terminated with exit code 1
-</code></pre><p>각 Pod의 netcat server가 성공적으로 실행되면 위와 같이 <code>netcat-client</code> Pod를 이용해 명령을 날려 응답을 받아볼 수 있습니다.</p><p>(<strong>초기 서버가 구동되기까지 다소 시간이 걸릴 수 있습니다.</strong> 이 경우 서버의 로그를 통해 서버가 구동됐는지를 확인해보는 것이 좋습니다.)</p><p><code>eth0</code>의 IP에 서버를 띄운 Pod를 목적지로 하는 Service에게 요청을 보낼 경우 해당 목적지 Pod가 istio 1.9에 의해 sidecar injection 되었다면 Pod 내의 서버는 올바르게 요청을 전달받을 수 없습니다.</p><pre tabindex=0><code>$ kubectl exec -n default netcat-client -- bash -c &#34;echo &#39;ping&#39; | nc lo.rev-1-10 8080&#34;
-Ncat: Connection reset by peer.
-command terminated with exit code 1
-$ kubectl exec -n default netcat-client -- bash -c &#34;echo &#39;ping&#39; | nc eth0.rev-1-10 8080&#34;
-pong
-</code></pre><p>istio 1.10을 이용한 경우 결과는 예상대로 istio 1.9와 반대입니다.</p><p><code>lo</code> 의 IP에 서버를 띄운 Pod를 목적지로 하는 Service에게 요청을 보낼 경우 해당 목적지 Pod가 istio 1.10에 의해 sidecar injection 되었다면 Pod 내의 서버는 올바르게 요청을 전달받을 수 없습니다.</p><h2 id=마치며>마치며</h2><p>요즘 버전이 참 중요하다는 생각이 듭니다. 실제로 <strong>이렇게 버전에 따라 통신이 되고 안 되고가 결정될 수 있다는 것을 확인해보니 한층 더 버전이 중요하게 느껴집니다.</strong></p><p>따로 컨테이너 이미지를 제작하고 imagePullSecret을 기입하기 귀찮아서 기존에 존재하는 Ubuntu 이미지를 활용하려다 보니 간단하게 네트워크 통신을 하기 위해 netcat을 적극 활용해봤습니다. 오히려 너무 코드가 길어졌나 싶기도하네요.</p><p>이 작업을 하면서 완전히 이해하지 못한 부분이 한 가지 존재하긴 합니다. 작업하며 경험한 바로는 Pod의 IP로 요청을 보내는 경우에는 istio 버전에 무관하게 eth0의 IP로 서버를 띄워야만 외부(동료 Pod들)에서는 접속이 가능하고, lo의 IP로 서버를 띄우는 경우 Pod의 IP로 접속이 불가능했는데요. 사실 이로 인해 많은 삽질을 했습니다… 왜 서비스로 접속할 때에는 예상대로 버전에 맞는 동작을 하는데, Pod의 IP로 직접 접속할 때에는 무조건 eth0의 IP로 서버를 띄운 경우에만 외부에서 접근이 가능한지는 잘 모르겠습니다.</p><p>하지만 과거 버전의 istio를 통해 네트워크 인터페이스의 동작을 확인해보는 것은 이 정도로 충분할 것 같다고 생각이 들어 이번 글은 여기서 마무리 지으려합니다. 🙂</p></section><footer class=article-footer><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-contents--wrapper><h2 class=section-title>관련 글</h2><div class=related-contents><div class="flex article-list--tile"><article class=has-image><a href=/blog/clova-ai-on-k8s/><div class=article-image><img src=/blog/clova-ai-on-k8s/preview.e2045cd085c0bfb60dac5c449c153709_hu0de35698344aa28c3f5141b2d5dcaef6_812038_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-4gRc0IXAv7YNrFxEnBU3CQ=="></div><div class=article-details><h2 class=article-title>쿠버네티스로 Clova AI Custom Extension 배포하기 (feat. Istio, Cert Manager)</h2></div></a></article><article class=has-image><a href=/blog/devops/declarative-argocd-helm-rbac/><div class=article-image><img src=/blog/devops/declarative-argocd-helm-rbac/logo.2f2745030cbf1c98f0f25182b22d48aa_huc6aa4a846d689b08bb4f93a6ab036ab8_63751_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-LydFAwy/HJjw8lGCsi1Iqg=="></div><div class=article-details><h2 class=article-title>ArgoCD 선언적으로 이용해나가기 - Github을 통한 SSO 및 RBAC</h2></div></a></article><article class=has-image><a href=/blog/devops/declarative-argocd-helm-app-of-app/><div class=article-image><img src=/blog/devops/declarative-argocd-helm-app-of-app/logo.2f2745030cbf1c98f0f25182b22d48aa_huc6aa4a846d689b08bb4f93a6ab036ab8_63751_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-LydFAwy/HJjw8lGCsi1Iqg=="></div><div class=article-details><h2 class=article-title>ArgoCD 선언적으로 이용해나가기 - Helm, App of App</h2></div></a></article></div></div></aside><div class=disqus-container><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//umi0410.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div><style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style><script>window.addEventListener("onColorSchemeChange",e=>{DISQUS&&DISQUS.reset({reload:!0})})</script><footer class=site-footer><section class=copyright>&copy;
+따라서 저는 1.9.9 버전에서는 전자의 인자를, 1.10.6 버전에서는 후자의 인자를 적용해주었습니다.</p><p>만약 envoy proxy가 완전히 준비되기 전에 다른 컨테이너에서 네트워크 작업을 수행하면 해당 작업은 성공적으로 수행되지 않을 것입니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ asdf global istioctl 1.10.6 <span class=o>&amp;&amp;</span> istioctl version
+</span></span><span class=line><span class=cl>client version: 1.10.6
+</span></span><span class=line><span class=cl>control plane version: 1.9.9
+</span></span><span class=line><span class=cl>data plane version: none
+</span></span></code></pre></div><p>istioctl 1.10.6을 이용하도록 설정합니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ istioctl install --set <span class=nv>profile</span><span class=o>=</span>minimal --set <span class=nv>revision</span><span class=o>=</span>1-10 --set meshConfig.defaultConfig.holdApplicationUntilProxyStarts<span class=o>=</span><span class=nb>true</span>
+</span></span><span class=line><span class=cl>WARNING: Istio is being upgraded from 1.9.9 -&gt; 1.10.6.
+</span></span><span class=line><span class=cl>WARNING: Before upgrading, you may wish to use <span class=s1>&#39;istioctl analyze&#39;</span> to check forIST0002 and IST0135 deprecation warnings.
+</span></span><span class=line><span class=cl>This will install the Istio 1.10.6 minimal profile with <span class=o>[</span><span class=s2>&#34;Istio core&#34;</span> <span class=s2>&#34;Istiod&#34;</span><span class=o>]</span> components into the cluster. Proceed? <span class=o>(</span>y/N<span class=o>)</span> y
+</span></span><span class=line><span class=cl>✔ Istio core installed
+</span></span><span class=line><span class=cl>✔ Istiod installed
+</span></span><span class=line><span class=cl>✔ Installation <span class=nb>complete</span>                                                      Thank you <span class=k>for</span> installing Istio 1.10.  Please take a few minutes to tell us about your install/upgrade experience!  https://forms.gle/KjkrDnMPByq7akrYA
+</span></span></code></pre></div><p>istio 1.10.6을 <code>1-10</code>이라는 revision으로 깔아줍니다.</p><p>워닝이 떠있긴 하지만 그닥 상관은 없습니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl get pod -n istio-system
+</span></span><span class=line><span class=cl>NAME                           READY   STATUS    RESTARTS   AGE
+</span></span><span class=line><span class=cl>istiod-1-10-5cd4d5b44d-b98xm   1/1     Running   <span class=m>0</span>          84s
+</span></span><span class=line><span class=cl>istiod-1-9-6b549b9d87-9f76b    1/1     Running   <span class=m>0</span>          2m56s
+</span></span></code></pre></div><p>잘 깔렸다면 위와 같이 Pod들이 성공적으로 떴을 것입니다.</p><h2 id=istio-sidecar가-injected된-netcat-server--client-pod-배포하기>istio sidecar가 injected된 netcat server & client Pod 배포하기</h2><p>이제 netcat server이자 client가 될 Pod 들을 배포해줄 것입니다.</p><p>배포할 리소스들은 모두 다음과 같습니다.</p><ul><li><strong>Namespace rev-1-9</strong> - istio 1.9의 sidecar inject를 받을 Namespace</li><li><strong>Namespace rev-1-10</strong> - istio 1.10의 sidecar inject를 받을 Namespace</li><li><strong>Pod netcat-client</strong> - <code>default</code> Namespace에서 각 Service를 통해 netcat 요청을 날려줄 client</li><li><strong>Pod netcat-lo</strong> - <code>lo</code> 인터페이스의 IP 에 netcat 서버를 띄우는 Pod.</li><li><strong>Pod netcat-eth0</strong> - <code>eth0</code> 인터페이스의 IP에 netcat 서버를 띄우는 Pod.</li><li><strong>Service lo</strong> - <code>lo</code> 인터페이스의 IP에 netcat 서버를 띄운 Pod를 노출시켜줄 Service</li><li><strong>Service eth0</strong> - <code>eth0</code> 인터페이스의 IP에 netcat 서버를 띄운 Pod를 노출시켜줄 Service</li></ul><p><strong>(netcat 서버 Pod는 8080 포트에 요청이 TCP 커넥션이 형성되면 “pong”으로 응답하는 Pod입니다.)</strong></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Namespace</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>istio.io/rev</span><span class=p>:</span><span class=w> </span><span class=m>1-9</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Namespace</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>istio.io/rev</span><span class=p>:</span><span class=w> </span><span class=m>1-10</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>netcat-client</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu:22.04</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;/bin/bash&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;-c&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>args</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>      apt update &amp;&amp; apt install -y ncat
+</span></span></span><span class=line><span class=cl><span class=sd>      while true;
+</span></span></span><span class=line><span class=cl><span class=sd>      do sleep 60;
+</span></span></span><span class=line><span class=cl><span class=sd>      done;</span><span class=w>      
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>imagePullPolicy</span><span class=p>:</span><span class=w> </span><span class=l>IfNotPresent</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>netcat-client</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>restartPolicy</span><span class=p>:</span><span class=w> </span><span class=l>Always</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>netcat-lo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9-lo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu:22.04</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;/bin/bash&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;-c&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>args</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>      apt update &amp;&amp; apt install -y net-tools ncat
+</span></span></span><span class=line><span class=cl><span class=sd>      ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;
+</span></span></span><span class=line><span class=cl><span class=sd>      while true
+</span></span></span><span class=line><span class=cl><span class=sd>      do echo &#39;pong&#39; | nc -l 127.0.0.1 8080
+</span></span></span><span class=line><span class=cl><span class=sd>      sleep 1
+</span></span></span><span class=line><span class=cl><span class=sd>      done</span><span class=w>      
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>imagePullPolicy</span><span class=p>:</span><span class=w> </span><span class=l>IfNotPresent</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>containerPort</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>restartPolicy</span><span class=p>:</span><span class=w> </span><span class=l>Always</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>netcat-lo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>istio.io/rev</span><span class=p>:</span><span class=w> </span><span class=m>1-10</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10-lo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu:22.04</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;/bin/bash&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;-c&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>args</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>      apt update &amp;&amp; apt install -y net-tools ncat
+</span></span></span><span class=line><span class=cl><span class=sd>      while true
+</span></span></span><span class=line><span class=cl><span class=sd>      do echo &#39;pong&#39; | nc -l 127.0.0.1 8080
+</span></span></span><span class=line><span class=cl><span class=sd>      sleep 1
+</span></span></span><span class=line><span class=cl><span class=sd>      done</span><span class=w>      
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>imagePullPolicy</span><span class=p>:</span><span class=w> </span><span class=l>IfNotPresent</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>containerPort</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>restartPolicy</span><span class=p>:</span><span class=w> </span><span class=l>Always</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>netcat-eth0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>istio.io/rev</span><span class=p>:</span><span class=w> </span><span class=m>1-9</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9-eth0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu:22.04</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;/bin/bash&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;-c&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>args</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>      apt update &amp;&amp; apt install -y net-tools ncat
+</span></span></span><span class=line><span class=cl><span class=sd>      ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;
+</span></span></span><span class=line><span class=cl><span class=sd>      while true
+</span></span></span><span class=line><span class=cl><span class=sd>      do echo &#39;pong&#39; | nc -l $(ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;)  8080
+</span></span></span><span class=line><span class=cl><span class=sd>      sleep 1
+</span></span></span><span class=line><span class=cl><span class=sd>      done</span><span class=w>      
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>imagePullPolicy</span><span class=p>:</span><span class=w> </span><span class=l>IfNotPresent</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>containerPort</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>restartPolicy</span><span class=p>:</span><span class=w> </span><span class=l>Always</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>netcat-eth0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>istio.io/rev</span><span class=p>:</span><span class=w> </span><span class=m>1-10</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10-eth0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu:22.04</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;/bin/bash&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;-c&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>args</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>      apt update &amp;&amp; apt install -y net-tools ncat
+</span></span></span><span class=line><span class=cl><span class=sd>      ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;
+</span></span></span><span class=line><span class=cl><span class=sd>      while true
+</span></span></span><span class=line><span class=cl><span class=sd>      do echo &#39;pong&#39; | nc -l $(ifconfig eth0 | grep &#39;inet &#39; | awk &#39;{print $2}&#39;)  8080
+</span></span></span><span class=line><span class=cl><span class=sd>      done</span><span class=w>      
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>imagePullPolicy</span><span class=p>:</span><span class=w> </span><span class=l>IfNotPresent</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>containerPort</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>restartPolicy</span><span class=p>:</span><span class=w> </span><span class=l>Always</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Service</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>lo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9-lo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Service</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>eth0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-9-eth0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Service</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>lo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10-lo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Service</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>eth0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>8080</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>rev-1-10-eth0</span><span class=w>
+</span></span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl apply -f tmp.yaml
+</span></span><span class=line><span class=cl>namespace/rev-1-9 created
+</span></span><span class=line><span class=cl>namespace/rev-1-10 created
+</span></span><span class=line><span class=cl>pod/netcat-client created
+</span></span><span class=line><span class=cl>pod/netcat-lo created
+</span></span><span class=line><span class=cl>pod/netcat-lo created
+</span></span><span class=line><span class=cl>pod/netcat-eth0 created
+</span></span><span class=line><span class=cl>pod/netcat-eth0 created
+</span></span><span class=line><span class=cl>service/lo created
+</span></span><span class=line><span class=cl>service/eth0 created
+</span></span><span class=line><span class=cl>service/lo created
+</span></span><span class=line><span class=cl>service/eth0 created
+</span></span></code></pre></div><p>위의 명령어들을 이용해 sidecar가 injected될 netcat 서버와 클라이언트 Pod를 배포해줍니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl get pod -A
+</span></span><span class=line><span class=cl>NAMESPACE      NAME                               READY   STATUS    RESTARTS   AGE
+</span></span><span class=line><span class=cl>default        netcat-client                      1/1     Running   <span class=m>0</span>          15m
+</span></span><span class=line><span class=cl>istio-system   istiod-1-10-5cd4d5b44d-8lv2h       1/1     Running   <span class=m>0</span>          145m
+</span></span><span class=line><span class=cl>istio-system   istiod-1-9-5ccbd888d8-scdzz        1/1     Running   <span class=m>0</span>          107m
+</span></span><span class=line><span class=cl>...
+</span></span><span class=line><span class=cl>rev-1-10       netcat-eth0                        2/2     Running   <span class=m>0</span>          18m
+</span></span><span class=line><span class=cl>rev-1-10       netcat-lo                          2/2     Running   <span class=m>0</span>          18m
+</span></span><span class=line><span class=cl>rev-1-9        netcat-eth0                        2/2     Running   <span class=m>1</span>          17m
+</span></span><span class=line><span class=cl>rev-1-9        netcat-lo                          2/2     Running   <span class=m>1</span>          17m
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ kubectl get svc -A
+</span></span><span class=line><span class=cl>NAMESPACE      NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class=o>(</span>S<span class=o>)</span>                                 AGE
+</span></span><span class=line><span class=cl>default        kubernetes    ClusterIP   10.96.0.1        &lt;none&gt;        443/TCP                                 3h10m
+</span></span><span class=line><span class=cl>istio-system   istiod-1-10   ClusterIP   10.110.227.112   &lt;none&gt;        15010/TCP,15012/TCP,443/TCP,15014/TCP   3h3m
+</span></span><span class=line><span class=cl>istio-system   istiod-1-9    ClusterIP   10.107.205.100   &lt;none&gt;        15010/TCP,15012/TCP,443/TCP,15014/TCP   145m
+</span></span><span class=line><span class=cl>kube-system    kube-dns      ClusterIP   10.96.0.10       &lt;none&gt;        53/UDP,53/TCP,9153/TCP                  3h10m
+</span></span><span class=line><span class=cl>rev-1-10       eth0          ClusterIP   10.111.38.103    &lt;none&gt;        8080/TCP                                35m
+</span></span><span class=line><span class=cl>rev-1-10       lo            ClusterIP   10.106.100.209   &lt;none&gt;        8080/TCP                                35m
+</span></span><span class=line><span class=cl>rev-1-9        eth0          ClusterIP   10.105.29.177    &lt;none&gt;        8080/TCP                                35m
+</span></span><span class=line><span class=cl>rev-1-9        lo            ClusterIP   10.100.228.64    &lt;none&gt;        8080/TCP                                35m
+</span></span></code></pre></div><p>성공적으로 배포했다면 위와 같을 것입니다.</p><h2 id=netcat-서버들에게-요청-보내보기>netcat 서버들에게 요청 보내보기</h2><p>kubectl exec와 netcat 명령어를 통해 <code>netcat-client</code> 의 이름으로 배포한 Pod로 각 Service들을 거쳐 각 Pod에게 요청을 보내볼 것입니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl <span class=nb>exec</span> -n default netcat-client -- bash -c <span class=s2>&#34;echo &#39;ping&#39; | nc lo.rev-1-9 8080&#34;</span>
+</span></span><span class=line><span class=cl>pong
+</span></span><span class=line><span class=cl>$ kubectl <span class=nb>exec</span> -n default netcat-client -- bash -c <span class=s2>&#34;echo &#39;ping&#39; | nc eth0.rev-1-9 8080&#34;</span>
+</span></span><span class=line><span class=cl>Ncat: Connection reset by peer.
+</span></span><span class=line><span class=cl><span class=nb>command</span> terminated with <span class=nb>exit</span> code <span class=m>1</span>
+</span></span></code></pre></div><p>각 Pod의 netcat server가 성공적으로 실행되면 위와 같이 <code>netcat-client</code> Pod를 이용해 명령을 날려 응답을 받아볼 수 있습니다.</p><p>(<strong>초기 서버가 구동되기까지 다소 시간이 걸릴 수 있습니다.</strong> 이 경우 서버의 로그를 통해 서버가 구동됐는지를 확인해보는 것이 좋습니다.)</p><p><code>eth0</code>의 IP에 서버를 띄운 Pod를 목적지로 하는 Service에게 요청을 보낼 경우 해당 목적지 Pod가 istio 1.9에 의해 sidecar injection 되었다면 Pod 내의 서버는 올바르게 요청을 전달받을 수 없습니다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ kubectl <span class=nb>exec</span> -n default netcat-client -- bash -c <span class=s2>&#34;echo &#39;ping&#39; | nc lo.rev-1-10 8080&#34;</span>
+</span></span><span class=line><span class=cl>Ncat: Connection reset by peer.
+</span></span><span class=line><span class=cl><span class=nb>command</span> terminated with <span class=nb>exit</span> code <span class=m>1</span>
+</span></span><span class=line><span class=cl>$ kubectl <span class=nb>exec</span> -n default netcat-client -- bash -c <span class=s2>&#34;echo &#39;ping&#39; | nc eth0.rev-1-10 8080&#34;</span>
+</span></span><span class=line><span class=cl>pong
+</span></span></code></pre></div><p>istio 1.10을 이용한 경우 결과는 예상대로 istio 1.9와 반대입니다.</p><p><code>lo</code> 의 IP에 서버를 띄운 Pod를 목적지로 하는 Service에게 요청을 보낼 경우 해당 목적지 Pod가 istio 1.10에 의해 sidecar injection 되었다면 Pod 내의 서버는 올바르게 요청을 전달받을 수 없습니다.</p><h2 id=마치며>마치며</h2><p>요즘 버전이 참 중요하다는 생각이 듭니다. 실제로 <strong>이렇게 버전에 따라 통신이 되고 안 되고가 결정될 수 있다는 것을 확인해보니 한층 더 버전이 중요하게 느껴집니다.</strong></p><p>따로 컨테이너 이미지를 제작하고 imagePullSecret을 기입하기 귀찮아서 기존에 존재하는 Ubuntu 이미지를 활용하려다 보니 간단하게 네트워크 통신을 하기 위해 netcat을 적극 활용해봤습니다. 오히려 너무 코드가 길어졌나 싶기도하네요.</p><p>이 작업을 하면서 완전히 이해하지 못한 부분이 한 가지 존재하긴 합니다. 작업하며 경험한 바로는 Pod의 IP로 요청을 보내는 경우에는 istio 버전에 무관하게 eth0의 IP로 서버를 띄워야만 외부(동료 Pod들)에서는 접속이 가능하고, lo의 IP로 서버를 띄우는 경우 Pod의 IP로 접속이 불가능했는데요. 사실 이로 인해 많은 삽질을 했습니다… 왜 서비스로 접속할 때에는 예상대로 버전에 맞는 동작을 하는데, Pod의 IP로 직접 접속할 때에는 무조건 eth0의 IP로 서버를 띄운 경우에만 외부에서 접근이 가능한지는 잘 모르겠습니다.</p><p>하지만 과거 버전의 istio를 통해 네트워크 인터페이스의 동작을 확인해보는 것은 이 정도로 충분할 것 같다고 생각이 들어 이번 글은 여기서 마무리 지으려합니다. 🙂</p></section><footer class=article-footer><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-contents--wrapper><h2 class=section-title>관련 글</h2><div class=related-contents><div class="flex article-list--tile"><article class=has-image><a href=/blog/clova-ai-on-k8s/><div class=article-image><img src=/blog/clova-ai-on-k8s/preview.e2045cd085c0bfb60dac5c449c153709_hu0de35698344aa28c3f5141b2d5dcaef6_812038_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-4gRc0IXAv7YNrFxEnBU3CQ=="></div><div class=article-details><h2 class=article-title>쿠버네티스로 Clova AI Custom Extension 배포하기 (feat. Istio, Cert Manager)</h2></div></a></article><article class=has-image><a href=/blog/devops/declarative-argocd-helm-rbac/><div class=article-image><img src=/blog/devops/declarative-argocd-helm-rbac/logo.2f2745030cbf1c98f0f25182b22d48aa_huc6aa4a846d689b08bb4f93a6ab036ab8_63751_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-LydFAwy/HJjw8lGCsi1Iqg=="></div><div class=article-details><h2 class=article-title>ArgoCD 선언적으로 이용해나가기 - Github을 통한 SSO 및 RBAC</h2></div></a></article><article class=has-image><a href=/blog/devops/declarative-argocd-helm-app-of-app/><div class=article-image><img src=/blog/devops/declarative-argocd-helm-app-of-app/logo.2f2745030cbf1c98f0f25182b22d48aa_huc6aa4a846d689b08bb4f93a6ab036ab8_63751_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key data-hash="md5-LydFAwy/HJjw8lGCsi1Iqg=="></div><div class=article-details><h2 class=article-title>ArgoCD 선언적으로 이용해나가기 - Helm, App of App</h2></div></a></article></div></div></aside><div class=disqus-container><div id=disqus_thread></div><script type=application/javascript>window.disqus_config=function(){},function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById("disqus_thread").innerHTML="Disqus comments not available by default when the website is previewed locally.";return}var t=document,e=t.createElement("script");e.async=!0,e.src="//umi0410.disqus.com/embed.js",e.setAttribute("data-timestamp",+new Date),(t.head||t.body).appendChild(e)}()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div><style>.disqus-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}</style><script>window.addEventListener("onColorSchemeChange",e=>{DISQUS&&DISQUS.reset({reload:!0})})</script><footer class=site-footer><section class=copyright>&copy;
 2020 -
 2022 Jinsu Playground</section><section class=powerby><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a>로 만듦<br><a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a>의 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=2.4.0>Stack</a></b> 테마 사용 중</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
 <button class="pswp__button pswp__button--share" title=Share></button>
