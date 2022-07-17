@@ -40,8 +40,8 @@ image: preview.png
 
 하지만 만약 기존에 특정 interface의 IP만을 지정해서 서버를 띄우는 경우가 있었다면 이 변경사항으로 인해 통신 장애가 발생할 수 있습니다.
 
-- loopback interface의 IP로만 서버를 띄운 경우 → Pod IP로 보낸 요청을 sidecar를 거쳐 요청을 받을 수 있던 컨테이너가 요청을 받을 수 없어짐.
-- eth0 interface의 IP로만 서버를 띠운 경우 → Pod IP로 보낸 요청을 sidecar를 거쳐 요청을 받을 수 있어짐.
+- loopback interface의 IP로만 서버를 띄운 경우 → `eth0`로 보낸 요청을 sidecar를 거쳐 `lo`가 받을 수 있던 컨테이너가 요청을 받을 수 없어짐.
+- eth0 interface의 IP로만 서버를 띠운 경우 → `eth0`로 보낸 요청을 sidecar를 거쳐 여전히 `eth0`가 요청을 받을 수 있어짐.
 
 **이러한 변경 사항이 추가된 이유는?**
 
