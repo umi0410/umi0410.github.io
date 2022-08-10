@@ -1,2 +1,367 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS on Jinsu Playground</title><link>https://umi0410.github.io/categories/aws/</link><description>Recent content in AWS on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sun, 06 Sep 2020 19:11:07 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/categories/aws/index.xml" rel="self" type="application/rss+xml"/><item><title>EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기</title><link>https://umi0410.github.io/blog/aws/aws_eks_elb/</link><pubDate>Sun, 06 Sep 2020 19:11:07 +0900</pubDate><guid>https://umi0410.github.io/blog/aws/aws_eks_elb/</guid><description>🐶 시작하며 본 게시글은 AWS 대학생 유저그룹인 AUSG의 활동 중 하나로서 본인(박진수)이 작성한 게시물을 포워딩한 것입니다.
-preview.png 데브옵스 인턴으로 근무한 지가 벌써 두 달이 되어갑니다. 이것 저것 배운 것이 많았던 시간이었는데, 그 중 꽤나 삽질을 했던 Kubernetes 와 ELB를 이용하는 부분에 대해 정리를 해볼까합니다. jenkins, spinnaker, argo, terraform, ansible, github action, &amp;hellip; 등등 다양한 내용을 경험할 수 있던 시간이었지만, 그 중 kubernetes에서 무슨 작업을 하던 빼놓을 수 없으면서 어딘가 깔끔히 그 흐름이 정리된 곳을 보기 힘들었던 service를 ELB에 연결하기에 대한 내용을 정리해보겠습니다.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS on Jinsu Playground</title><link>https://umi0410.github.io/categories/aws/</link><description>Recent content in AWS on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sun, 06 Sep 2020 19:11:07 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/categories/aws/index.xml" rel="self" type="application/rss+xml"/><item><title>EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기</title><link>https://umi0410.github.io/blog/aws/aws_eks_elb/</link><pubDate>Sun, 06 Sep 2020 19:11:07 +0900</pubDate><guid>https://umi0410.github.io/blog/aws/aws_eks_elb/</guid><description>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/preview.png" alt="Featured image of post EKS K8s에서 ELB(ALB, NLB) 제대로 설정하며 사용하기" />&lt;h2 id="-시작하며">🐶 시작하며&lt;/h2>
+&lt;blockquote>
+&lt;p>본 게시글은 AWS 대학생 유저그룹인 &lt;a class="link" href="https://velog.io/@ausg" target="_blank" rel="noopener"
+>AUSG&lt;/a>의 활동 중
+하나로서 본인(박진수)이 작성한 게시물을 포워딩한 것입니다.&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/preview.png"
+width="2032"
+height="1097"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/preview_huc38b74e19f60c2848e88837c4c6920fa_1709468_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/preview_huc38b74e19f60c2848e88837c4c6920fa_1709468_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="preview.png"
+class="gallery-image"
+data-flex-grow="185"
+data-flex-basis="444px"
+>&lt;/p>
+&lt;p>&lt;code>데브옵스&lt;/code> 인턴으로 근무한 지가 벌써 두 달이 되어갑니다. 이것 저것 배운 것이 많았던 시간이었는데, 그 중 꽤나 삽질을 했던 &lt;code>Kubernetes&lt;/code> 와 &lt;code>ELB&lt;/code>를 이용하는 부분에 대해 정리를 해볼까합니다. &lt;code>jenkins&lt;/code>, &lt;code>spinnaker&lt;/code>, &lt;code>argo&lt;/code>, &lt;code>terraform&lt;/code>, &lt;code>ansible&lt;/code>, &lt;code>github action&lt;/code>, &amp;hellip; 등등 다양한 내용을 경험할 수 있던 시간이었지만, 그 중 kubernetes에서 무슨 작업을 하던 빼놓을 수 없으면서 어딘가 깔끔히 그 흐름이 정리된 곳을 보기 힘들었던 &lt;strong>service를 ELB에 연결&lt;/strong>하기에 대한 내용을 정리해보겠습니다.&lt;/p>
+&lt;p>&lt;em>본 포스트는 EKS를 통해 K8s를 이용할 때를 기준으로 설명합니다.&lt;/em>&lt;/p>
+&lt;h2 id="-eks-에서-elb를-사용해-서비스를-노출킬-때-유의사항들">💁🏻‍♂️ EKS 에서 ELB를 사용해 서비스를 노출킬 때 유의사항들&lt;/h2>
+&lt;blockquote>
+&lt;p>🧐 : &amp;quot; &lt;code>ELB&lt;/code>, &lt;code>NLB&lt;/code>, &lt;code>ALB&lt;/code> 대체 뭐가 다른 거야..?ㅜㅜ &lt;strong>쿠버네티스&lt;/strong>를 쓸 때는 어떻게 얘네를 지정하는 거지..? &lt;code>kubectl expose deploy {{deployment_name}} --type=LoadBalancer&lt;/code> 하면 그냥 작동은 하던데&amp;hellip;&amp;quot;&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;code>EKS&lt;/code>에서 주로 사용하는 &lt;code>ELB&lt;/code>는 L4의 &lt;code>NLB&lt;/code>와 L7의 &lt;code>ALB&lt;/code> 입니다. ALB가 L7에 대한 좀 더 다양한 설정이 가능하기 때문에 조건이 많기도 하고, AWS의 ALB만을 위한 &lt;code>alb-ingress-controller&lt;/code>라는 녀석이 직접 &lt;code>Ingress&lt;/code>의 설정들을 관리해주기 때문에 설정할 수 있는 옵션도 많습니다. 좋게 보면 많은 설정을 할 수 있고, 나쁘게 보면 초보자에겐 귀찮을 수 있습니다. &lt;code>NLB&lt;/code>는 비교적 설정이 적고 따라서 설정해줄 수 있는 항목도 적습니다.&lt;/p>
+&lt;p>쿠버네티스에서 다양한 작업을 하면서 다양한 controller을 접하게 되고, 그렇게 될 수록 &lt;code>annotation&lt;/code>으로 많은 설정을 하게 됩니다. k8s를 처음 접할 때에는 annotation에 대한 정의로서 아래와 같은 문장을 접할 수 있고, 마치 기능과 크게 상관이 없을 것처럼 느껴지기도 하지만 사실 EKS를 비롯한 여러 서비스에서는 annotation을 이용해 중요한 설정 등을 기입할 수 있기 때문에 잘 설정해주어야합니다. ELB또한 모든 설정이 annotation으로 동작한다.&lt;/p>
+&lt;blockquote>
+&lt;p>&amp;quot; &lt;code>Label&lt;/code>을 사용하여 오브젝트를 선택하고, 특정 조건을 만족하는 오브젝트 컬렉션을 찾을 수 있다. 반면에, &lt;code>annotation&lt;/code>은 오브젝트를 식별하고 선택하는데 사용되지 않는다. 어노테이션의 메타데이터는 작거나 크고, 구조적이거나 구조적이지 않을 수 있으며, 레이블에서 허용되지 않는 문자를 포함할 수 있다.&amp;quot;&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="-alb를-사용할-때-유의할-점">⚠️ ALB를 사용할 때 유의할 점&lt;/h3>
+&lt;blockquote>
+&lt;p>어떤 옵션들이 있고, 기본적으로는 어떻게 설정되는 지에 대한 이해가 있어야 오류 과정을 추적하기 쉬우므로 기본적으로 ALB를 AWS Console에서 사용해본 뒤에 설정할 것을 추천합니다.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>alb ingress controller&lt;/code>가 생성할 ALB가 사용할 서브넷을 discover하기 위해서는 &lt;strong>올바른 태그가 달린 subnet&lt;/strong>이 존재해야한다.&lt;/li>
+&lt;li>node 혹은 &lt;code>alb ingress controller&lt;/code>에 연결된 service account가 alb를 제어하기 위한 &lt;strong>iam permission&lt;/strong>이 부여되어야한다.&lt;/li>
+&lt;li>internet facing한 alb를 만들지 internal한 alb를 만들지 고민해봐야한다.&lt;/li>
+&lt;li>&lt;code>alb ingress controller&lt;/code>의 log를 통해 작업에 대한 log를 볼 수 있다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="-nlb-clb를-사용할-때-유의할-점">⚠️ NLB, CLB를 사용할 때 유의할 점&lt;/h3>
+&lt;p>&lt;a class="link" href="https://kubernetes.io/ko/docs/concepts/services-networking/service/#aws-nlb-support" target="_blank" rel="noopener"
+>https://kubernetes.io/ko/docs/concepts/services-networking/service/#aws-nlb-support&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/load-balancing.html" target="_blank" rel="noopener"
+>https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/load-balancing.html&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>NLB&lt;/code>, &lt;code>CLB&lt;/code>가 사용할 서브넷을 설정하기 위해서는 &lt;strong>올바른 태그가 달린 subnet&lt;/strong>이 존재해야한다.&lt;/li>
+&lt;li>어느 부분에선가 NLB, CLB를 제어하기 위한 &lt;strong>iam permission&lt;/strong>이 부여되어야한다. (어느 부분인지 확실히는 모르겠음. 따로 설정안해도 동작하는 것을 보아 worker node가 갖는 iam role에 permission이 붙어있을 것으로 예상됨)&lt;/li>
+&lt;/ul>
+&lt;h2 id="-alb를-사용해-서비스를-노출시키는-방법">🌎 ALB를 사용해 서비스를 노출시키는 방법&lt;/h2>
+&lt;blockquote>
+&lt;p>😊 &lt;code>ALB&lt;/code>는 K8s에 친숙하지 않으신 분들께는 다소 진입장벽이 있을 수 있습니다. 그냥 서비스를 노출시킬 때는 굳이 사용할 필요 없는 &lt;code>Ingress&lt;/code> 라는 오브젝트도 관리해야하고, &lt;code>alb-ingress-contoller&lt;/code>라는 녀석도 배포해야하며 설정이 다양하기 때문이죠! 💦&lt;/p>
+&lt;/blockquote>
+&lt;p>K8s에서 EKS를 사용해 &lt;code>ALB&lt;/code>를 이용하고싶은 경우 &lt;code>alb-ingress-controller&lt;/code>을 배포한 뒤, &lt;code>Ingress&lt;/code>를 통해 사용할 alb에 대한 rule을 설정을 해주어야합니다.&lt;/p>
+&lt;p>&lt;a class="link" href="https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/controller/setup/" target="_blank" rel="noopener"
+>https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/controller/setup/&lt;/a> 의 내용을 버릴 부분이 하나도 없습니다. 위 링크를 통해 alb-ingress-controller에 대한 개념을 잡고 배포해봅니다. &lt;code>alb-ingress-controller.yaml&lt;/code>의 인자를 적절히 수정해주어야합니다.&lt;/p>
+&lt;p>ALB가 아닌 k8s cluster 상에서 L7 LoadBalancer를 이용하는 경우에는 nginx ingress controller등을 이용하며 nginx 에 적용할 rule을 &lt;code>Ingress&lt;/code>라는 K8s Object를 통해 설정합니다. ingress controller의 설정에서 자신의 class name을 적어주고, &lt;code>Ingress&lt;/code>에서는 어떤 class name의 ingress controller에서 자신(Ingress이자 Rule)을 적용하도록 할 지를 annotation을 통해 설정하거나 ingressClassName이라는 필드를 통해 설정합니다.(ingress 설정에 대한 참고 - &lt;a class="link" href="https://kubernetes.io/ko/docs/concepts/services-networking/ingress/#%EC%9D%B8%EA%B7%B8%EB%A0%88%EC%8A%A4-%ED%81%B4%EB%9E%98%EC%8A%A4" target="_blank" rel="noopener"
+>https://kubernetes.io/ko/docs/concepts/services-networking/ingress/#인그레스-클래스&lt;/a>)&lt;/p>
+&lt;p>이와 같은 경우에는 ingress controller가 직접 ingress에 명시된 rule을 이용했지만, &lt;strong>alb-ingress-controller&lt;/strong>의 경우는 alb-ingress-controller가 nginx-ingress-controller처럼 &lt;strong>직접 웹서버의 역할을 하는 것이 아닌&lt;/strong>, ingress에 명시된 rule을 이용하는 &lt;strong>ALB를 생성하고 관리&lt;/strong>하는 역할을 한다는 것입니다. 이 부분이 처음에는 다소 헷갈리게 느껴질 수 있기에 길게 서술해보았습니다.&lt;/p>
+&lt;p>실제로 ingress를 생성한 뒤 앞에서 배포한 alb-ingress-controller의 log를 보면 alb를 관리하기위한 여러 작업을 수행중인 모습을 볼 수 있습니다.&lt;/p>
+&lt;p>그럼 이제 실제로 alb ingress controller을 통해 alb를 이용해보겠습니다.&lt;/p>
+&lt;h3 id="alb를-원활히-제어하기-위한-permission-부여">ALB를 원활히 제어하기 위한 permission 부여&lt;/h3>
+&lt;ul>
+&lt;li>ALB iam 정책 참고
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/alb-ingress.html" target="_blank" rel="noopener"
+>https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/alb-ingress.html&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.2/docs/examples/iam-policy.json" target="_blank" rel="noopener"
+>https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.2/docs/examples/iam-policy.json&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>ALB&lt;/code>를 제어하기 위해서는 aws의 리소스에 대한 어떠한 permission이 필요합니다. &lt;code>node&lt;/code>에 부여할 수도 있고, IAM User에 부여한 뒤 &lt;code>alb ingress controller&lt;/code>의 설정에서 해당 IAM User의 Key를 부여할 수도 있고, Service account와 IAM Role을 &lt;code>OIDC&lt;/code>(OpenID Connect를 이용해 Service account와 IAM Role을 연결시키는 작업)를 이용해 엮은 뒤, alb ingress controller pod에 해당 Service Account를 부여할 수도 있지만 뒤의 방법들은 좀 튜토리얼치고 투머치한 감이 있기때문에, 간단히 node에 Permission을 부여하도록하겠습니다.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/iam.png"
+width="797"
+height="532"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/iam_hu9ac6964ec6844f4165a3f6a7be3b3a23_55018_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/iam_hu9ac6964ec6844f4165a3f6a7be3b3a23_55018_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="iam.png"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="359px"
+>&lt;/p>
+&lt;p>worker node들이 이용하는 IAM Role에 Policy를 추가한 모습.&lt;/p>
+&lt;h3 id="alb가-사용할-subnet에-적절한-태그-달기">alb가 사용할 subnet에 적절한 태그 달기&lt;/h3>
+&lt;p>&lt;a class="link" href="https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/alb-ingress.html" target="_blank" rel="noopener"
+>https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/alb-ingress.html&lt;/a> 에 나와있듯이 ELB가 이용하는 서브넷을 자동으로 설정되도록 하기 위해서는 사용하고자 하는 서브넷에 아래와 같은 태그들을 달아주어야한다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">cluster&lt;/span>&lt;span class="err">-&lt;/span>&lt;span class="na">name&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">shared&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="nx">owned&lt;/span> &lt;span class="err">#&lt;/span> &lt;span class="nx">Required&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">role&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">internal&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">elb&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span> &lt;span class="err">#&lt;/span> &lt;span class="nx">Optional&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="nx">internal&lt;/span> &lt;span class="nx">alb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">role&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">elb&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span> &lt;span class="err">#&lt;/span> &lt;span class="nx">Optional&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="nx">internet&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">facing&lt;/span> &lt;span class="nx">alb&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>a | b&lt;/code>와 같은 표현은 a 나 b중 한 값을 가져야한다는 의미로 표현한 것입니다.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/tag.png"
+width="714"
+height="435"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/tag_hu2bbb23500c440a1ae11b9e8cf9268536_37002_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/tag_hu2bbb23500c440a1ae11b9e8cf9268536_37002_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="tag.png"
+class="gallery-image"
+data-flex-grow="164"
+data-flex-basis="393px"
+>&lt;/p>
+&lt;p>internet facing ALB만 이용할 것이기 때문에 &lt;a class="link" href="http://kubernetes.io/role/internal-elb" target="_blank" rel="noopener"
+>&lt;code>kubernetes.io/role/internal-elb&lt;/code>&lt;/a> tag는 생략하고 태그를 달아준 모습.&lt;/p>
+&lt;p>subnet에 ALB를 사용하기 위한 태그를 제대로 달아주지 않을 경우 alb-ingress-controller 에서 아래와 같은 로그를 보게 됩니다. ALB가 생성되지도 않습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">controller&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">go&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="mi">217&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="nx">kubebuilder&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">controller&lt;/span> &lt;span class="s2">&amp;#34;msg&amp;#34;&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;Reconciler error&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;error&amp;#34;&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">&amp;#34;&lt;/span>&lt;span class="nx">failed&lt;/span> &lt;span class="nx">to&lt;/span> &lt;span class="nx">build&lt;/span> &lt;span class="nx">LoadBalancer&lt;/span> &lt;span class="nx">configuration&lt;/span> &lt;span class="nx">due&lt;/span> &lt;span class="nx">to&lt;/span> &lt;span class="nx">failed&lt;/span> &lt;span class="nx">to&lt;/span> &lt;span class="nx">resolve&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="nx">qualified&lt;/span> &lt;span class="nx">subnet&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="nx">ALB&lt;/span>&lt;span class="p">.&lt;/span> &lt;span class="nx">Subnets&lt;/span> &lt;span class="nx">must&lt;/span> &lt;span class="nx">contains&lt;/span> &lt;span class="nx">these&lt;/span> &lt;span class="nx">tags&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;kubernetes.io/cluster/umi-dev&amp;#39;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;shared&amp;#39;&lt;/span> &lt;span class="nx">or&lt;/span> &lt;span class="s1">&amp;#39;owned&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="nx">and&lt;/span> &lt;span class="s1">&amp;#39;kubernetes.io/role/internal-elb&amp;#39;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;&amp;#39;&lt;/span> &lt;span class="nx">or&lt;/span> &lt;span class="s1">&amp;#39;1&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="alb-ingress-controller-배포하기">alb ingress controller 배포하기.&lt;/h3>
+&lt;blockquote>
+&lt;p>슬슬 읽기 귀찮아질 타이밍입니다. &amp;lsquo;&lt;em>요놈이 IAM policy도 만들고, 서브넷에 엄한 태그를 달더니 이제는 하,,, 뭘 또 배포하라고 하는구나 아이고 내 눈아,,,&lt;/em>&amp;rsquo; 싶겠지만, 좀 더 힘을 내어봅시다 🍻&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;a class="link" href="https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/controller/setup/" target="_blank" rel="noopener"
+>https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/controller/setup/&lt;/a> 를 참고하여 &lt;code>Deployment&lt;/code> 내의 container의 &lt;code>args&lt;/code>를 자신의 상황에 맞게 수정한 뒤 배포해줍니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">args&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="kr">class&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nx">alb&lt;/span> &lt;span class="err">#&lt;/span> &lt;span class="nx">ingress의&lt;/span> &lt;span class="nx">annotation에&lt;/span> &lt;span class="nx">명시할&lt;/span> &lt;span class="kr">class&lt;/span> &lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="nx">cluster&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nx">umi&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">dev&lt;/span> &lt;span class="err">#&lt;/span> &lt;span class="nx">eks&lt;/span> &lt;span class="nx">cluster&lt;/span> &lt;span class="nx">name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="nx">aws&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">region&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nx">ap&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">northeast&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="nx">aws&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">api&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">debug&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">true&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>저는 위와 같은 식으로 설정해주었고, 잘 배포되었는지 확인해봅니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">$&lt;/span> &lt;span class="nx">kubectl&lt;/span> &lt;span class="nx">get&lt;/span> &lt;span class="nx">po&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="nx">A&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="nx">grep&lt;/span> &lt;span class="nx">alb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kube&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">system&lt;/span> &lt;span class="nx">alb&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">controller&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">594&lt;/span>&lt;span class="nx">f84b465&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">q4qjb&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">1&lt;/span> &lt;span class="nx">Running&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">106&lt;/span>&lt;span class="nx">m&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="노출시킬-서비스-배포하기">노출시킬 서비스 배포하기&lt;/h3>
+&lt;p>간단하게 &lt;code>Nginx&lt;/code>를 배포해보록하겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">apiVersion&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">v1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kind&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Service&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">metadata&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ingress&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">test&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">spec&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selector&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">app&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ports&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="nx">protocol&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">TCP&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">port&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">targetPort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nodePort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">30010&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">NodePort&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">---&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">apiVersion&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">apps&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">v1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kind&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Deployment&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">metadata&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ingress&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">test&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">labels&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">app&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">spec&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">replicas&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selector&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">matchLabels&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">app&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">template&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">metadata&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">labels&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">app&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">spec&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">containers&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">image&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ports&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="nx">containerPort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>ALB는 기본적으로 &lt;strong>node의 Port&lt;/strong>를 AWS 상의 &lt;code>target group&lt;/code>으로서 이용하기 때문에, ingress를 통해 노출시켜줄 서비스는 적어도 &lt;code>NodePort&lt;/code> 타입으로 노출되어있어야 &lt;code>ALB ingress controller&lt;/code>가 해당 서비스를 노출시킬 수 있습니다.(target type을 기본값인 &lt;code>instance&lt;/code>가 아니라 &lt;code>IP&lt;/code>로 설정하면, Pod의 IP로 트래픽이 흘러가게 할 수는 있습니다.)&lt;/p>
+&lt;p>작동방식을 설명해보자면 ingress 는 service name과 service port를 설정으로 받습니다. alb-ingress-controller는 그러면 해당 service name, service port와 연결된 NodePort를 찾아서 ALB의 target group으로 등록시킵니다.&lt;/p>
+&lt;h3 id="ingress-배포하기">Ingress 배포하기&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">apiVersion&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">extensions&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">v1beta1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kind&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Ingress&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">metadata&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;ingress&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">annotations&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">class&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">alb&lt;/span> &lt;span class="err">#&lt;/span> &lt;span class="nx">the&lt;/span> &lt;span class="nx">value&lt;/span> &lt;span class="nx">we&lt;/span> &lt;span class="nx">set&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="nx">alb&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">controller&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alb&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">scheme&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">internet&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">facing&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">spec&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">rules&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="nx">http&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">paths&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="nx">path&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="err">/*&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">backend&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">serviceName&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;ingress-test&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">servicePort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;a class="link" href="https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/" target="_blank" rel="noopener"
+>https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/&lt;/a> 을 참고하여 &lt;code>Ingress&lt;/code>를 작성해줍니다. &lt;code>[kubernetes.io/ingress.class&lt;/code>는](&lt;a class="link" href="http://kubernetes.io/ingress.class" target="_blank" rel="noopener"
+>http://kubernetes.io/ingress.class&lt;/a>는) alb-ingress-controller에서 설정한 &lt;code>ingress.class&lt;/code>를 적어주고, &lt;a class="link" href="http://alb.ingress.kubernetes.io/scheme%eb%8a%94" target="_blank" rel="noopener"
+>&lt;code>alb.ingress.kubernetes.io/scheme&lt;/code>는&lt;/a> 용도에 따라 &lt;code>internet-facing&lt;/code> 혹은 &lt;code>internal&lt;/code>을 적어줍니다. ingress 를 생성하기 전에 &lt;code>kubectl logs -f {alb-ingress-controller pod name}&lt;/code>을 한 창에 띄워놓으면 ALB 생성 관련 로그를 쭈루룩 볼 수 있습니다.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/elb.png"
+width="670"
+height="166"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/elb_huae6e8bb776e806d0d619a890a5bf58a9_19454_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/elb_huae6e8bb776e806d0d619a890a5bf58a9_19454_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="elb.png"
+class="gallery-image"
+data-flex-grow="403"
+data-flex-basis="968px"
+>&lt;/p>
+&lt;p>잘 설정되었다면 위와 같이 ALB가 생성될 것 입니다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">$&lt;/span> &lt;span class="nx">kubectl&lt;/span> &lt;span class="nx">get&lt;/span> &lt;span class="nx">ingress&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">NAME&lt;/span> &lt;span class="nx">HOSTS&lt;/span> &lt;span class="nx">ADDRESS&lt;/span> &lt;span class="nx">PORTS&lt;/span> &lt;span class="nx">AGE&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">ingress&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">bf1e76be&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="k">default&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">e8c7&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">1351183883.&lt;/span>&lt;span class="nx">ap&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">northeast&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">2.&lt;/span>&lt;span class="nx">elb&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">amazonaws&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">com&lt;/span> &lt;span class="mi">80&lt;/span> &lt;span class="mi">30&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="인증서-설정을-통해-https-까지">인증서 설정을 통해 HTTPS 까지?!&lt;/h3>
+&lt;blockquote>
+&lt;p>❤️ AWS &lt;code>Certificate Manager&lt;/code>와 &lt;code>Ingress&lt;/code>에 대한 &lt;code>annotation&lt;/code>을 이용해 간단하게 &lt;code>HTTPS&lt;/code>를 이용할 수도 있습니다! 직접하려면 도메인 소유 인증과 인증서, 비밀키 등을 모두 관리해야했는데 말이지요! 🐥&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/cert.png"
+width="1082"
+height="317"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/cert_hu285e592bed94d8c711caab941a928b85_40319_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/cert_hu285e592bed94d8c711caab941a928b85_40319_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="cert.png"
+class="gallery-image"
+data-flex-grow="341"
+data-flex-basis="819px"
+>&lt;/p>
+&lt;p>이런식으로 AWS의 &lt;code>Certificate Manager&lt;/code>을 통해 발급받은 인증서가 있다면 이를 alb 에서 ingress에 annotation을 설정함으로써 사용할 수 있습니다.&lt;/p>
+&lt;p>&lt;strong>Ingress의 annotation에 HTTPS및 인증서 관련 설정 추가해주기&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">apiVersion&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">extensions&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">v1beta1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kind&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Ingress&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">metadata&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;ingress&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">annotations&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="kr">class&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">alb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alb&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">scheme&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">internet&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">facing&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alb&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">listen&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">ports&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;[{&amp;#34;HTTP&amp;#34;: 80}, {&amp;#34;HTTPS&amp;#34;: 443}]&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alb&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">actions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">redirect&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">to&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">https&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="s2">&amp;#34;Type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s2">&amp;#34;redirect&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;RedirectConfig&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="s2">&amp;#34;Port&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s2">&amp;#34;443&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;Protocol&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s2">&amp;#34;HTTPS&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;StatusCode&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s2">&amp;#34;HTTP_302&amp;#34;&lt;/span>&lt;span class="p">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">alb&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ingress&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">certificate&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">arn&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">Certificate&lt;/span> &lt;span class="nx">Manger의&lt;/span> &lt;span class="nx">인증서&lt;/span> &lt;span class="nx">arn&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;em>http redirect 및 actions에 대한 내용은 저의 애교입니다.&lt;/em> 궁금하신 분들은 한 번 적용해보시거나 알아보시면 어렵지 않게 알아내실 수 있을 겁니다! 😆&lt;/p>
+&lt;p>&lt;strong>Route53에 ALB 추가해주기&lt;/strong>&lt;/p>
+&lt;p>EKS에서 ALB를 사용하는 등의 작업을 하시는 분은 어느 정도 aws에 대한 이해가 있으리라 생각하고, ALB를 Route53을 통해 레코드로 추가하는 작업에 대한 설명은 생략하겠습니다.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/cert2.png"
+width="1714"
+height="605"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/cert2_huff1102cf41f5fc11c3e61b957cd43eab_183400_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/cert2_huff1102cf41f5fc11c3e61b957cd43eab_183400_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="cert2.png"
+class="gallery-image"
+data-flex-grow="283"
+data-flex-basis="679px"
+>&lt;/p>
+&lt;p>alb-ingress-controller로 AWS Certificate Manager의 인증서까지 사용한 모습.&lt;/p>
+&lt;h2 id="-nlb를-사용해-서비스를-노출시키는-방법">🌎 NLB를 사용해 서비스를 노출시키는 방법&lt;/h2>
+&lt;p>CLB는 Deprecate 대상이라고 들었기도 하고, 굳이 써본 적이 없어 NLB로만 설명합니다. NLB는 ALB에 비해 사용이 간단합니다.&lt;/p>
+&lt;p>Ingress와 alb-ingress-controller를 사용했던 ALB와 달리 NLB는 서비스를 직접 노출시킵니다. 주로 &lt;code>Nginx Ingress Controller&lt;/code>을 NLB에 연결해서 사용했던 기억이 납니다. NLB는 L4 LB로, Nginx를 주로 L7 LB로 사용하는 경우 이렇게 NLB를 사용합니다. ALB와 Nginx 모두 L7 LB로서 역할을 하기때문에 굳이 ALB를 사용할 필요가 없는 경우가 많았습니다.&lt;/p>
+&lt;p>NLB를 통해 서비스를 노출시키기 위해선 annotaion중에서도 [&lt;code>service.beta.kubernetes.io](http://service.beta.kubernetes.io/)...&lt;/code>형태의 annotation을 이용합니다. 사실 실제로 실무해서 사용해본 annotation은 거의 [&lt;code>service.beta.kubernetes.io/aws-load-balancer-type:](http://service.beta.kubernetes.io/aws-load-balancer-type:) &amp;quot;nlb&amp;quot;&lt;/code> 뿐입니다. (이를 사용하지 않을 경우 디폴트가 CLB이기 때문에&amp;hellip;)&lt;/p>
+&lt;h3 id="nlb가-사용할-subnet에-적절한-태그-달기">NLB가 사용할 subnet에 적절한 태그 달기&lt;/h3>
+&lt;p>ALB를 사용했을 때와 마찬가지로 NLB가 사용할 서브넷에 필수 태그를 달아줍니다. 기억이 안난 다면 글의 상단 ALB 파트를 참고!&lt;/p>
+&lt;h3 id="nlb로-노출할-서비스-생성하기">NLB로 노출할 서비스 생성하기&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">apiVersion&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">v1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kind&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Service&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">metadata&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">nlb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">annotations&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">service&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">beta&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">aws&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">balancer&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;nlb&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">spec&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selector&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">app&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ports&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="nx">protocol&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">TCP&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">port&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">targetPort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nodePort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">30011&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">LoadBalancer&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/terminal.png"
+width="983"
+height="223"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/terminal_hua70a78035179ff73439578821520f3f3_51627_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/terminal_hua70a78035179ff73439578821520f3f3_51627_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="terminal.png"
+class="gallery-image"
+data-flex-grow="440"
+data-flex-basis="1057px"
+>&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/zzal.png"
+width="420"
+height="400"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/zzal_hu70382f8ad38785a4d7f8dffcaf07bdc6_351117_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/zzal_hu70382f8ad38785a4d7f8dffcaf07bdc6_351117_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="zzal.png"
+class="gallery-image"
+data-flex-grow="105"
+data-flex-basis="252px"
+>&lt;/p>
+&lt;p>간단히 type을 LoadBalancer로 바꾸어주고, annotation에 어떤 ELB를 사용할지( NLB/CLB )만 적어주면 아래 그림처럼 손쉽게 NLB로 서비스를 노출 시킬 수 있습니다.&lt;/p>
+&lt;h3 id="인증서-설정을-통해-https까지">인증서 설정을 통해 HTTPS까지?!&lt;/h3>
+&lt;blockquote>
+&lt;p>🌋: &amp;ldquo;그만&amp;hellip;. 아무도 안 궁금해&amp;hellip;&amp;rdquo; - 하지만 마지막까지 힘을 내서 EKS에서의 ELB를 정복해봅시다!&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">apiVersion&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">v1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">kind&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">Service&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">metadata&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">name&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">nlb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">annotations&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">service&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">beta&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">aws&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">balancer&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;nlb&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">service&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">beta&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">aws&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">balancer&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">backend&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">protocol&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">tcp&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">service&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">beta&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">aws&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">balancer&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">ssl&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">ports&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;443&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">service&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">beta&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">kubernetes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">aws&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">balancer&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">ssl&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">cert&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">arn&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="nx">aws&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="nx">acm&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="nx">ap&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">northeast&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="p">{{&lt;/span>&lt;span class="nx">root&lt;/span>&lt;span class="p">}}&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="nx">certificate&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">{{&lt;/span>&lt;span class="nx">arn&lt;/span>&lt;span class="p">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">spec&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">selector&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">app&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">nginx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">ports&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="nx">protocol&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">TCP&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">port&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">targetPort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nodePort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">30011&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span> &lt;span class="nx">protocol&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">TCP&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">port&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">443&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">targetPort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">80&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nodePort&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="mi">30012&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">LoadBalancer&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>backend-protocol&lt;/code>은 &lt;code>tcp&lt;/code>|tls 혹은 https|http로 설정이 돠는 듯합니다. 예를 들어 &lt;code>backend-protocol&lt;/code> 로 &lt;code>tcp&lt;/code>를 설정한 뒤 &lt;code>ssl-port&lt;/code>로 443을 설정, 서비스의 &lt;code>spec&lt;/code>에서의 포트로는 &lt;code>80&lt;/code>과 &lt;code>443&lt;/code>을 설정하면, 자동적으로 &lt;code>80&lt;/code>은 &lt;code>tcp&lt;/code>, &lt;code>443&lt;/code>은 tls를 이용하는 NLB listener로 설정되게 되는데 http,https도 마찬가지로 tcp,tls로 적절히 설정이 됩니다. 다만 http,https를 설정할 경우 &lt;code>X-Forwarded-For&lt;/code> 헤더가 삽입된다고 합니다. (정확하지는 않아요&amp;hellip; 딱히 NLB의 backend protocol을 L7으로 설정하는 것이 NLB의 원래 스펙이 아니었던 점도 있고, L7을 이용하고 싶으면, ALB를 이용하는 것이 더 편하다고 생각이 들어서 따로 검증해본 적이 없기 때문에&amp;hellip; )&lt;/p>
+&lt;p>⚠️&lt;strong>단점&lt;/strong>이 하나 있다면 아직 &lt;strong>http⇒https redirect&lt;/strong>가 불가능하다는 것인데, 이는 애초에 L4 LB를 이용하는 것과 L7 LB를 이용하는 쓰임에 대한 차이라고 생각을 하기 때문에 감수를 해야할 것 같습니다. 예를 들어 L4 NLB에 L7 nginx-ingress-controller을 연결하여 redirect는 nginx가 담당하도록하는 방식을 많이 이용하는 것 같습니다. NLB에서는 L4 의 뭔가 SSL/TLS한 작업을 하기 위함이고, L7의 https 작업이 주가 되는 것은 아니므로&amp;hellip;? &lt;em>사실 이 부분은 잘 모르겠습니다&amp;hellip;💦💦 잘 아시는 분이 계시다면 알려주시면 감사하겠습니다. ㅜㅜㅜ&lt;/em>( NLB에서 HTTP, HTTPS redirect가 안되는 이유 참고 - &lt;a class="link" href="https://aws.amazon.com/premiumsupport/knowledge-center/redirect-http-https-elb/" target="_blank" rel="noopener"
+>https://aws.amazon.com/premiumsupport/knowledge-center/redirect-http-https-elb/&lt;/a> )&lt;/p>
+&lt;h3 id="-nlb를-통한-https-서버-구축-결과">⭕️ NLB를 통한 HTTPS 서버 구축 결과&lt;/h3>
+&lt;p>어쨌든 위의 annotation을 통해 올바르게 svc를 설정한다면&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">$&lt;/span> &lt;span class="nx">kubectl&lt;/span> &lt;span class="nx">get&lt;/span> &lt;span class="nx">svc&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">nginx&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">nlb&lt;/span> &lt;span class="nx">LoadBalancer&lt;/span> &lt;span class="mf">10.100.180.174&lt;/span> &lt;span class="nx">ae27784521c4f4bcd96b22f2cca2358b&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="nx">bffb166fafa47f2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">elb&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">ap&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">northeast&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">2.&lt;/span>&lt;span class="nx">amazonaws&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">com&lt;/span> &lt;span class="mi">443&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="mi">30014&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">TCP&lt;/span> &lt;span class="mi">37&lt;/span>&lt;span class="nx">m&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>Route53 설정은 추가로 해주어야함. - 예시
+&lt;a class="link" href="http://nlb.umidev.net" target="_blank" rel="noopener"
+>nlb.umidev.net&lt;/a> - ALIAS ae2778452xxxxxxxxxxxxxx.elb.ap-northeast-2.amazonaws.com&lt;/li>
+&lt;/ul>
+&lt;p>이렇게 service가 생성될 것이고, (service의 port로서 사용할 80,443 등은 service.spec에서 명시) 생성 후 &lt;code>A Record Alias&lt;/code>로서 NLB의 &lt;code>DNS&lt;/code> name을 넣어주면 사진과 같이 &lt;code>HTTPS&lt;/code> 접속이 가능합니다!&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/aws/aws_eks_elb/cert3.png"
+width="1660"
+height="605"
+srcset="https://umi0410.github.io/blog/aws/aws_eks_elb/cert3_hu4f6093134f3fc61777b52e640067d7a7_152079_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/aws/aws_eks_elb/cert3_hu4f6093134f3fc61777b52e640067d7a7_152079_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="cert3.png"
+class="gallery-image"
+data-flex-grow="274"
+data-flex-basis="658px"
+>&lt;/p>
+&lt;h2 id="-마치며">🐳 마치며&lt;/h2>
+&lt;p>어차피 한 번의 검색이면 정보를 얻을 수 있는 모든 annotation이나 기타 설정에 대한 내용을 다루기 보단 나름 제가 &lt;strong>실제로 쿠버네티스를 관리하는&lt;/strong> &lt;strong>데브옵스 인턴로서 일을 하면서 헷갈렸던 내용&lt;/strong>과 &lt;strong>EKS에서의 ELB 관리에 대한 흐름&lt;/strong>을 위주로 설명하려 노력했고, 저의 &lt;code>삽질&lt;/code>이 깃든 내용들입니다 ㅎㅎㅎ&lt;/p>
+&lt;p>아는 범위 + 좀 더 조사하여 열심히 정리해보았지만, 부족한 부분이 있을 수도 있고 틀린 부분이 있을 수도 있을텐데, 보완해주실 내용이 있다면 말씀해주시면 열심히 검토해보겠습니다~! 감사합니다.&lt;/p>
+&lt;h2 id="글쓴이">🧙‍♂️글쓴이&lt;/h2>
+&lt;ul>
+&lt;li>&lt;strong>박진수&lt;/strong> - 👨‍👩‍👧‍👧&lt;code>AUSG&lt;/code> (AWS University Student Group) 3기로 활동 중&lt;/li>
+&lt;li>&lt;strong>관심사&lt;/strong>
+&lt;ul>
+&lt;li>&lt;code>Docker&lt;/code>, &lt;code>Kubernetes&lt;/code> 등의 &lt;strong>컨테이너 기술&lt;/strong>&lt;/li>
+&lt;li>&lt;code>Argo&lt;/code>, &lt;code>Spinnaker&lt;/code>, &lt;code>Github action&lt;/code> 등의 &lt;strong>CI/CD 툴&lt;/strong>&lt;/li>
+&lt;li>&lt;code>Terraform&lt;/code>, &lt;code>AWS&lt;/code>를 통한 &lt;strong>클라우드 인프라 구축&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Blog&lt;/strong> - &lt;a class="link" href="https://senticoding.tistory.com" target="_blank" rel="noopener"
+>https://senticoding.tistory.com&lt;/a>&lt;/li>
+&lt;li>&lt;strong>Email&lt;/strong> - &lt;a class="link" href="mailto:bo314@naver.com" >bo314@naver.com&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="-참고-references">📚 참고 (References)&lt;/h2>
+&lt;ul>
+&lt;li>EKS의 Required subnet tags
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/load-balancing.html" target="_blank" rel="noopener"
+>https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/load-balancing.html&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/alb-ingress.html" target="_blank" rel="noopener"
+>https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/alb-ingress.html&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Kubernetes Cloud provider aws - &lt;a class="link" href="https://kubernetes.io/docs/concepts/cluster-administration/cloud-providers/#aws" target="_blank" rel="noopener"
+>https://kubernetes.io/docs/concepts/cluster-administration/cloud-providers/#aws&lt;/a>&lt;/li>
+&lt;li>ALB ingress controller install - &lt;a class="link" href="https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/controller/setup/" target="_blank" rel="noopener"
+>https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/controller/setup/&lt;/a>&lt;/li>
+&lt;li>ALB ingress Annotation &lt;a class="link" href="https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/" target="_blank" rel="noopener"
+>https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/&lt;/a>&lt;/li>
+&lt;li>NLB의 HTTPS redirect가 불가능한 이유 -&lt;a class="link" href="https://aws.amazon.com/premiumsupport/knowledge-center/redirect-http-https-elb/" target="_blank" rel="noopener"
+>https://aws.amazon.com/premiumsupport/knowledge-center/redirect-http-https-elb/&lt;/a>&lt;/li>
+&lt;li>NLB service Annotations - &lt;a class="link" href="https://kubernetes.io/ko/docs/concepts/services-networking/service/#aws-nlb-support" target="_blank" rel="noopener"
+>https://kubernetes.io/ko/docs/concepts/services-networking/service/#aws-nlb-support&lt;/a>&lt;/li>
+&lt;li>Ingress의 class에 대해 - &lt;a class="link" href="https://kubernetes.io/ko/docs/concepts/services-networking/ingress/#%EC%9D%B8%EA%B7%B8%EB%A0%88%EC%8A%A4-%ED%81%B4%EB%9E%98%EC%8A%A4" target="_blank" rel="noopener"
+>https://kubernetes.io/ko/docs/concepts/services-networking/ingress/#인그레스-클래스&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

@@ -1,7 +1,182 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on Jinsu Playground</title><link>https://umi0410.github.io/page/</link><description>Recent content in Pages on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://umi0410.github.io/page/index.xml" rel="self" type="application/rss+xml"/><item><title>About me</title><link>https://umi0410.github.io/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/about/</guid><description>😄 소개 이름: 박진수
-학력: 경희대학교 컴퓨터공학과
-자기소개
-Golang, Spring, 클라우드 인프라, MSA, 컨테이너와 자동화, 대규모 트래픽과 확장성을 고려한 설계 등에 관심이 많습니다.
-어떤 기술을 배우거나 적용시킬 때 &amp;ldquo;언제&amp;rdquo;, &amp;ldquo;왜&amp;rdquo; 그 기술이 필요한지에 대해 생각해보는 것을 좋아합니다. 그런 생각을 자유롭게 공유하는 자리를 사랑합니다 :)
-특히나 요즘은 대용량 트래픽, 대규모 프로젝트에 대비한 캐싱이나 데이터베이스 설계, CQRS에 관심이 많습니다.
-위와 같은 주제로 자유롭게 의견을 공유하는 것을 좋아하는 팀원들을 만나 좋은 케미를 내며 개발해나가는 게 꿈입니다.</description></item><item><title>Archives</title><link>https://umi0410.github.io/archives/</link><pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/archives/</guid><description/></item><item><title>Search</title><link>https://umi0410.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/search/</guid><description/></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on Jinsu Playground</title><link>https://umi0410.github.io/page/</link><description>Recent content in Pages on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://umi0410.github.io/page/index.xml" rel="self" type="application/rss+xml"/><item><title>About me</title><link>https://umi0410.github.io/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/about/</guid><description>&lt;h2 id="-소개">😄 소개&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>이름&lt;/strong>: 박진수&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>학력&lt;/strong>: 경희대학교 컴퓨터공학과&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>자기소개&lt;/strong>&lt;/p>
+&lt;p>&lt;strong>Golang&lt;/strong>, &lt;strong>Spring&lt;/strong>, &lt;strong>클라우드 인프라&lt;/strong>, &lt;strong>MSA&lt;/strong>, &lt;strong>컨테이너&lt;/strong>와 &lt;strong>자동화&lt;/strong>, 대규모 트래픽과 확장성을 고려한 &lt;strong>설계&lt;/strong> 등에 관심이 많습니다.&lt;/p>
+&lt;p>어떤 기술을 배우거나 적용시킬 때 &lt;strong>&amp;ldquo;언제&amp;rdquo;, &amp;ldquo;왜&amp;rdquo; 그 기술이 필요한지&lt;/strong>에 대해 생각해보는 것을 좋아합니다. 그런 &lt;strong>생각을 자유롭게 공유하는 자리를 사랑&lt;/strong>합니다 :)&lt;/p>
+&lt;p>특히나 요즘은 대용량 트래픽, 대규모 프로젝트에 대비한 &lt;strong>캐싱&lt;/strong>이나 &lt;strong>데이터베이스 설계&lt;/strong>, &lt;strong>CQRS&lt;/strong>에 관심이 많습니다.&lt;/p>
+&lt;p>위와 같은 주제로 &lt;strong>자유롭게 의견을 공유하는 것을 좋아하는 팀원들을 만나 좋은 케미를 내며 개발해나가는 게 꿈&lt;/strong>입니다.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="기술-스택-및-관심사">기술 스택 및 관심사&lt;/h2>
+&lt;ul>
+&lt;li>깔끔하고 튼튼한 백엔드 구조 및 설계
+&lt;ul>
+&lt;li>Java Spring Boot, JPA&lt;/li>
+&lt;li>Golang&lt;/li>
+&lt;li>MSA, DDD, CQRS, 메시지 큐, 이벤트 드리븐 아키텍쳐&lt;/li>
+&lt;li>TDD, Mocking&lt;/li>
+&lt;li>테스트 및 배포 자동화&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>컨테이너&lt;/li>
+&lt;li>클라우드 인프라
+&lt;ul>
+&lt;li>상황에 맞는 AWS 인프라 설계&lt;/li>
+&lt;li>CI/CD 파이프라인&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="-경력-사항">💼 경력 사항&lt;/h2>
+&lt;h3 id="당근마켓httpswwwdaangncom-플랫폼-팀-서버-엔지니어-인턴-202112202202">&lt;a class="link" href="https://www.daangn.com/" target="_blank" rel="noopener"
+>당근마켓&lt;/a> 플랫폼 팀 서버 엔지니어 인턴 [2021.12~2022.02]&lt;/h3>
+&lt;ul>
+&lt;li>문자 발송 플랫폼의 Golang 서버를 담당
+&lt;ul>
+&lt;li>특히 기존에 발생하던 에러를 올바르게 처리하는 업무를 진행&lt;/li>
+&lt;li>일반적으로 &lt;strong>하루 400건 정도 발생하던 문자 발송 에러를 95% 이상 해결 및 감소&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>문자 발송 업체의 장애 및 기타 장애들이 전파되지 않도록 애플리케이션 수준에서의 &lt;code>Circuit breaker&lt;/code> 패턴을 적용&lt;/li>
+&lt;li>하루 수 백건씩 발생하던 문자 발송 업체와의 &lt;code>keep-alive&lt;/code> 관련 이슈 해결
+&lt;ul>
+&lt;li>Wireshark로 TCP 패킷 분석 후 문자 업체 측 &lt;code>MaxIdleConnectionTimeout&lt;/code>을 밝혀냄&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>문자 발송이 성공적으로 수행되지 못한 케이스에 대한 재시도 로직 개선&lt;/li>
+&lt;/ul>
+&lt;h3 id="배틀팡httpsbattlepangcom-개발-리드-202103202112">&lt;a class="link" href="https://battlepang.com" target="_blank" rel="noopener"
+>배틀팡&lt;/a> 개발 리드 [2021.03~2021.12]&lt;/h3>
+&lt;p>&lt;img src="https://umi0410.github.io/media/battlepang.drawio.png"
+loading="lazy"
+alt="battlepang.drawio.png"
+>
+&lt;img src="https://umi0410.github.io/media/battlepang_preview.png"
+loading="lazy"
+alt="battlepang-preview.png"
+>&lt;/p>
+&lt;blockquote>
+&lt;p>짧은 영상을 바탕으로한 대결 서비스 &lt;a class="link" href="https://battlepang.com" target="_blank" rel="noopener"
+>배틀팡&lt;/a>에서 AWS 인프라 관리 및 Spring boot 위주로 전체 백엔드 개발 했습니다.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>TDD&lt;/code>를 바탕으로 &lt;code>Spring Boot&lt;/code> RESTful API 서버 개발&lt;/li>
+&lt;li>&lt;code>JPA&lt;/code>를 이용하며 복잡한 참조 관계로 인한 성능 저하를 다양한 방법으로 해결
+&lt;ul>
+&lt;li>조회 시 매번 특정 값을 계산하지 않고 배치 방식로 특정 값의 스냅샷을 저장&lt;/li>
+&lt;li>배치 방식의 In-Query 또는 페치 조인 이용&lt;/li>
+&lt;li>불필요한 Eager Loading 제거&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>AWS&lt;/code>를 이용한 클라우드 아키텍쳐 설계 및 관리
+&lt;ul>
+&lt;li>평소 쿠버네티스 환경에 익숙했지만 초기 스타트업의 상황에 맞춰 &lt;code>Elastic Beanstalk&lt;/code> 바탕의 아키텍쳐 설계.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Jenkins&lt;/code>와 &lt;code>Github Action&lt;/code>을 통해 테스트/빌드/배포를 자동화&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h3 id="megazone-cloud에서-devops-인턴blogmegazone-cloudindex-202004202008">&lt;a class="link" href="https://umi0410.github.io/blog/megazone-cloud/index/" >Megazone Cloud에서 DevOps 인턴&lt;/a> [2020.04~2020.08]&lt;/h3>
+&lt;p>&lt;img src="https://umi0410.github.io/media/megazone.drawio.png"
+loading="lazy"
+alt="megazone.drawio.png"
+>&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>terraform&lt;/code>을 이용해 AWS 개발 인프라를 IaC로 구축 및 관리
+&lt;ul>
+&lt;li>terraform을 통해 IaC를 처음 접하게 되었고, 선언적인 설정과 멱등성이 가져다주는 안정성, 중요성을 느끼게 됨.&lt;/li>
+&lt;li>단순히 짜여진 아키텍쳐를 구축하는 것뿐만 아니라 좀 더 최적화할 수 있는 방안들이나 설계하는 법도 배워갈 수 있었음.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Kubernetes&lt;/code>(AWS EKS) 위에서 &lt;code>마이크로서비스&lt;/code>들을 컨테이너로 관리&lt;/li>
+&lt;li>&lt;code>Spinnaker&lt;/code>, &lt;code>Github Action&lt;/code>, &lt;code>Jenkins&lt;/code>를 통한 CI/CD 파이프라인 자동화
+&lt;ul>
+&lt;li>다양한 기술을 접해보면서 새로운 기술을 배우는 것에 대한 자신감이 생겼다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>팀에서 개발 중인 서비스를 Helm chart로 패키징
+&lt;ul>
+&lt;li>SaaS 형태로만 이용 가능했던 서비스를 구축형으로 이용할 수 있도록 함&lt;/li>
+&lt;li>Helm chart가 꾸준히 개발되어 후에는 사내의 SaaS도 Helm으로 관리되고 있는 듯함.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="-사이드-프로젝트">💻 사이드 프로젝트&lt;/h2>
+&lt;h3 id="쿠뮤httpsgithubcomsearchqtopic3akhumuorg3akhu-devtyperepositories-프로젝트-리드-데브옵스-엔지니어-백엔드-개발-202010xxxxxx">&lt;a class="link" href="https://github.com/search?q=topic%3Akhumu&amp;#43;org%3Akhu-dev&amp;amp;type=Repositories" target="_blank" rel="noopener"
+>쿠뮤&lt;/a> 프로젝트 리드, 데브옵스 엔지니어, 백엔드 개발 [2020.10~xxxx.xx]&lt;/h3>
+&lt;p>&lt;img src="https://umi0410.github.io/media/khumu.png"
+loading="lazy"
+alt="khumu-argo.png"
+>&lt;/p>
+&lt;blockquote>
+&lt;p>경희대학교 커뮤니티 서비스 &lt;a class="link" href="https://github.com/search?q=topic%3Akhumu&amp;#43;org%3Akhu-dev&amp;amp;type=Repositories" target="_blank" rel="noopener"
+>쿠뮤&lt;/a> 개발 중&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>컨테이너 단위의 마이크로서비스 아키텍쳐 설계 및 구축
+&lt;ul>
+&lt;li>한 프로젝트에서 &lt;code>Golang&lt;/code>, Java &lt;code>Spring boot&lt;/code>, Python &lt;code>Django&lt;/code> 등의 언어와 프레임워크를 도입하면서 다양한 경험을 해볼 수 있었음&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>대학생 사이드 프로젝트에서 쿠버네티스를 사용하면서도 비용 최적화&lt;/li>
+&lt;li>&lt;code>ArgoCD&lt;/code>와 &lt;code>Github Action&lt;/code>을 이용한 CI/CD
+&lt;ul>
+&lt;li>데브옵스 인턴 때 경험했던 &lt;code>ArgoCD&lt;/code>와 &lt;code>Spinnaker&lt;/code> 중 ArgoCD ArgoCD를 사이드 프로젝트에 도입하기로 선택
+&lt;ul>
+&lt;li>ArgoCD가 좀 더 IaC로 관리하기 쉬웠고, 구축하기도 편했다. GitOps를 바탕으로 컨테이너를 배포하기 아주 편했음.&lt;/li>
+&lt;li>Spinnaker에는 CI와의 연동이나 추가적인 기능들도 많았지만 가볍게 Github Action으로 CI를 하고 있는 우리에겐 필요 없는 기능이 많았다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>부분적으로 &lt;code>TDD&lt;/code>를 도입
+&lt;ul>
+&lt;li>Golang으로 구현한 댓글 서비스, Spring Boot로 구현한 알림 서비스에서 TDD를 도입.&lt;/li>
+&lt;li>비교적 Django로 구현한 커뮤니티 메인 서비스는 단순 CRUD 위주였기 때문에 테스트 코드 없이 진행할만 했음.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h3 id="눈바디에서-백엔드-클라우드-인프라-담당-202108xxxxxx">눈바디에서 백엔드, 클라우드 인프라 담당 [2021.08~xxxx.xx]&lt;/h3>
+&lt;p>&lt;img src="https://umi0410.github.io/media/depromeet-backend.png"
+loading="lazy"
+alt="depromeet-backend.png"
+>
+&lt;img src="https://umi0410.github.io/media/depromeet_store.png"
+loading="lazy"
+alt="depromeet_store.png"
+>&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;a class="link" href="https://www.depromeet.com/" target="_blank" rel="noopener"
+>개발 동아리 디프만&lt;/a>에서 10기 백엔드 포지션으로 활동했습니다.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>Golang&lt;/code> 위주의 &lt;code>MSA&lt;/code>
+&lt;ul>
+&lt;li>인증, 인가, 요청 전달 등을 관리하는 API Gateway 서버&lt;/li>
+&lt;li>RESTful API 작업을 위한 API 서버&lt;/li>
+&lt;li>동영상 및 이미지를 처리하는 Python 서버&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ElasticBeanstalk과 Lambda 위주의 서버 설계&lt;/li>
+&lt;li>&lt;code>TDD&lt;/code>, 유닛테스트, Mocking을 적극적으로 사용&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="기타-활동들">기타 활동들&lt;/h2>
+&lt;ul>
+&lt;li>&lt;strong>&lt;a class="link" href="https://www.depromeet.com/" target="_blank" rel="noopener"
+>개발 동아리 디프만&lt;/a>에서 10기 백엔드로 활동&lt;/strong> [2021.08~2021.12]&lt;/li>
+&lt;li>2021 &lt;strong>오픈소스 컨트리뷰션 아카데미&lt;/strong> Golang Yorkie 프로젝트 멘티 [2021.08~2021.09]&lt;/li>
+&lt;li>&lt;strong>&lt;a class="link" href="https://umi0410.github.io/experiences/open-source/open-source-contributhon-2020" >오픈 소스 컨트리뷰톤: 오픈스택 팀 멘티&lt;/a>&lt;/strong> [2020.08~2020.09]&lt;/li>
+&lt;li>&lt;strong>한국 AWS Communitiy KRUG의 대학생 그룹 &lt;a class="link" href="https://ausg.me" target="_blank" rel="noopener"
+>AUSG&lt;/a>에서 3기로 활동 중&lt;/strong> [2019.06~]&lt;/li>
+&lt;li>&lt;strong>경희대학교 소프트웨어 페스티발 웹/앱 최우수상 수상&lt;/strong> [2019.11]&lt;/li>
+&lt;/ul></description></item><item><title>Archives</title><link>https://umi0410.github.io/archives/</link><pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/archives/</guid><description/></item><item><title>Search</title><link>https://umi0410.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://umi0410.github.io/search/</guid><description/></item></channel></rss>

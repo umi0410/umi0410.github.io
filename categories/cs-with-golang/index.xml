@@ -1,5 +1,949 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Golang으로 적용해보는 Computer Science on Jinsu Playground</title><link>https://umi0410.github.io/categories/cs-with-golang/</link><description>Recent content in Golang으로 적용해보는 Computer Science on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sat, 13 Feb 2021 14:10:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/categories/cs-with-golang/index.xml" rel="self" type="application/rss+xml"/><item><title>Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore</title><link>https://umi0410.github.io/blog/golang/go-mutex-semaphore/</link><pubDate>Wed, 20 Jan 2021 15:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-mutex-semaphore/</guid><description>Go 언어로 적용해보는 Computer Science의 첫 번째 내용으로 OS 관련 내용 중 이론적으로는 흔하게 접할 수 있지만 실제 적용에 대한 내용은 찾아보기 힘들었던 Mutex, Semaphore에 대해 알아보려한다.
-Mutex와 Semaphore은 각각의 추상적인 개념을 바탕으로 OS나 Go 등에서 사용될 수 있기에 세부적인 내용은 문맥에 따라 달라질 수 있다고 생각한다. 예를 들어 Go에서의 Mutex는 주로 sync.Mutex를 이용한 서로 다른 Goroutine의 동시 접근에 대한 제어를 의미하는 반면, 다른 프로그래밍 언어나 OS에서는 주로 서로 다른 Kernel thread나 Process에 대한 동시 접근 제어를 의미할 수 있다.</description></item><item><title>Go 언어로 적용해보는 Computer Science - Deadlock</title><link>https://umi0410.github.io/blog/golang/go-deadlock/</link><pubDate>Sun, 31 Jan 2021 18:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-deadlock/</guid><description>시작하며 개발 공부를 시작하고 여태까지 몇 년간 데드락을 실제로 접할 일은 없었다. 사실 동시성을 주의해야하는 작업을 해본 적도 없었고, 트랜잭션에 대한 개념도 없었기 때문일 수도 있다. 전공 과목에서 데드락에 대한 내용을 듣고서도 &amp;lsquo;아 이런 게 있구나&amp;rsquo; 정도로만 생각하고 넘겼었다. 하지만 Go 언어를 통해 개발을 하던 도중 Channel이나 Mutex로 인해 종종 데드락을 경험할 수 있었고, 이 경우 프로그램이 완전히 멈춰버리는 크리티컬한 문제가 발생하기도 했고, 디버깅하기 힘든 경우도 있었다. 그런 경험을 하면서 &amp;lsquo;데드락 이 녀석&amp;hellip; 만만치 않구나&amp;lsquo;라는 생각을 하곤 했다.</description></item><item><title>Go 언어로 적용해보는 Computer Science - Cache</title><link>https://umi0410.github.io/blog/golang/go-cpu-cache/</link><pubDate>Wed, 27 Jan 2021 15:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-cpu-cache/</guid><description>시작하며 저번 학기에 컴퓨터 구조를 수강하면서 간과하고 있던 로우 레벨의 지식에도 흥미가 생겼었다. 그 중 CPU와 Memory, Disk의 역할에 대해 알아볼 수 있었고 캐시는 CPU와 Memory 사이에 위치해 메모리 대신 빠르게 CPU에게 데이터를 제공하는 녀석이라고 배웠다.
-이전에는 주로 캐시라고 하면 주로 CDN과 같은 네트워크에서 쓰이는 캐시들밖에 몰랐다. 그렇다보니 L1 캐시, L2 캐시 같은 얘기를 들으면 OSI 7계층과 연관 지어 &amp;lsquo;음..? L2 캐시는 스위치에서 쓰는 캐시인가..?&amp;rsquo; 라는 상상을 하곤했다.
-이번에는 Go를 통해 배열에 여러 차례 접근하는 프로그램을 만들어보고 벤치마킹을 통해 캐시라는 녀석이 어떤 효과를 가져다주는지 직접 확인해보려한다.</description></item><item><title>Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket)</title><link>https://umi0410.github.io/blog/golang/go-socket/</link><pubDate>Sat, 13 Feb 2021 14:10:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-socket/</guid><description>시작하며 개발 공부를 처음 시작한 지 언제 안 됐을 무렵, 의경 복무를 하며 자바로 TCP Socket을 이용해 옆 컴퓨터와 채팅을 하는 프로그램을 만들어 보는 것을 시작으로 docker나 mysql과 같은 다양한 오픈소스들을 이용해보면서나 네트워크를 공부하면서 다양하게 들어왔던 소켓이지만 정확히 어떤 역할을 하는지 어떤 종류가 있는지 어떻게 동작하는지 알지 못했다.
-오늘은 그렇게 알쏭달쏭한 존재였던 소켓을 크게 Unix Domain Socket와 Network Socket 두 가지로 나눠 정리해보고 Unix Domain Socket과 TCP를 사용하는 Network Socket을 벤치마크해보고 어떤 차이가 있는지 확인해보도록 하겠다.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Golang으로 적용해보는 Computer Science on Jinsu Playground</title><link>https://umi0410.github.io/categories/cs-with-golang/</link><description>Recent content in Golang으로 적용해보는 Computer Science on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sat, 13 Feb 2021 14:10:54 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/categories/cs-with-golang/index.xml" rel="self" type="application/rss+xml"/><item><title>Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore</title><link>https://umi0410.github.io/blog/golang/go-mutex-semaphore/</link><pubDate>Wed, 20 Jan 2021 15:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-mutex-semaphore/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2.png" alt="Featured image of post Go 언어로 적용해보는 Computer Science - Mutex와 Semaphore" />&lt;p>Go 언어로 적용해보는 Computer Science의 첫 번째 내용으로 OS 관련 내용 중 이론적으로는 흔하게 접할 수 있지만 실제 적용에 대한 내용은
+찾아보기 힘들었던 &lt;code>Mutex&lt;/code>, &lt;code>Semaphore&lt;/code>에 대해 알아보려한다.&lt;/p>
+&lt;p>Mutex와 Semaphore은 각각의 추상적인 개념을 바탕으로 OS나 Go 등에서 사용될 수 있기에 세부적인 내용은 문맥에 따라 달라질 수 있다고 생각한다. 예를 들어 Go에서의 Mutex는 주로 &lt;code>sync.Mutex&lt;/code>를 이용한 서로 다른 Goroutine의 동시 접근에 대한 제어를 의미하는 반면, 다른 프로그래밍 언어나 OS에서는 주로 서로 다른 Kernel thread나 Process에 대한 동시 접근 제어를 의미할 수 있다.&lt;/p>
+&lt;h2 id="mutex">Mutex&lt;/h2>
+&lt;p>&lt;code>Mutex&lt;/code>는 &lt;strong>Mutual Exclusion&lt;/strong>의 줄임말로 &lt;strong>상호 배제&lt;/strong>를 의미한다. 즉 &lt;strong>서로 다른 워커가 공유 자원에 접근하는 것을 제한&lt;/strong>한다는 말이다. &lt;code>Go&lt;/code>에서는 이 &amp;ldquo;&lt;strong>워커&lt;/strong>&amp;ldquo;가 &lt;code>Goroutine&lt;/code>이 되고, 컨텍스트에 따라 프로세스가 될 수도, 스레드가 될 수도 그 외의 다른 존재가 될 수도 있다. &lt;code>공유 자원&lt;/code>이란 여러 워커가 동시에 접근하는 자원을 말하고 이 &lt;strong>공유 자원에 대한 동시 접근을 제한해 thread-safe하게 작업하고자 하는 영역&lt;/strong>을 &lt;code>Critical section&lt;/code>이라고 한다. Cricical section은 Mutex가 Lock을 수행한 뒤 Unlock되기 전까지의 영역이며, Lock과 Unlock은 Atomic한 작업이기때문에 어떠한 경우에도 동시적으로 수행될 수 없다.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1.png"
+width="817"
+height="547"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1_hu76213fc7fff91be05fb9c7f7e7037656_79471_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-1_hu76213fc7fff91be05fb9c7f7e7037656_79471_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="mutex-1.png"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="358px"
+>&lt;/p>
+&lt;p>이해하기 쉽게 예시를 통해 접근해보겠다. 원래 화장실 예제를 보고 굉장히 와닿았는데, 화장실보다는 피팅룸이 좀 더 청결한 것 같아서 피팅룸으로 예를 들어보겠다. 우리 귀여운 고퍼가 &lt;strong>피팅룸을 한 개만 운영하는 옷가게에 방문&lt;/strong>했다고 가정해보자.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2.png"
+width="831"
+height="331"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2_hu253887d6f424b5a6c4c14b3309becda5_68035_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/mutex-2_hu253887d6f424b5a6c4c14b3309becda5_68035_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="mutex-2.png"
+class="gallery-image"
+data-flex-grow="251"
+data-flex-basis="602px"
+>&lt;/p>
+&lt;ul>
+&lt;li>피팅룸 - Critical section&lt;/li>
+&lt;li>고퍼가 피팅룸에 들어가서 옷을 입는 작업은 하나의 Goroutine&lt;/li>
+&lt;/ul>
+&lt;p>동시에 여러 고퍼가 하나의 피팅룸에서 옷을 갈아입으려한다면 😟 난처한 상황이 발생할 것이다. 그렇기때문에 피팅룸에는 Lock, Unlock 기능이 존재해야하는데, 이 기능을 구현한다해도 &lt;strong>Atomic&lt;/strong>하게 동작할 수 있도록 제대로 구현하지 않는다면 &lt;strong>한 워커가 Lock을 하는 사이에 다른 워커가 동시에 Lock&lt;/strong>을 걸려할 수 있고, 그 경우 두 워커가 동시에 한 피팅룸(Critical Section)에서 작업을 하려할 것이다. 그렇기때문에 &lt;strong>Lock, Unlock은 Atomic해야하며 이렇게 각 워커를 상호 배제시켜 동시에 작업할 수 없도록 하는 것&lt;/strong>이 바로 &lt;code>Mutex&lt;/code>이다.&lt;/p>
+&lt;h3 id="mutex를-이용한-go-program---counter">Mutex를 이용한 Go program - Counter&lt;/h3>
+&lt;p>&lt;strong>Count = 0에서 시작해 동시적으로 +1을 10만 번, -1을 10만 번 수행하는 카운터 프로그램&lt;/strong>&lt;/p>
+&lt;p>그럼 실생활에 비유한 Mutex는 이 정도로 마치고, Mutex가 어떻게 사용되는지 Go로 짠 간단한 Counter 프로그램을 통해 알아보자.&lt;/p>
+&lt;ul>
+&lt;li>Mutex를 잘 적용한 경우 - 몇 번을 수행하든 결과는 0.&lt;/li>
+&lt;li>Mutex가 적용되지 않은 safe하지 않은 경우 - 결과가 0이 나오지 않을 수 있다.&lt;/li>
+&lt;/ul>
+&lt;p>특히 &lt;code>Go&lt;/code>에서는 &lt;code>sync&lt;/code> 패키지의 &lt;code>Mutex&lt;/code>라는 type을 통해 간단하게 Mutex 기능을 이용할 수 있다. &lt;strong>동일한 Mutex struct를 참조한다면 같은 Key를 이용한다는 개념&lt;/strong>이고, &lt;code>mutex.Lock()&lt;/code>을 호출한 뒤 &lt;code>mutex.Unlock()&lt;/code>이 호출되기 이전까지가 Critical section이 되며 다른 goroutine들은 같은 Mutex(즉 키)에 의한 Critical section에 진입할 수 없다.&lt;/p>
+&lt;p>&lt;em>내가 처음 Mutex를 처음 접했을 때 한 가지 헷갈렸던 것&lt;/em>은 당시 Critical section이라는 개념이 없었기 때문에 Lock을 호출하기만 하면 런타임에 &lt;del>알아서 스마트하게 Lock과 Unlock사이의 변수들에 대한 접근 중 동시적인 접근만을 잠시 블락해주는 줄&lt;/del> 알았는데, 사실 그 사이 변수들중 동시적으로 접근하려는 변수에 대해서만 잠시 블락해주는 게 아니라 &lt;strong>Lock과 Unlock 사이를 Critical section으로 만드는 것&lt;/strong>이었다.&lt;/p>
+&lt;p>자 그럼 Count라는 하나의 int형 변수에 동시적으로 접근을 하는 상황을 극대화하기 위해 여러 고루틴으로 작업해보겠다. +1을 1만 번하는 고루틴을 10개, -1을 1만 번하는 고루틴을 마찬가지로 10개 이용하겠다.&lt;/p>
+&lt;p>전체 코드 참고: &lt;a class="link" href="https://play.golang.org/p/xaLE1YkAdvd" target="_blank" rel="noopener"
+>https://play.golang.org/p/xaLE1YkAdvd&lt;/a>&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1.png"
+width="516"
+height="443"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1_hu6e22a3f3f203a0242d8843396eefee7b_63957_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-1_hu6e22a3f3f203a0242d8843396eefee7b_63957_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="output-1.png"
+class="gallery-image"
+data-flex-grow="116"
+data-flex-basis="279px"
+>&lt;/p>
+&lt;ul>
+&lt;li>우리가 일반적으로 익숙한 Sync 즉 동기적인 순차적 진행 시에는 당연히 10만번 +1, 10만번 -1 후에 결과가 0이었다.&lt;/li>
+&lt;li>동시적 접근을 수행하자 10만번 +1, 10만번 -1을 했지만 &lt;code>Count += 1&lt;/code> 을 수행하던 중 또 다른 &lt;code>Count += 1&lt;/code>이 수행되는 등의 원치않던 상황이 야기될 수 있기에 결과값이 0인 경우를 찾기 힘들다.&lt;/li>
+&lt;li>여러 Goroutine이 concurrent하게 진행하되 &lt;code>Count += 1&lt;/code>, &lt;code>Count -= 1&lt;/code> 과 같은 &lt;strong>동시적 접근이 수행되어서는 안되는 영역은 Critical Area&lt;/strong>로 설정해 상호 배제적으로 작업되게 하기 위해 Critical section의 전/후에 &lt;code>sync.Mutex&lt;/code>를 이용해 Lock, Unlock 기능을 넣어주자 &lt;strong>기대했던 대로 0의 결과&lt;/strong>를 얻을 수 있었다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="-mutex-그래서-언제-써요">💡 Mutex.. 그래서 언제 써요?&lt;/h3>
+&lt;p>사실 Mutex라는 개념이 그렇게 어려운 것도 아니고, 사용법 자체가 어려운 것도 아니다. 나는 하지만 항상 &lt;strong>&amp;ldquo;언제&amp;rdquo;&lt;/strong>, &lt;strong>&amp;ldquo;왜&amp;rdquo;&lt;/strong> 써야하는지를 궁금해하는 편이다.&lt;/p>
+&lt;ol>
+&lt;li>Critical section에서 많은 시간이 소요되는 경우? ⇒ ❌
+위의 counter와 같은 작업은 대부분의 작업이 critical section 속에 있다고 볼 수 있다. 이 경우 동시적인 작업과 함께 Lock, Unlock을 하며 critical section을 관리하는 것보다 애초에 작업 자체를 동기적으로 수행하는 게 나을 수 있다. 왜냐하면 동시적 작업 속에서 Mutex를 통해 동기적으로 작업할 수 있도록 하는 것에서 오는 오버헤드는 분명히 존재하고, Critical section 밖에서 효율적으로 동시적으로 작업을 진행했다하더라도 critical section에서 병목이 발생해버려 전체적인 Throughput이 안 좋아질 것이다.&lt;/li>
+&lt;li>&lt;strong>Critical section에서는 적은 시간이 소요되고, 대부분은 동시적으로 작업이 가능한 경우&lt;/strong>? ⇒ ⭕
+예를 들어 어떤 API를 여러 번 호출한 뒤 그 응답 중 일부를 계속해서 더해 결과를 내는 Reduce 작업을 수행한다고 치자. 순차적으로 수행할 시 오랜 시간이 소요될 API 호출은 동시적으로 진행하고, 결과에 대한 Reduce 작업만 잠시 Critical section내에서 작업한다면 아주 좋은 성능과 함께 안전하게 작업할 수 있을 것이다!&lt;/li>
+&lt;/ol>
+&lt;h2 id="semaphore">Semaphore&lt;/h2>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore.png"
+width="884"
+height="619"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore_hu1456e527b7729559b12f99ce1b9bda34_227201_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/semaphore_hu1456e527b7729559b12f99ce1b9bda34_227201_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="semaphore.png"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="342px"
+>&lt;/p>
+&lt;p>Mutex에서 대부분의 Lock이나 Critical section에 대한 내용을 설명했기 때문에 Semaphore에서 더 설명할 내용이 많지는 않다. Semaphore의 동작에 대한 간단한 예시는 위의 그림과 같은데, 5마리의 고퍼가 존재한다해도 동시에 접근할 수 있게하는 고퍼를 3개로 제한한다면 2마리의 고퍼는 피팅룸에 들어가지 못하고 블락된다. Locked와 Unlocked 상태 뿐인 &lt;code>Mutex&lt;/code>와 달리 &lt;code>Semaphore&lt;/code>는 &lt;strong>임의의 개수를 세는 Counter처럼 동작해 임의의 개수의 워커만이 Critical section에 동시적으로 접근&lt;/strong>할 수 있도록 한다.&lt;/p>
+&lt;p>Counter를 예로 들자면 10개의 워커가 존재한다해도 &amp;ldquo;5&amp;quot;를 세는 Semaphore는 한 워커가 Critical section에 진입할 때마다 Counter 값을 1씩 낮추고, Critical section을 탈출할 때마다 Counter 값을 다시 1씩 높인다. 만약 어떤 워커가 Critical section에 진입하려는데 Count 값이 0이라면 초기에 계획했던 대로 5개의 워커가 이미 동시적으로 작업중이라는 의미이므로 이 워커는 한 워커가 Critical section을 나오면서 Counter 값을 다시 1 증가시킬 때까지 Block된다.&lt;/p>
+&lt;p>Mutex의 Lock과 Unlock이 Atomic하기에 어떠한 경우에도 동시적으로 수행될 수 없었듯이 Semaphore의 Counting 작업 또한 Atomic해야하고 그래야만 Thread-safe한 counter로 동작할 수 있다. Semaphore가 수행하는 Counting 작업은 주로 try를 뜻하는 네덜란드어 Proberen의 앞 글자를 딴 &lt;code>P&lt;/code>와 increment를 뜻하는 Verhogen의 앞 글자를 딴 &lt;code>V&lt;/code>로 두 가지가 표현하는 듯하다. &lt;code>P&lt;/code>는 Count 값이 0이 아니면 작업을 수행하겠다는 의미하며 만약 Count 값이 0이라면 0이 아닌 값이 될 때까지 wait했다가 0 아닌 값이 되면 count 값을 1 감소시키며 작업을 시작한다. &lt;code>V&lt;/code>는 작업을 마치며 count 값을 다시 1 증가시키겠다는 의미이다.&lt;/p>
+&lt;h3 id="mutex와-binary-semaphore의-유사한-점">Mutex와 Binary semaphore의 유사한 점&lt;/h3>
+&lt;p>동시 접근 워커를 1개로 제한하는 Semaphore의 경우 Count 값이 0과 1 두 개로만 존재할 수 있는데 이를 Binary semaphore라고한다. 특히 이는 Locked와 Unlocked라는 두 가지의 상태만을 갖는 Mutex와 유사하다. 하지만 Binary semaphore는 mutex가 유사한 기능을 할 뿐 동일하지는 않다는 의견이 많다. 그 이유는 &lt;strong>Mutex는 Lock 방식을 이용하고 Semaphore는 Signal(신호) 방식을 이용&lt;/strong>하기 때문이다. Lock 방식의 경우 Lock을 수행한 워커만이 Unlock을 할 수 있는 반면 Signal 방식은 try(작업 시도)를 수행한 워커가 아니더라도 increment(작업 완료) 신호를 보낼 수 있기에 서로 명백히 동작 방식이 다르다는 것이다. (하지만 이 부분에 대해서는 직접 실습해보지는 못했다.)&lt;/p>
+&lt;p>*Semaphore를 이해하는 데에 있어 내가 착각해서 헤맸던 부분은 바로 &lt;del>Semaphore의 요점이 thread-safe한 count라고 착각&lt;/del>*했던 것이다. 하지만 semaphore의 요점은 여러 워커에 대해서 thread safe한 count 기능을 제공하는 것이 아니라 임의의 숫자만큼의 동시적 접근을 허용하고, 그 이상은 Block 상태로 대기시킨다는 것이다.&lt;/p>
+&lt;h3 id="semaphore를-이용한-go-program-1---counter">Semaphore를 이용한 Go Program 1 - Counter&lt;/h3>
+&lt;p>go에서 Semaphore를 이용하는 방법은 크게 2가지가 있는 것 같다. 아래 두 가지 방법 중 좀 더 Go스러운 &lt;code>channel&lt;/code>을 이용해보겠다.&lt;/p>
+&lt;ol>
+&lt;li>Go 특유의 자료형인 &lt;code>channel&lt;/code>을 이용하기 - channel은 여러 goroutine의 concurrent한 작업간 데이터 전송은 물론이고 동시적인 작업 중 데이터를 편리하게 동기화해주는 녀석이다. 따라서 동기적인 count와 유사한 기능을 내재하고있다.&lt;/li>
+&lt;li>&lt;a class="link" href="http://golang.org/x/sync/semaphore" target="_blank" rel="noopener"
+>golang.org/x/sync/semaphore&lt;/a>의 Weighted를 이용하기 - Semaphore의 P를 Acquire, V를 Release로 구현해 이용할 수 있게 했다.&lt;/li>
+&lt;/ol>
+&lt;p>전체 코드는 Mutex와 동일하며 마찬가지로 다음 링크로 참고해볼 수 있다: &lt;a class="link" href="https://play.golang.org/p/xaLE1YkAdvd" target="_blank" rel="noopener"
+>https://play.golang.org/p/xaLE1YkAdvd&lt;/a>&lt;/p>
+&lt;h3 id="buffered-channel을-이용한-semaphore-in-go">Buffered channel을 이용한 Semaphore in Go&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">DoSemaphore&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">maxConcurrent&lt;/span> &lt;span class="kt">int64&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Count&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">wg&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">sync&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">WaitGroup&lt;/span>&lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">sem&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">chan&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{},&lt;/span> &lt;span class="nx">maxConcurrent&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">go&lt;/span> &lt;span class="nf">Add1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">go&lt;/span> &lt;span class="nf">Sub1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Wait&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Concurrent goroutines + Semaphore&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">maxConcurrent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Result(Desired 0):&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Count&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;=====================================&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">Sub1Sem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">wg&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">sync&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">WaitGroup&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">sem&lt;/span> &lt;span class="kd">chan&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{}){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">defer&lt;/span> &lt;span class="nx">wg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Done&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="mi">10000&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">sem&lt;/span> &lt;span class="o">&amp;lt;-&lt;/span> &lt;span class="kd">struct&lt;/span>&lt;span class="p">{}{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Count&lt;/span> &lt;span class="o">-=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;-&lt;/span>&lt;span class="nx">sem&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>channel을 이용한 Semaphore 코드를 설명하기 위해 전체 코드 중 일부를 가져와보았다. Semaphore를 이용하기 위해 &lt;code>Unbuffered channel&lt;/code>이 아닌 &lt;code>Buffered channel&lt;/code>을 이용하는 이유는 다음과 같은 Unbuffered channel의 동작 방식이 Semaphore의 동작 방식과 동일하기 때문이다.&lt;/p>
+&lt;ul>
+&lt;li>Buffer의 크기만큼은 동시적으로 channel에 값을 넣으려는 시도가 허용됨.&lt;/li>
+&lt;li>buffered channel이 꽉 찬 경우 채널에서 값을 꺼내지 않는 이상은 추가적으로 Channel에 값을 넣으려시도하는 goroutine은 Block됨.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2.png"
+width="534"
+height="313"
+srcset="https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2_hu5c9eb1f96e3e02a52a6b354b1459125f_26935_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-mutex-semaphore/output-2_hu5c9eb1f96e3e02a52a6b354b1459125f_26935_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="output-2.png"
+class="gallery-image"
+data-flex-grow="170"
+data-flex-basis="409px"
+>&lt;/p>
+&lt;p>(앞서 코드를 링크한 go playground에서 코드를 바로 실행해볼 수 있다.)&lt;/p>
+&lt;p>동시 접근 워커를 1개로 제한하는 Semaphore는 &lt;strong>Binary Semaphore로서 Mutex를 이용했을 때와 유사하다고 말했듯이 thread-safe하게 count 작업이 이루어져 예상되는 값이었던 0이 출력됨&lt;/strong>을 확인할 수 있다. 하지만 동시접근이 가능한 워커가 1개 이상이 되면 thread-safe하지 않게 되고, 동시접근 워커 개수가 많아질수록 결과가 더 부정확한 경향이 있는 것으로 나타났다.&lt;/p>
+&lt;h3 id="-semaphore-그래서-언제-쓰나요">💡 Semaphore.. 그래서 언제 쓰나요?&lt;/h3>
+&lt;blockquote>
+&lt;p>Mutex는 thread-safe한 작업을 할 때 사용하면 되는 것 같은데 Semaphore는 개념은 알겠는데 언제 써야할 지를 잘 모르겠네요. 일정 개수만큼만 동시 접근을 허용하려는 경우가 있을까요?&lt;/p>
+&lt;/blockquote>
+&lt;p>Semaphore을 사용하기 좋은 케이스는 &lt;strong>동시에 접근할 수 있는 워커 수를 제한하는 경우&lt;/strong>이고, 이는 주로 &lt;strong>전체 작업이 늘어지는 것을 방지하고자 하는 경우&lt;/strong>에 이용된다. 많은 작업을 동시에 수행하려하면 먼저 수행될 수 있는 작업은 먼저 수행되도록 하기보다는 전체적으로 모든 작업이 늘어지게 되고 CPU나 Memory 리소스를 많이 소모하게 되고 이는 서버의 안정성에도 좋지 않다. Semaphore를 이용해 동시 접근 워커 수를 제한하고자하는 케이스는 Go의 Worker pool 패턴을 이용하는 경우나 Pipeline pattern을 이용하는 경우와 유사하다.(&lt;em>처음엔 Go의 모든 Concurrent pattern들을 개별적으로 구별지으려했었는데, 공부하다보니 일정한 개수의 Worker를 이용하는 Worker Pool pattern, Channel을 기반으로 작업 내역을 쪼개어 실시간 처리하는 Pipeline, 한 채널, 여러 Goroutine을 이용하는 Fan-in Fan-out pattern 등등 다들 유사하고 연관이 되어있더라.&lt;/em>)&lt;/p>
+&lt;p>&lt;strong>Semaphore로 동시 접근 Worker 수를 제한하지 않고 모든 Goroutine을 동시적으로 수행하는 경우엔 어떻게 될까?&lt;/strong>&lt;/p>
+&lt;p>Logical Processor 개수를 훨씬 넘는 모든 Goroutine 동시적으로 작업을 진행할 경우 아무리 Goroutine이 concurrent한 작업 수행에 뛰어난 성능을 보인다할지라도 과하게 많은 수의 Goroutine은 성능 저하를 야기하지 않을까 예상했다. 하지만 user-level thread 혹은 green level thread의 일종인 Goroutine은 OS(혹은 Kernel) thread와 달리 Context switch로 인한 penalty가 거의 없어서인지 거의 Throughput 면에서의 성능 차이가 없었다.&lt;/p>
+&lt;blockquote>
+&lt;p>Kernel level thread는 OS가 스케쥴링을 담당하기 때문에 Go 프로그램이 뭐 어떻게 할 수 있는 게 아니지만 Goroutine은 프로그램이 실행되는 동안 Go 런타임이 스케쥴링을 담당한다. 같은 Kernel level thread에 속한 User level thread인 goroutine간의 switch는 cost가 거의 없다. 즉 goroutine이 많든 적든 Kernel level thread간의 context switch cost는 동일하다고 볼 수 있고, 해당 Kernel level thread에 속한 goroutine간의 context switch cost는 거의 없다.&lt;/p>
+&lt;/blockquote>
+&lt;blockquote>
+&lt;p>참고: Kernel level thread에 대한 스케쥴링은 주로 Preemptive 방식을, User level thread에 대한 스케쥴링은 주로 Cooperative한 방식을 이용하지만 Goroutine은 User level thread임에도 Go 1.14 버전부터는 10ns를 기준으로 goroutine을 switch 할 수 있는 asynchronously preemptive한 스케쥴 방식을 지원한다고 한다. 하지만 Go 1.14가 릴리즈된 지 얼마되지 않아서인지, asynchorously preemptive scheduling에 대해서는 명확히 설명된 문서를 찾기 힘들었다.
+User level thread의 예로는 RxJava in Java, Coroutine in Kotlin, Goroutine in Golang이 있다.&lt;/p>
+&lt;/blockquote>
+&lt;p>하지만 Throughput 적인 측면보다는 Machine의 Resource 소모 측면에서는 모든 Goroutine이 동시적으로 수행되는 구조보다는 &lt;strong>Semaphore을 바탕으로한 동시에 일정 개수의 워커만이 작업하는 Worker Pool 구조가 훨씬 Memory나 CPU 리소스를 적게 소모&lt;/strong>하는 듯 했다. 또한 100개의 동시 요청을 수행하는데 동일한 Throughput으로 약 10초가 걸린다고 치면, 요청당 goroutine을 생성하는 경우는 첫 번째 요청도 거의 10초가 걸린 반면 Semaphore을 이용한 경우는 먼저 온 요청은 대체로 빠르게 먼저 처리되는 경향을 보였다. 이 차이는 &lt;strong>처음 요청을 보낸 사용자 마저 10초를 기다리게 할 것이냐, 0.1초만에 응답을 받도록 할 것이냐의 차이&lt;/strong>이다. 또한 &lt;strong>전체 작업이 늘어지면 그 작업에 대한 메모리 점유가 지속&lt;/strong>되기에 메모리 측면에서도 비효율적이다.&lt;/p>
+&lt;h3 id="semaphore을-이용한-go-program-2---이미지-크기-변환기">Semaphore을 이용한 Go Program 2 - 이미지 크기 변환기&lt;/h3>
+&lt;p>마침 이번에 프로젝트에서 thumbnail 생성, image 크기 변환, hashed uri 생성 작업 등을 담당하는 &lt;code>image processing 서버&lt;/code>를 개발하려했는데, image를 불러오는 I/O 작업 이후의 image processing은 CPU Bound 한 작업이기 때문에 동시적으로 동작하는 Goroutine이 일정 숫자(대게 Logical Processor 개수) 이상으로는 많아져봤자 크게 효율이 없을 것이라 예상했고, 그와 관련해 간단하게 이미지 크기 변환 프로그램을 하나 만들어 테스트 해보았다.&lt;/p>
+&lt;p>약 2MB의 이미지에 대한 크기 변환 작업 요청이 동시에 30개 들어왔다는 가정을 했고, semaphore을 이용한 경우 동시적으로 최대 4개의 worker(goroutine)이 작업을 수행할 수 있게, concurrent를 이용한 경우는 30개의 요청 모두 동시적으로 작업을 하는 경우이다.&lt;/p>
+&lt;p>(코드 참고(인터넷 액세스를 하는 경우 Playground에서 동작하지는 않는듯하다): &lt;a class="link" href="https://play.golang.org/p/Vfyw6uCOIuL" target="_blank" rel="noopener"
+>https://play.golang.org/p/Vfyw6uCOIuL&lt;/a>)&lt;/p>
+&lt;blockquote>
+&lt;p>사실 Logical Processor 8개, RAM 16GB의 개인 노트북으로는 그 차이가 많이 나지는 않아서 AWS EC2 t2.micro instance에서 성능을 테스트해봤다.&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">ubuntu&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="nx">ip&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">172&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">31&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="err">~$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">sem&lt;/span> &lt;span class="nx">semaphore&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">변환하고자하는&lt;/span> &lt;span class="nx">Image들을&lt;/span> &lt;span class="nx">메모리에&lt;/span> &lt;span class="nx">Load했습니다&lt;/span>&lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">13&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.974380959&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">...&lt;/span> &lt;span class="nx">생략&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.159552779&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1.016627316&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">2021&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mo">01&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">18&lt;/span> &lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">26&lt;/span> &lt;span class="nx">Total&lt;/span> &lt;span class="nx">elapsed&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">14.959516003&lt;/span>&lt;span class="nx">s&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">ubuntu&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="nx">ip&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">172&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">31&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="err">~$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">sem&lt;/span> &lt;span class="nx">concurrent&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">변환하고자하는&lt;/span> &lt;span class="nx">Image들을&lt;/span> &lt;span class="nx">메모리에&lt;/span> &lt;span class="nx">Load했습니다&lt;/span>&lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">Killed&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>놀랍게도 동시적으로 30개의 요청을 보내는 경우에 30개의 모든 goroutine이 동시에 작업을 시도할 때에는 과도한 리소스 사용으로 인해 아예 OS가 프로세스를 Kill해버렸다. 즉 &lt;strong>Semaphore로 동시 접근 Worker 수를 제한하지 않는 경우 t2.micro 인스턴스로 돌리는 image 서버에 동시에 30개의 image resizing 요청이 들어오면 process가 죽어버린다&lt;/strong>는 말이다&amp;hellip;!&lt;/p>
+&lt;p>또한 앞서 말했듯이 동시에 요청하는 사용자가 많아지더라도 Semaphore을 이용한 경우는 나중에 들어온 요청일 수록 처리가 늘어지지만, Semaphore를 통해 동시 작업을 제한하지 않는 경우는 전체 작업이 늘어진다.&lt;/p>
+&lt;p>이렇게 Semaphore는 동시 접근 워커 수를 제한하여 전체적인 Throughput 측면보다는 리소스 소모적인 측면과 먼저 처리될 수 있는 작업은 먼저 처리되도록 할 수 있다는 면에서 장점이 있음을 확인할 수 있었다.&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>Mutex나 Semaphore의 개념이나 설명과 같은 이론적인 내용은 구글링을 통해 어렵지 않게 얻을 수 있는 흔한 지식인 반면, 정확히 언제 쓰면 좋을지, 언제 쓰일 수 있을지와 같은 실용적인 내용은 찾아보기 어려웠기때문에 Go를 통해 Mutex와 Semaphore을 이용해보는 간단한 프로그램을 만들어 실습해보았다.&lt;/p>
+&lt;p>예제 프로그램으로서 코드를 간결하고 읽기 쉽게 깔끔하게 제공해보고자했는데, 그러기 쉽지 않았던 것 같아 아쉽다. 다음엔 기회가 되면 go의 benchmark test를 이용해보면 어떨까싶다.&lt;/p>
+&lt;h2 id="참고">참고&lt;/h2>
+&lt;p>&lt;strong>Goroutine과 Goroutine scheduling에 대해&lt;/strong> - &lt;a class="link" href="https://thegopher.tistory.com/3" target="_blank" rel="noopener"
+>https://thegopher.tistory.com/3&lt;/a>&lt;/p>
+&lt;p>화장실에 비유한 뮤텍스와 세마포어 - &lt;a class="link" href="https://worthpreading.tistory.com/90" target="_blank" rel="noopener"
+>https://worthpreading.tistory.com/90&lt;/a>&lt;/p>
+&lt;p>semaphore in Go &lt;a class="link" href="https://medium.com/@deckarep/gos-extended-concurrency-semaphores-part-1-5eeabfa351ce" target="_blank" rel="noopener"
+>https://medium.com/@deckarep/gos-extended-concurrency-semaphores-part-1-5eeabfa351ce&lt;/a>&lt;/p>
+&lt;p>cooperative vs preemptive - &lt;a class="link" href="https://medium.com/traveloka-engineering/cooperative-vs-preemptive-a-quest-to-maximize-concurrency-power-3b10c5a920fe" target="_blank" rel="noopener"
+>https://medium.com/traveloka-engineering/cooperative-vs-preemptive-a-quest-to-maximize-concurrency-power-3b10c5a920fe&lt;/a>&lt;/p>
+&lt;p>preemptive scheduling in go - &lt;a class="link" href="https://blog.puppyloper.com/menus/Golang/articles/Goroutine%EA%B3%BC%20Go%20scheduler" target="_blank" rel="noopener"
+>https://blog.puppyloper.com/menus/Golang/articles/Goroutine과 Go scheduler&lt;/a>&lt;/p></description></item><item><title>Go 언어로 적용해보는 Computer Science - Deadlock</title><link>https://umi0410.github.io/blog/golang/go-deadlock/</link><pubDate>Sun, 31 Jan 2021 18:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-deadlock/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/pprof-debugging-1.png" alt="Featured image of post Go 언어로 적용해보는 Computer Science - Deadlock" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>개발 공부를 시작하고 여태까지 몇 년간 데드락을 실제로 접할 일은 없었다. 사실 동시성을 주의해야하는 작업을 해본 적도 없었고, 트랜잭션에 대한 개념도 없었기 때문일 수도 있다. 전공 과목에서 데드락에 대한 내용을 듣고서도 &amp;lsquo;&lt;em>아 이런 게 있구나&lt;/em>&amp;rsquo; 정도로만 생각하고 넘겼었다. 하지만 Go 언어를 통해 개발을 하던 도중 &lt;code>Channel&lt;/code>이나 &lt;code>Mutex&lt;/code>로 인해 종종 데드락을 경험할 수 있었고, 이 경우 프로그램이 완전히 멈춰버리는 크리티컬한 문제가 발생하기도 했고, 디버깅하기 힘든 경우도 있었다. 그런 경험을 하면서 &amp;lsquo;&lt;em>데드락 이 녀석&amp;hellip; 만만치 않구나&lt;/em>&amp;lsquo;라는 생각을 하곤 했다.&lt;/p>
+&lt;p>이번 글에서는 &lt;strong>&lt;code>Golang&lt;/code> 즉 &lt;code>Go&lt;/code> 언어를 통해 어떤 경우에 &lt;code>Deadlock&lt;/code>이 발생할 수 있는지 실제 프로그램을 통해 알아보려한다.&lt;/strong> Mutex에 대한 &lt;code>Lock&lt;/code>과 같이 일반적으로 발생할 수 있는 데드락부터 &lt;code>channel&lt;/code>이나 &lt;code>goroutine&lt;/code>에 대한 &lt;code>Cooperative scheduling&lt;/code>과 같은 Go 언어에 특화된 내용까지를 정리해보았다.&lt;/p>
+&lt;h2 id="deadlock이란">Deadlock이란&lt;/h2>
+&lt;blockquote>
+&lt;p>Deadlock이란 교착상태를 의미하며 두 개 이상의 작업이 서로 상대방의 작업이 끝나기만을 기다리고 있기 때문에 결과적으로 아무것도 완료되지 못하는 상태를 가리킨다. - 위키백과 -&lt;/p>
+&lt;/blockquote>
+&lt;p>데드락의 개념 자체는 그리 어렵지 않고, 예시를 통해서 쉽게 이해가 가능하다. 위키 백과에 나온 예시를 인용하자면 하나의 사다리에 위에서 내려오려는 사람, 아래에서 올라가는 사람이 동시에 올라가있으면 아무도 내려오거나 올라가지 못하는 경우를 예로 들 수 있다.&lt;/p>
+&lt;h3 id="교착-상태의-조건">교착 상태의 조건&lt;/h3>
+&lt;p>더 자세히 정의나 의미에 대해 설명할 것은 없을 듯하고, 학문적으로는 주로 아래의 4가지 조건을 통해 발생한다고 설명하는 것 같다.&lt;/p>
+&lt;ol>
+&lt;li>상호 배제 (Mutual exclusion) - 하나의 자원을 동시에 사용하지 못하도록 하는 것&lt;/li>
+&lt;li>점유 상태로 대기 (Hold and wait) - 하나의 자원을 소유한 상태로 다른 자원을 기다리고 있는 상태&lt;/li>
+&lt;li>선점 불가 (No preemption) - 컴퓨터 분야에서의 선점은 한국말의 선점과 다소 다른 의미. process 혹은 goroutine의 자원을 빼앗는 것을 선점이라고 함. 선점 불가란 그럴 수 없는 상태.&lt;/li>
+&lt;li>순환성 대기 (Circular wait) - 각 프로세스가 순환적으로 다음 프로세스가 요구하는 자원을 가지고있다. 쉽게 2개의 프로세스를 예로 들면 A는 B가 소유 중인 자원을, B는 A가 소유 중인 자원을 얻으려고 대기 중인 상황을 말함.&lt;/li>
+&lt;/ol>
+&lt;p>Deadlock의 개념 자체가 어렵다거나 위의 4가지 조건을 암기하는 것이 중요한 것은 아니라고 생각한다. 중요한 것은 실제로 어떤 경우에 데드락이 발생할 수 있을 지 파악하고 주의하는 것과 그 경우 어떻게 해결할 수 있을지 인지하는 것이라고 생각한다. 그럼 Go 언어로 간단한 프로그램을 짜보며 알아보자.&lt;/p>
+&lt;h2 id="go에서-발생할-수-있는-deadlock">Go에서 발생할 수 있는 Deadlock&lt;/h2>
+&lt;h3 id="channel">Channel&lt;/h3>
+&lt;p>주로 채널을 접한 지 얼마 안 되어 그 동작 방식을 잘 이해하지 못한 채 사용할 경우 채널로 인한 데드락이 발생한다.&lt;/p>
+&lt;h4 id="unbuffered-channel">Unbuffered channel&lt;/h4>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-1.png"
+width="658"
+height="523"
+srcset="https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-1_hu10a616b58d6a106d3f4b8196ebfc4c11_56914_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-1_hu10a616b58d6a106d3f4b8196ebfc4c11_56914_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="unbuffered-channel-1.png"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="301px"
+>&lt;/p>
+&lt;p>특히나 unbuffered channel에 대한 미숙한 사용은 자주 데드락을 야기한다. &lt;code>unbuffered channel&lt;/code>에서 발생하는 일반적인 데드락의 의미인 2개 이상의 작업 서로의 작업이 완료되기를 대기하는 교착 상태와는 약간 다르다고 볼 수도 있다. 왜냐하면 &lt;code>sender&lt;/code>와 &lt;code>receiver&lt;/code> 중 누군가가 먼저 작업을 끝내야지 그 다음으로 누군가가 작업을 수행할 수 있는 것이 아니라 &lt;strong>서로 동시에 협력해야만 unbuffered channel에 대한 대기를 끝낼 수 있는데 이 경우는 동시에 협력해줄 그 누군가(receiver)가 없는 경우&lt;/strong>이기 때문이다.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-2.png"
+width="524"
+height="280"
+srcset="https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-2_huc23feddb7907332ddbd012773a8469b8_20930_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-2_huc23feddb7907332ddbd012773a8469b8_20930_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="unbuffered-channel-2.png"
+class="gallery-image"
+data-flex-grow="187"
+data-flex-basis="449px"
+>&lt;/p>
+&lt;p>그렇다고해서 위와 같이 자기 혼자 send와 receive를 하려해봤자 Unbuffered channel은 sender와 receiver가 모두 ready여야 작업을 진행할 수 있기 때문에 불가능하다. (&lt;em>Unbuffered channel의 동작에 대해 좀 더 궁금하신 분들은 제가 번역에 참여한 &lt;a class="link" href="https://go-tour-ko.appspot.com/concurrency/2" target="_blank" rel="noopener"
+>A Tour of Go&lt;/a>를 참고해주시면 감사하겠습니다!&lt;/em>)&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-3.png"
+width="667"
+height="474"
+srcset="https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-3_hu79ddac0bd959ff7fccac87fc3364f23d_48295_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-deadlock/unbuffered-channel-3_hu79ddac0bd959ff7fccac87fc3364f23d_48295_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="unbuffered-channel-3.png"
+class="gallery-image"
+data-flex-grow="140"
+data-flex-basis="337px"
+>&lt;/p>
+&lt;p>따라서 &lt;strong>다른 goroutine에서 A에 대한 receiver 역할을 해주면 된다.&lt;/strong>&lt;/p>
+&lt;h3 id="buffered-channel">Buffered channel&lt;/h3>
+&lt;blockquote>
+&lt;p>Buffered channel을 이용하면 어떨지 좀 더 자세히 들어가보자. 독자분께서 Go의 channel에 대해 별 관심이 없다면 패스~!&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/buffered-channel-1.png"
+width="668"
+height="474"
+srcset="https://umi0410.github.io/blog/golang/go-deadlock/buffered-channel-1_hu3ce95aebbfcae3388bc01c477c5405bf_44856_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-deadlock/buffered-channel-1_hu3ce95aebbfcae3388bc01c477c5405bf_44856_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="buffered-channel-1.png"
+class="gallery-image"
+data-flex-grow="140"
+data-flex-basis="338px"
+>&lt;/p>
+&lt;p>맨 처음에 Unbuffered channel에서는 위와 같이 한 goroutine에서 sender와 receiver 역할 모두를 수행하려해도 이미 sender에서 block이 걸려버려 deadlock을 야기한다고 했으나 buffered channel에서는 그렇지 않다! &lt;strong>buffered channel은 buffer size까지는 입력 작업이 블락되지 않기 때문&lt;/strong>이다.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/buffered-channel-2.png"
+width="672"
+height="609"
+srcset="https://umi0410.github.io/blog/golang/go-deadlock/buffered-channel-2_hu5d060740dcd194dde0764aece5d1bf11_61778_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-deadlock/buffered-channel-2_hu5d060740dcd194dde0764aece5d1bf11_61778_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="buffered-channel-2.png"
+class="gallery-image"
+data-flex-grow="110"
+data-flex-basis="264px"
+>&lt;/p>
+&lt;p>하지만 &lt;strong>buffer size를 넘어서는 순간부터는 receiver가 channel 내의 아이템을 꺼내어 줄 때까지 block되어버리므로 주의&lt;/strong>해야한다.&lt;/p>
+&lt;h3 id="mutexlock의-중첩">Mutex.Lock의 중첩&lt;/h3>
+&lt;p>&lt;code>Mutex&lt;/code>의 구현에 따라 다르겠지만 Go에서는 Lock이 걸린 자물쇠에 다시 자기가 Lock을 걸려해도 Unlock이 될 때까지는 Lock을 걸 수 없다. 즉 어떤 Mutex에 Lock을 건 것이 자신(Goroutine)이라 해도 해당 Mutex에 또 다시 Lock을 걸려하면 그 작업은 Mutex가 Unlock 될 때까지 블락되고 결과적으로는 Deadlock 상태가 되어버린다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;fmt&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;sync&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">scores&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">[]&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">30&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Mutex&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">sync&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Mutex&lt;/span>&lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Lock을 건 뒤 안전하게 topScore를 구함.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">GetTopScore&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">playerIndex&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">topScore&lt;/span> &lt;span class="kt">int&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Mutex&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Lock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">topScore&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">idx&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">score&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">scores&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">topScore&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">score&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">playerIndex&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">idx&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">topScore&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">score&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Mutex&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Unlock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// GetTopScore는 이미 Lock을 이용해 thread safe하게 작업하는데
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 그걸 인지하지 못하고 실수로 그 밖인 Award에서 Lock을 걸어버림.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">Award&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Mutex&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Lock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">playerIdx&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">topScore&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">GetTopScore&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Mutex&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Unlock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;%d가 %d의 점수로 우승했습니다!&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">playerIdx&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">topScore&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">Award&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// deadlock 발생
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>위의 예시에는 thread-safe하게 top score를 구하는 &lt;code>GetTopScore&lt;/code> 함수가 선언되어있다. 하지만 &lt;code>Award&lt;/code> 함수에서 이미 &lt;code>GetTopScore&lt;/code>는 scores에 대해 &lt;code>thread-safe&lt;/code>함에도 불구하고 Lock을 걸고 &lt;code>GetTopScore&lt;/code>를 수행하려하기 때문에 데드락이 발생한다. 이 경우에는 &lt;strong>inner인 GetTopScore 혹은 outer인 Award 둘 중 한 곳에서만 Lock, Unlock 작업을 수행&lt;/strong>하도록 해주어야한다.&lt;/p>
+&lt;p>inner에서 Lock/Unlock을 담당하는 게 옳을 지 outer에서 Lock/Unlock을 담당하는 게 옳을 지는 잘 모르겠다. inner에서 Lock/Unlock을 담당하면 outer에서는 데드락으로 인해 절대 Lock/Unlock을 못한다는 단점이 있지만, 해당 작업은 언제나 Atomic하게 thread-safe하다는 것이 보장된다는 장점이 있다. 반면 outer에서 Lock/Unlock을 담당하도록하면 비교적 자유자재로 Lock/Unlock을 명령할 수 있는 반면 thread-safe해야할 내부 작업이 unsafe해질 수도 있다. 실수로 Lock/Unlock 작업을 잊어버릴 수 있기 때문이다. 하지만 무엇보다도 &lt;strong>inner에서 Lock/Unlock을 담당할 지 outer에서 담당할 지를 정확히 정할 수 없는 이유는 outer도 결국엔 또 다른 outer의 inner가 될 수 있기 때문&lt;/strong>이라고 생각한다.&lt;/p>
+&lt;h3 id="cooperative-scheduling-방식에서의-무한-loop">Cooperative scheduling 방식에서의 무한 Loop&lt;/h3>
+&lt;p>Goroutine scheduler가 &lt;strong>Goroutine을 스케쥴링 하는 방식은 Go 1.14 이전까지는 Cooperative 방식이었으나, Go 1.14 부터는 Preemptive한 방식으로 바뀌었다&lt;/strong>고 한다. OS가 Go process의 thread를 스케쥴 하는 방식은 OS 마다 다르겠지만 대체로 preemptive할 것이고 여기서 얘기하려는 스케쥴러는 Goroutine을 스케쥴링하는 Goroutine scheduler임을 주의하자.&lt;/p>
+&lt;p>Goroutine은 syscall와 mutex, channel, 함수 콜 등으로 인해 switch 될 수 있는데, &lt;strong>cooperative 방식을 이용하는 경우에는 이러한 goroutine switch 조건에 해당하지 않는 경우 임의로 goroutine switch 함수를 호출하지 않는 한은 같은 스레드 내의 다른 goroutine은 절대로 실행될 수 없다&lt;/strong>. preemption(선점) 즉 다른 goroutine을 block 상태로 만들어버리고 자신이 CPU를 선점하는 것이 불가능했기 때문이다. 하지만 Go 1.14부터는 약 10ms를 기준으로 preemption을 수행하고 있다. Asynchronous preemption이라고 부르는 것 같은데, 정확히 왜 asynchronous인지, 기존의 preemptive schedule과는 무엇이 다른지는 찾아봤으나 제대로 설명되어있는 곳을 찾지 못했다.&lt;/p>
+&lt;p>앞으로 이어지는 내용은 &lt;em>데드락에 대한 예시라기 보다는 &amp;lsquo;cooperative 스케쥴링과 preemptive 스케쥴링의 차이로 인해 데드락이 발생할 수도 있고 발생하지 않을 수도 있구나&amp;rsquo;에 대해 알아보는 예시&lt;/em>이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;fmt&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">Foo&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;No Deadlock. 나도 실행될 수 있어!&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">go&lt;/span> &lt;span class="nf">Foo&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">dummy&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="c1">// 그냥 for 문 안에서 dummy 작업을 수행하기 위한 변수
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">dummy&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>for 문 안에서는 함수콜도 syscall도 channel/mutex도 아닌 goroutine swtich와 관련 없는 &lt;code>dummy += 1&lt;/code> 작업만을 수행하고 있다. 이 경우 &lt;code>go Foo()&lt;/code>를 통해 goroutine을 생성하긴 하지만 그 goroutine은 바로 실행되는 것이 아니라 대기 상태이며 만약 스레드가 하나라면 cooperative 스케쥴링으로는 Foo라는 goroutine이 실행될 수가 없을 것이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Go 버전 &amp;gt;= 1.14 일 때에도 Deadlock 발생&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ &lt;span class="nv">GOMAXPROCS&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span> &lt;span class="nv">GODEBUG&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">asyncpreemptoff&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span> go run main.go
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>&lt;code>GOMAXPROCS=1&lt;/code> - Go 프로그램이 사용할 최대 OS Thread 개수를 1개로 제한함으로써 여러 스레드에서 Goroutine이 실행되는 것을 방지. (데드락을 야기해보려는 조건)&lt;/li>
+&lt;li>&lt;code>GODEBUG=asyncpreemptoff=1&lt;/code> - Go 1.14부터 적용된 Asynchronous preemptive scheduling을 사용하지 않는 옵션&lt;/li>
+&lt;/ul>
+&lt;p>이 경우 Go 버전이 1.14 이상이라면 Foo는 실행되지 않는다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Go 버전 &amp;gt;= 1.14인 경우 async preemption으로 인해 Deadlock 발생 X&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ &lt;span class="nv">GOMAXPROCS&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span> go run main.go
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">No Deadlock. 나도 실행될 수 있어!
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>하지만 asyncpreemptoff 옵션을 생략하면 기본적으로 선점형 스케쥴링이 지원되므로 이 경우엔 Deadlock이 발생하지 않고 Foo() 함수가 실행되는 것을 &amp;ldquo;No Deadlock. 나도 실행될 수 있어!&amp;rdquo; 라는 Stdout을 통해 볼 수 있다.&lt;/p>
+&lt;h4 id="pprof를-이용한-goroutine-schedule-시각화">pprof를 이용한 goroutine schedule 시각화&lt;/h4>
+&lt;p>하지만 정말로 async preemption이 동작했기 때문에 데드락에 빠지지 않은 것인지 다른 이유 때문인지는 그닥 직관적으로 와닿지 않는다. 그래서 몇몇 외국 블로그의 글에서 봤던 &lt;code>pprof&lt;/code>라는 도구를 사용해봤고, 처음엔 사용법이 다소 어려웠지만 조금 익숙해지니 너무나도 편리했다.
+&lt;code>pprof&lt;/code>는 &lt;code>net/http&lt;/code> 패키지 하위에 존재하고, Goroutine scheduling, syscall log, CPU 사용 등을 시각화해서 보여주는 간편한 디버깅 도구이다.
+요청을 날리면 요청 이후 N초 간의 goroutine scheduling에 대한 정보를 기록해 보여주는 기능을 이용해보았다.&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-deadlock/pprof-debugging-1.png"
+width="547"
+height="502"
+srcset="https://umi0410.github.io/blog/golang/go-deadlock/pprof-debugging-1_hu27a13bf8dcdafb0aaff224765e3a83ab_59369_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-deadlock/pprof-debugging-1_hu27a13bf8dcdafb0aaff224765e3a83ab_59369_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="pprof-debugging-1.png"
+class="gallery-image"
+data-flex-grow="108"
+data-flex-basis="261px"
+>&lt;/p>
+&lt;p>End Stack Trace를 통해 어떤 작업으로 인해 goroutine이 잠시 중단되고 CPU를 다른 goroutine에게 양보하게 되는지 알 수 있다. 놀랍게도 dummy에 대한 무한 루프 진행 도중 처음으로 &lt;strong>async preemption이 발생한 뒤 이어서 Foo 함수를 실행하는 goroutine이 CPU를 점유&lt;/strong>하게 된다는 것을 시각적으로 볼 수 있다.&lt;/p>
+&lt;p>Wall Duration은 해당 고루틴 블럭을 수행한 시간으로 보여지고 약 10ms를 기준으로 preemptive하게 switch가 일어날 수 있다는 여러 블로그의 글들과 유사하게 15,021,904ns, 즉 약 15ms만에 asyncPreempt라는 이벤트로 인해 goroutine switch가 일어났다.
+cooperative 스케쥴링만을 이용하는 경우에는 데드락으로 인해 한 번도 Foo를 실행하는 goroutine이 수행되지 못한다는 것도 시각화해서 제공해보고싶었지만, 당연하게도 그 데드락으로 인해 일정 기간동안 runtime을 관찰한 뒤 그 정보를 저장하는 goroutine 조차 실행할 수 없어 그 정보를 얻을 수 없었다!&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-dockerfile" data-lang="dockerfile">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Go의 버전을 1.13으로 제한해본다.&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="s"> golang:1.13&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">WORKDIR&lt;/span>&lt;span class="s"> /app&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">COPY&lt;/span> . .&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">ENTRYPOINT&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;go&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">CMD&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;run&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;main.go&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ docker build . -t tmp &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> docker run -it --rm -e &lt;span class="nv">GOMAXPROCS&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span> tmp
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>그렇다면 정말 Go의 1.14 이전 버전은 Preemptive한 방식이 아니라 Cooperative한 방식을 이용하고, 이 경우 데드락이 발생할까? 이전 글들과 마찬가지로 Docker를 이용해 간편하게 Go의 버전을 변경해서 실행해보자. golang:1.13 이미지를 이용해보았다.&lt;/p>
+&lt;p>1.13 버전 이하로는 &lt;code>GODEBUG=asyncpreemptoff=1&lt;/code> 옵션을 설정하지 않아도 cooperative한 스케쥴링만을 지원하므로 프로그램이 데드락 상태에 빠져 Foo()가 실행되지 못함을 알 수 있다.&lt;/p>
+&lt;h4 id="참고-사항-gomaxprocs1-옵션을-주는-이유는">참고 사항) GOMAXPROCS=1 옵션을 주는 이유는?&lt;/h4>
+&lt;blockquote>
+&lt;p>The GOMAXPROCS variable limits the number of operating system threads that can execute user-level Go code simultaneously. - go rutime package 문서 -&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;code>GOMAXPROCS&lt;/code>는 &lt;strong>Go 프로그램이 사용할 수 있는 최대의 OS 스레드 개수&lt;/strong>를 의미한다. 만약 OS 스레드가 2개 이상으로 생성된다면 위의 경우 main goroutine과 함수 Foo를 실행하는 Goroutine이 서로 다른 스레드에 배치될 것이고, 그 경우 &lt;strong>Go의 스케쥴러가 Cooperative한 방식을 이용한다해도 OS 스케쥴러가 Preemptive하게 각각의 Go 스레드(OS Level)를 스케쥴&lt;/strong>하기 때문에 Foo goroutine도 실행될 수 있는 기회가 주어진다. 이 경우에는 데드락이 발생하지 않는다. 따라서 &lt;strong>우리는 데드락을 발생시켜보고자 GOMAXPROCS를 1로 제한&lt;/strong>한다.&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>Go를 이용해 실제 프로그램을 짜보며 어떤 경우에 Deadlock이 발생할 수 있는지 알아보았다. 이 글에선 서로 같은 Mutex를 이용하는 경우를 예시로 들었지만 서로 다른 두 Mutex를 통해 서로의 작업을 기다리는 경우의 Deadlock도 거의 유사하며 일반적으로 말하는 Deadlock에 가장 가까운 경우이긴할 것이다. 그래도 Go로 개발을 하면서 아직 서로 다른 Mutex를 이용했던 경우가 딱히 없었기에 같은 Mutex에 중첩으로 Lock을 걸었던 경우를 예시로 들어보았다.&lt;/p>
+&lt;p>&lt;code>Channel&lt;/code>이나 &lt;code>Cooperative scheduling&lt;/code>의 경우는 어느 정도 Go에 한정적인 내용이고 특히나 스케쥴링은 런타임이나 고루틴 스케쥴 방식까지 내려가는 세부적인 내용이긴하지만 Go에 특히 관심 있으신 분들께는 나름 재미있는 내용이 되지 않았을까싶다.&lt;/p>
+&lt;p>그리고 이전 글에선 &lt;code>testing&lt;/code>의 &lt;code>benchmark&lt;/code>를 이용해 좀 더 정확하고 편리한 벤치마킹을 도입해봤다는 점과
+이번엔 추가적으로 &lt;code>pprof&lt;/code>를 이용해 &lt;code>goroutine 스케쥴링&lt;/code>을 시각화해봤다는 점에서 Golang으로 적용해보는 컴퓨터 사이언스라는 이 시리즈를 처음 시작했을 때에 비해 컴퓨터 사이언스 뿐만 아니라 디버깅 기술이나 스케쥴링 방식 등등 다양한 주제에 대해서도 공부해보고 적용해볼 수 있었던 것 같아 뿌듯하다.
+다소 Go만의 지엽적인 내용으로 여겨질 수도 있겠지만 추후에 내가 어떤 언어를 공부하든 어떤 기술을 공부하든 이러한 경험들을 얼마든지 녹여낼 수 있을 것이라 생각한다!!&lt;/p>
+&lt;h2 id="참고">참고&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>Go: How are Deadlocks Triggered? &lt;a class="link" href="https://medium.com/a-journey-with-go/go-how-are-deadlocks-triggered-2305504ac019" target="_blank" rel="noopener"
+>https://medium.com/a-journey-with-go/go-how-are-deadlocks-triggered-2305504ac019&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Go: What Does a Goroutine Switch Actually Involve? &lt;a class="link" href="https://medium.com/a-journey-with-go/go-what-does-a-goroutine-switch-actually-involve-394c202dddb7" target="_blank" rel="noopener"
+>https://medium.com/a-journey-with-go/go-what-does-a-goroutine-switch-actually-involve-394c202dddb7&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Goroutine and Preemption &lt;a class="link" href="https://medium.com/a-journey-with-go/go-goroutine-and-preemption-d6bc2aa2f4b7" target="_blank" rel="noopener"
+>https://medium.com/a-journey-with-go/go-goroutine-and-preemption-d6bc2aa2f4b7&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Go: Asynchronous Preemption &lt;a class="link" href="https://medium.com/a-journey-with-go/go-asynchronous-preemption-b5194227371c" target="_blank" rel="noopener"
+>https://medium.com/a-journey-with-go/go-asynchronous-preemption-b5194227371c&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>데드락 정의&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://namu.wiki/w/%EB%8D%B0%EB%93%9C%EB%9D%BD?from=Deadlock" target="_blank" rel="noopener"
+>https://namu.wiki/w/%EB%8D%B0%EB%93%9C%EB%9D%BD?from=Deadlock&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ko.wikipedia.org/wiki/%EA%B5%90%EC%B0%A9_%EC%83%81%ED%83%9C" target="_blank" rel="noopener"
+>https://ko.wikipedia.org/wiki/%EA%B5%90%EC%B0%A9_%EC%83%81%ED%83%9C&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Go runtime documentation &lt;a class="link" href="https://golang.org/pkg/runtime/" target="_blank" rel="noopener"
+>https://golang.org/pkg/runtime/&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ul></description></item><item><title>Go 언어로 적용해보는 Computer Science - Cache</title><link>https://umi0410.github.io/blog/golang/go-cpu-cache/</link><pubDate>Wed, 27 Jan 2021 15:25:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-cpu-cache/</guid><description>&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>저번 학기에 &lt;code>컴퓨터 구조&lt;/code>를 수강하면서 간과하고 있던 로우 레벨의 지식에도 흥미가 생겼었다. 그 중 CPU와 Memory, Disk의 역할에 대해 알아볼 수 있었고 &lt;strong>캐시는 CPU와 Memory 사이에 위치해 메모리 대신 빠르게 CPU에게 데이터를 제공하는 녀석&lt;/strong>이라고 배웠다.&lt;/p>
+&lt;p>이전에는 주로 캐시라고 하면 주로 CDN과 같은 네트워크에서 쓰이는 캐시들밖에 몰랐다. 그렇다보니 L1 캐시, L2 캐시 같은 얘기를 들으면 OSI 7계층과 연관 지어 &amp;lsquo;음..? L2 캐시는 스위치에서 쓰는 캐시인가..?&amp;rsquo; 라는 상상을 하곤했다.&lt;/p>
+&lt;p>이번에는 Go를 통해 배열에 여러 차례 접근하는 프로그램을 만들어보고 벤치마킹을 통해 캐시라는 녀석이 어떤 효과를 가져다주는지 직접 확인해보려한다.&lt;/p>
+&lt;h2 id="캐시란">캐시란&lt;/h2>
+&lt;p>캐시는 아주 다양한 문맥에서 사용된다. 공통적으로 &amp;ldquo;사용자가 요청할 것 같은 데이터를 작고 빠른 저장소에 저장해놓음으로써 좀 더 빨리 해당 데이터를 제공한다&amp;quot;는 목적을 갖는다. CDN, DB, REST API, Memory, CPU 등등 다양한 곳에서 쓰일 수 있을 것 같다. 그 중 이번에는 &lt;strong>CPU와 메모리 사이의 캐시&lt;/strong>에 대해 알아보겠다.&lt;/p>
+&lt;p>CPU와 메모리 사이의 캐시는 &lt;strong>메모리의 데이터를 얻기 위해 메모리에 직접 접근하지 않고 캐시라는 빠른 저장소를 이용해 해당 데이터를 얻게끔&lt;/strong>해준다. 예를 들어 변수 a=10 이라는 데이터가 메모리에 존재한다해도 a의 값을 얻기 위해 메모리에 직접 접근하기 보다는 가까우면서 빠르게 이용 가능한 캐시에서 데이터를 가져올 수도 있다는 것이다. 사실 캐시의 개념적인 측면에서 보면 메모리 또한 디스크 대신 빠르게 값을 전달해주기 위한 경우일 수 있으니 캐시 기능을 한다고 볼 수 있다. 그리고 CPU와 메모리 사이에 정말 캐시라는 이름을 갖는 녀석들은 프로세서 속에 있는 L1 캐시, 프로세서 옆에 있는 L2 캐시, 프로세서들이 공유하는 L3 캐시가 있긴 하지만 이는 시대가 지나면서 얼마든지 변할 수 있는 내용들이기 때문에 어떤 캐시가 어디에 있고 누구랑 누가 공유하는지와 같은 세부 내용은 크게 중요하진 않을 것 같다.&lt;/p>
+&lt;p>물리적인 크기나 거리는 속도와 반비례할 수 밖에 없다. 거리가 멀면 정보가 전달되는 속도가 느려지고 크기가 크면 여러 Mux나 Gate를 이용한다는 것이기 때문에 느려진다. 그렇기때문에 캐시는 작고 가까워야한다. 데이터를 요청하는 녀석은 CPU이기 때문에 캐시는 CPU 속 혹은 그 근처에 위치한다. 또한 작아야하기때문에 모든 정보를 담을 수 없고, 사용자가 요청할법한 데이터만을 담아야한다. 이 때 어떻게 사용자가 요청할 법한 데이터를 정할까? 이는 &lt;code>공간 지역성&lt;/code>과 &lt;code>시간 지역성&lt;/code>이라는 중요한 두 가지 성질을 기반으로 한다.&lt;/p>
+&lt;p>이외에도 태그나 충돌 같은 개념들이 있긴하지만 실제로 벤치마킹해보기도 쉽지 않고 다소 지엽적인 내용이라 간단히만 정리해보면 태그 없이 주소값을 모듈러(나머지)연산해서 cache line index를 결정하고 그것만을 이용해 데이터를 저장하면 한 line 내에 저장할 워드(Word)에 대한 충돌이 발생할 수 있다. cache line이 20개인 캐시는 0번지와 20번지가 같은 line이므로 충돌이 발생해 계속해서 같은 line에 서로의 데이터가 번갈아 저장될 수 있다는 것이다. 하지만 태그를 이용하면 cache line 수는 줄어들더라도 한 line내에 여러 태그의 정보를 저장할 수 있게되어 cache line이 10개인 cache의 한 line에 0번지와 20번지의 데이터가 다른 태그로 저장되어 불필요한 충돌을 방지할 수 있다는 장점이있다. 간단히 설명하기는 힘든 내용이라 좀 더 자세히 알고싶다면 &lt;code>Direct mapped cache&lt;/code>나 &lt;code>Fully associative cache&lt;/code> 등으로 검색해보기를 권장한다.&lt;/p>
+&lt;h2 id="spatial-locality">Spatial locality&lt;/h2>
+&lt;p>&lt;code>Spatial locality(공간 지역성)&lt;/code>이란 지금 &lt;strong>요청 받은 데이터와&lt;/strong> &lt;strong>가까운 곳에 위치한 데이터는 높은 확률로 다시 요청 받게 된다&lt;/strong>는 성질이다. 예를 들어 100번지의 a=10과 108번지의 b=20이 존재할 때 변수 a를 요청하면 이후 a와 가까운 주소에 저장된 b 또한 높은 확률로 요청된다는 것이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;fmt&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">a&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mi">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mi">20&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">c&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mi">30&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;a: %p\nb: %p\nc: %p\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">b&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">c&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">Output:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">a: 0xc000100010
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">b: 0xc000100018
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">c: 0xc000100020
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">*/&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>a, b, c의 크기는 8바이트로 주소값 또한 8바이트가 차이난다. (16진법이기에 20과 18의 차이는 8이다.) 즉 대체로 &lt;strong>비슷한 시기에 할당된 변수는 근접한 메모리 주소&lt;/strong>를 갖게 된다. 우리는 비슷한 시기에 할당한 변수 혹은 연속된 배열 요소에 자주 빠른 시일 내에 접근을 하지 맨 위에서 선언한 변수와 저 멀리 맨 밑에서 선언한 변수를 마구잡이로 왔다 갔다 하면서 작업을 하지 않는 편이기 때문에 공간 지역성을 근거로한 캐시가 효력을 갖게 된다. 만약 공간적으로 먼 맨 위의 변수와 맨 아래의 변수를 자주 번갈아가며 접근한다면 그것은 시간지역성을 띄는 경우이다.&lt;/p>
+&lt;h2 id="temporal-locality">Temporal locality&lt;/h2>
+&lt;p>&lt;code>Temporal locality(시간 지역성)&lt;/code>이란 &lt;strong>최근에 요청했던 데이터는 높은 확률로 다시 요청 받게 된다&lt;/strong>는 성질이다. 예를 들어 100번지의 a=10과 9999번지의 b=20은 서로 주소적인 거리는 멀지만 둘 다 최근에 호출됐다면 캐시에 적재하겠다는 것이다. 캐시는 주로 직사각형 형태로 생겼으며 &lt;strong>가로(행)는 연속된 주소의 데이터를 저장하는 공간 지역성, 세로(열)는 최근에 호출된 데이터를 저장하는 시간 지역성&lt;/strong>을 담당한다.&lt;/p>
+&lt;h2 id="두-지역성-비교">두 지역성 비교&lt;/h2>
+&lt;p>12칸의 캐시가 있다고 가정하자. 가로로 4칸 세로로 3칸 존재한다면 공간/시간 지역성의 균형이 잡힌 캐시라고 볼 수 있다.(경우에 따라 다르겠지만)&lt;/p>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-cpu-cache/balanced-cache.png"
+width="620"
+height="107"
+srcset="https://umi0410.github.io/blog/golang/go-cpu-cache/balanced-cache_hu49d8d624edd0378535d64f9a5c47e767_8216_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-cpu-cache/balanced-cache_hu49d8d624edd0378535d64f9a5c47e767_8216_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="balanced-cache.png"
+class="gallery-image"
+data-flex-grow="579"
+data-flex-basis="1390px"
+>&lt;/p>
+&lt;p>시간 지역성은 최근 불린 데이터는 다시 불릴 확률이 높다는 것이고 이는 연속된 공간이 아닌 다양한 공간(주소)의 데이터를 캐시에 저장한다는 말이기도 하다. 0번지 부근, 16번지 부근, 24번지 부근의 다양한 공간의 데이터를 저장할 수 있으면서 그 녀석들간의 주변 데이터도 제공하는 공간지역성도 만족한다.&lt;/p>
+&lt;p>두 가지 지역성에 의해 다양한 캐시들이 데이터를 적재하고 제공한다. 요점은 캐시는 빠르게 동작해야하고 그러기 위해선 크기가 작고 가까워야하며 크기가 작기 때문에 모든 데이터를 담을 수 없으니 알짜 데이터만을 담아야하는데 그 알짜는 지역성을 기반으로 선별된다는 것이다. 크기가 한정적이기 때문에 한 지역성을 키우면 한 지역성은 작아질 수밖에 없다.&lt;/p>
+&lt;h3 id="공간-지역성에-치우친-캐시-구조">공간 지역성에 치우친 캐시 구조&lt;/h3>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-cpu-cache/spatial-locality-biased-cache.png"
+width="930"
+height="110"
+srcset="https://umi0410.github.io/blog/golang/go-cpu-cache/spatial-locality-biased-cache_hu038761de6193f1262a5c02c2aef3a97f_10262_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-cpu-cache/spatial-locality-biased-cache_hu038761de6193f1262a5c02c2aef3a97f_10262_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="spatial-locality-biased-cache.png"
+class="gallery-image"
+data-flex-grow="845"
+data-flex-basis="2029px"
+>&lt;/p>
+&lt;p>한정된 크기의 캐시 속에서 공간지역성을 극대화시켜버리면 당연히 인접한 공간의 자료만 이용할 수 있고, 최근에 불린 데이터들은 안중에도 없고 인접한 공간의 데이터만을 저장하게 된다. 예를 들어 다음과 같은 시간 지역성이 필요한 경우에 제대로 기능을 할 수 없다.&lt;/p>
+&lt;ol>
+&lt;li>0~11번지 사이의 데이터가 한 번 접근 ⇒ 캐시에 0~11번지 적재&lt;/li>
+&lt;li>이후 12번지의 데이터에 접근 ⇒ 캐시에 데이터가 없기때문에 0~11번지의 데이터 대신 12~23번지의 데이터를 캐시에 적재&lt;/li>
+&lt;li>다시 최근에 접근했던 데이터인 0번지의 데이터에 접근 시도
+⇒ 0번 데이터는 최근에 접근했던 데이터임에도 시간 지역성이 활용되지 못함
+⇒ 캐시에서 데이터를 찾을 수 없음.&lt;/li>
+&lt;/ol>
+&lt;h3 id="시간-지역성에-치우친-캐시-구조">시간 지역성에 치우친 캐시 구조&lt;/h3>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-cpu-cache/temporal-locality-biased-cache.png"
+width="312"
+height="202"
+srcset="https://umi0410.github.io/blog/golang/go-cpu-cache/temporal-locality-biased-cache_hu5d03129976ee7a9e19515a8e72953e35_8599_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/golang/go-cpu-cache/temporal-locality-biased-cache_hu5d03129976ee7a9e19515a8e72953e35_8599_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="temporal-locality-biased-cache.png"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="370px"
+>&lt;/p>
+&lt;p>위의 경우 최근에 호출된 다양한 주소의 데이터들을 캐시에 저장해준다. 하지만 캐시의 크기는 한정되어있기 때문에 세로가 길어지면 가로는 짧아진다. 즉 최근 접근을 시도한 다양한 주소의 데이터를 저장할 수 있지만 그 데이터의 인근 데이터에 대한 저장은 많이 할 수 없다는 것이다.&lt;/p>
+&lt;p>예를 들어 위의 그림과 같은 경우 최근 0, 3, 12, 18, 6, 20번지의 데이터에 접근했고 이후에도 해당 번지에 대한 데이터를 캐시를 통해 이용할 수 있다. 바로 내가 최근에 접근했던 데이터이기때문이다. 하지만 만약 18번지의 데이터에 접근한 경우 높은 확률로 공간지역성에 의거 19, 20, 21, &amp;hellip; 번지의 데이터에 접근하겠지만, 이 예시는 시간지역성에 치우쳐져 19번지의 데이터만을 캐시에서 제공받을 수 있다.&lt;/p>
+&lt;h2 id="프로그램을-통한-벤치마킹">프로그램을 통한 벤치마킹&lt;/h2>
+&lt;p>저번에 Mutex, Semaphore를 직접 벤치마킹해보면서 Go의 내장 벤치마크 기능을 이용하면 좀 더 편리하게 결과를 보여줄 수 있을 것 같았기에 이번에 Go의 내장 벤치마크 기능을 이용해봤다.&lt;/p>
+&lt;p>&lt;strong>1000행 1000열의 2차원 int형 배열의 어떠한 요소에 접근해서 +1 하는 작업을 1000회 수행하는 것을 하나의 싸이클로 하는 벤치마크&lt;/strong>를 작성했다. 2차원 배열은 가로로는 연속적인 주소값을 갖기에 공간 지역성을 활용할 수 있지만 세로로는 N * (int형 자료형의 크기)씩 차이 나는 주소값을 갖기 때문에 공간 지역성을 활용하기 힘들고, 최근 접근했던 주소라면 시간 지역성은 활용할 수 있다.&lt;/p>
+&lt;p>&lt;strong>공간 지역성&lt;/strong> (가로로 연속적인 데이터)&lt;/p>
+&lt;ul>
+&lt;li>공간 지역성을 사용하는 경우 가로로 연속된 요소에 접근. 즉 연속된 주소를 갖는 1000개의 요소에 접근&lt;/li>
+&lt;li>공간 지역성을 사용하지 않는 경우에는 세로로 요소에 접근. 즉 1000 * int 자료형의 크기만큼 차이나는 연속되지 않은 주소의 1000개의 요소에 접근&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>시간 지역성&lt;/strong> (연속적 주소와 상관없이 최근에 불린 데이터)&lt;/p>
+&lt;ul>
+&lt;li>시간 지역성을 사용하는 경우 주소값이 근접하진 않지만 4개 혹은 16개의 데이터에만 계속해서 접근&lt;/li>
+&lt;li>시간 지역성을 사용하지 않은 경우에는 계속해서 처음 접근하는 데이터에만 접근&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;testing&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">Size&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">generateArray&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">[][]&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">([][]&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">arr&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">BenchmarkSpatialLocality&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;공간지역성 사용&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">generateArray&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ResetTimer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">N&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;공간지역성 X&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">generateArray&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ResetTimer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">N&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">BenchmarkTemporalLocality&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;시간 지역성 적극 사용. 최근 접근한 데이터 4개.&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">generateArray&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ResetTimer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">N&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;시간 지역성 조금 사용. 최근 접근한 데이터 16개.&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">generateArray&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ResetTimer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">N&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="mi">16&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 사실 완벽하게 새로운 데이터는 아님. 벤치마킹하는 동안 계속해서 반복되기 때문에
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;시간 지역성 X. 새로운 데이터에만 접근.&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">generateArray&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">ResetTimer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">N&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">n&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">Size&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="nx">goos&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nx">linux&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">goarch&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nx">amd64&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">pkg&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nx">playground&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">unix&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">socket&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">cache&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">BenchmarkSpatialLocality&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">공간지역성_사용&lt;/span> &lt;span class="mi">50000&lt;/span> &lt;span class="mi">894&lt;/span> &lt;span class="nx">ns&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">op&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">BenchmarkSpatialLocality&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">공간지역성_X&lt;/span> &lt;span class="mi">50000&lt;/span> &lt;span class="mi">6561&lt;/span> &lt;span class="nx">ns&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">op&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">BenchmarkTemporalLocality&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">시간_지역성_적극_사용&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_최근_접근한_데이터_4개&lt;/span>&lt;span class="p">.&lt;/span> &lt;span class="mi">50000&lt;/span> &lt;span class="mi">1918&lt;/span> &lt;span class="nx">ns&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">op&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">BenchmarkTemporalLocality&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">시간_지역성_조금_사용&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_최근_접근한_데이터_16개&lt;/span>&lt;span class="p">.&lt;/span> &lt;span class="mi">50000&lt;/span> &lt;span class="mi">4153&lt;/span> &lt;span class="nx">ns&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">op&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">BenchmarkTemporalLocality&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">시간_지역성_X&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">_새로운_데이터에만_접근&lt;/span>&lt;span class="p">.&lt;/span> &lt;span class="mi">50000&lt;/span> &lt;span class="mi">6564&lt;/span> &lt;span class="nx">ns&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nx">op&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>결과를 확인해보니 간단한 배열 내의 요소들에 대한 연산인데도 꽤나 차이가 컸다.&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>저번 학기에 컴퓨터 구조를 수강하면서 CPU-Memory 캐시의 효과를 직접 배열에 대한 프로그램을 통해 보여주는 예시를 보고 신기했던 기억이 있어서 이렇게 벤치마킹 프로그램을 작성해봤다. 다른 CS 주요 지식들에 비해 어려울 것은 없는 편이고 우리가 쉽게 접해오던 내용이라 더 이해하기 쉽지 않았을까 싶다.&lt;/p>
+&lt;h2 id="참고">참고&lt;/h2>
+&lt;ul>
+&lt;li>캐시란 - &lt;a class="link" href="https://ko.wikipedia.org/wiki/%EC%BA%90%EC%8B%9C" target="_blank" rel="noopener"
+>https://ko.wikipedia.org/wiki/캐시&lt;/a>&lt;/li>
+&lt;li>캐시가 동작하는 아주 구체적인 원리 - &lt;a class="link" href="https://parksb.github.io/article/29.html" target="_blank" rel="noopener"
+>https://parksb.github.io/article/29.html&lt;/a>&lt;/li>
+&lt;li>cache mapping - &lt;a class="link" href="https://m.blog.naver.com/jkssleeky/220478400046" target="_blank" rel="noopener"
+>https://m.blog.naver.com/jkssleeky/220478400046&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket)</title><link>https://umi0410.github.io/blog/golang/go-socket/</link><pubDate>Sat, 13 Feb 2021 14:10:54 +0900</pubDate><guid>https://umi0410.github.io/blog/golang/go-socket/</guid><description>&lt;img src="https://umi0410.github.io/blog/golang/go-socket/server-client-socket.jpeg" alt="Featured image of post Go 언어로 적용해보는 Computer Science - Socket (Unix Domain Socket, Network/TCP/UDP Socket)" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>개발 공부를 처음 시작한 지 언제 안 됐을 무렵, 의경 복무를 하며 자바로 TCP Socket을 이용해 옆 컴퓨터와 채팅을 하는 프로그램을 만들어 보는 것을 시작으로 docker나 mysql과 같은 다양한 오픈소스들을 이용해보면서나 네트워크를 공부하면서 다양하게 들어왔던 &lt;code>소켓&lt;/code>이지만 정확히 어떤 역할을 하는지 어떤 종류가 있는지 어떻게 동작하는지 알지 못했다.&lt;/p>
+&lt;p>오늘은 그렇게 알쏭달쏭한 존재였던 소켓을 크게 &lt;strong>&lt;code>Unix Domain Socket&lt;/code>와 &lt;code>Network Socket&lt;/code> 두 가지로 나눠 정리해보고 Unix Domain Socket과 TCP를 사용하는 Network Socket을 벤치마크해보고 어떤 차이가 있는지 확인&lt;/strong>해보도록 하겠다. 주로 내가 소켓을 접했던 자료나 이슈 상황에서는 UDP보다는 TCP가 많이 등장했었기 때문에 &lt;strong>UDP에 대한 내용은 거의 제외할 것이므로 대부분이 Network socket과 Unix domain socket 각각의 stream(network socket에선 tcp를 이용하는 경우에 해당) type socket&lt;/strong>에 관련한 내용일 것이다.&lt;/p>
+&lt;h2 id="socket-이란">Socket 이란&lt;/h2>
+&lt;p>소켓은 어떠한 통신에서의 Endpoint(끝점) 역할을 한다. 끝점이 없으면 어디와 어디가 통신하는지 어디에 데이터를 써야하는지 알 수 없다.&lt;/p>
+&lt;p>소켓을 마치 전구 소켓과 같이 소켓이라고 부르는 이유는 소켓에 올바르게 데이터를 적기만 하면 통신을 위한 세부적인 동작은 소켓이 알아서 수행하기 때문이다. 따라서 우리는 통신을 하기 위한 Socket을 올바르게 생성하고, 그 곳에 데이터를 올바르게 적거나 그곳의 데이터를 올바르게 읽기만 하면 된다. 실제 데이터 전송은 소켓이 알아서 수행해준다.&lt;/p>
+&lt;p>소켓은 같은 호스트 내에서 IPC를 위해 사용되는 &lt;code>Unix domain socket&lt;/code>과 네트워크 통신을 하기 위해 사용되는 &lt;code>Network socket&lt;/code>으로 분류할 수 있다. 간혹 unix domain socket과 TCP를 이용하는 Network socket, UDP를 이용하는 Network socket 이렇게 세 가지로 분류하는 경우를 본 것 같은데 이는 잘못된 분류라고 생각한다. Network socket 뿐만 아니라 Unix domain socket 또한 stream(Network socket의 경우 TCP를 이용하는 경우에 해당) 타입과 datagram 타입(Network socket의 경우 UDP를 이용하는 경우에 해당)으로 사용될 수 있기 때문이다.&lt;/p>
+&lt;h3 id="서버-소켓과-클라이언트-소켓">서버 소켓과 클라이언트 소켓&lt;/h3>
+&lt;p>&lt;img src="https://umi0410.github.io/blog/golang/go-socket/server-client-socket.jpeg"
+width="2146"
+height="1000"
+srcset="https://umi0410.github.io/blog/golang/go-socket/server-client-socket_huc5be35f5857cc34672b838b13057c03e_282874_480x0_resize_q75_box.jpeg 480w, https://umi0410.github.io/blog/golang/go-socket/server-client-socket_huc5be35f5857cc34672b838b13057c03e_282874_1024x0_resize_q75_box.jpeg 1024w"
+loading="lazy"
+alt="server-client-socket.jpeg"
+class="gallery-image"
+data-flex-grow="214"
+data-flex-basis="515px"
+>&lt;/p>
+&lt;p>소켓을 역할의 측면에서 분류한다면 서버 소켓과 클라이언트 소켓으로 나눌 수 있다. 동일한 구조의 소켓이지만 생성되는 시기나 역할이 다를 뿐이다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>서버 소켓&lt;/strong> - 클라이언트 소켓의 연결 요청을 받아들이기만 할 뿐. 실제 서버 측에서의 데이터의 송수신은 서버 소켓이 클라이언트 소켓의 연결 요청을 수락하면서 새로 만들어지는 소켓을 통해 수행.&lt;/li>
+&lt;li>&lt;strong>클라이언트 소켓&lt;/strong> - 클라이언트가 서버와 통신하고자 할 때 생성하는 소켓. 클라이언트는 실제 데이터 송수신도 이 소켓을 통해 수행.&lt;/li>
+&lt;/ul>
+&lt;p>서버 소켓과 클라이언트 소켓이 단순한게 1:N으로만 통신하면 이렇게 서버 소켓이 클라이언트 소켓의 요청을 수락한 뒤 새로 소켓을 만들 필요 없지 않을까싶지만 그렇게 되면 서버가 각 클라이언트와 통신할 때 하나의 소켓을 이용하므로 올바르게 원하는 클라이언트와 통신할 수 없을테니 좋은 방식이 아닐 것이다.&lt;/p>
+&lt;p>그렇다면 과연 &lt;strong>정말 서버에서는 연결을 accept 한 뒤 소켓을 새로 생성할까?&lt;/strong> 확인해보자.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;log&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;net&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;os&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;time&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">network&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">&amp;#34;tcp&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">address&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">&amp;#34;0.0.0.0:8080&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">os&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">address&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">socket&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Listen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">network&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">address&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fatal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">connectedSocket&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Accept&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fatal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">go&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">connectedSocket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Write&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="nb">byte&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;pong\n&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">time&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">time&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Second&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">connectedSocket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Close&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>간단하게 TCP 통신프로그램을 하나 만들어봤다. 단순히 1초 간격으로 pong을 5번 출력한 뒤 연결을 끊는 프로그램이다.&lt;/p>
+&lt;p>&lt;strong>요청 전&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ netstat --tcp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Active Internet connections &lt;span class="o">(&lt;/span>w/o servers&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Proto Recv-Q Send-Q Local Address Foreign Address State
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60082 ESTABLISHED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60084 ESTABLISHED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60078 ESTABLISHED
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>요청 수락 후 통신 중&lt;/strong> - 소켓이 하나 생성되어 ESTABLISHED 상태&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ netstat --tcp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Active Internet connections &lt;span class="o">(&lt;/span>w/o servers&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Proto Recv-Q Send-Q Local Address Foreign Address State
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60082 ESTABLISHED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60084 ESTABLISHED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60078 ESTABLISHED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp6 &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-1:http-alt 124.50.93.166:42434 ESTABLISHED
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>통신 종료&lt;/strong> - 생성되었던 소켓이 TIME_WAIT 상태. 잠시 후 사라진다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ netstat --tcp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Active Internet connections &lt;span class="o">(&lt;/span>w/o servers&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Proto Recv-Q Send-Q Local Address Foreign Address State
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60082 ESTABLISHED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60084 ESTABLISHED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-13.ap-:ssh 124.50.93.166:60078 ESTABLISHED
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tcp6 &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> ip-172-31-34-1:http-alt 124.50.93.166:42434 TIME_WAIT
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>깔끔한 네트워크 정보를 보기 위해 순수한 AWS EC2 t2.micro 인스턴스에서 작업해보았다. 맨 위 3줄에 나온 소켓 정보는 ssh 접속으로 인한 소켓 정보이다.&lt;/p>
+&lt;p>또한 서버 소켓은 출력되지 않았는데 이는 우리는 평소에 listen 중인 포트나 서버 소켓을 보기 위해 netstat에 -l 옵션을 전달한 반면 이번엔 &amp;ndash;tcp 옵션을 통해 listen 중인 서버 소켓이 아닌 클라이언트의 요청을 수락한 뒤 생성되는 소켓을 보려하고있기 때문이다.&lt;/p>
+&lt;/blockquote>
+&lt;p>4번 째 줄의 소켓 정보가 바로 우리가 생각하는 서버 소켓이 client의 연결 요청을 accept 후 생성하는 socket이다. 클라이언트의 요청을 accept 후에 새로운 소켓이 생성되며 통신 종료 후 잠시 기다린 뒤 사라진다.&lt;/p>
+&lt;h3 id="network-socket">Network Socket&lt;/h3>
+&lt;p>&lt;code>Network socket&lt;/code>은 네트워크 통신이 필요한 작업을 수행할 때 이용하는 소켓의 한 종류로 다시 동작 방식에 따라 TCP 프로토콜을 이용하는 stream socket과 UDP 프로토콜을 이용하는 datagram socket으로 구분할 수 있다. 사용자는 socket에 데이터를 적기만 하면 네트워크와 관련된 작업은 socket이 알아서 수행해준다. 읽을 때에도 마찬가지이다.&lt;/p>
+&lt;p>TCP socket이라고 부르는 사람도 있고 stream socket, TCP/IP socket이라 부르는 사람도 있는 것 같다. 정확한 명칭은 모르겠지만 사용하거나 이해하는 데에는 무리가 없을 것 같다.
+TCP를 이용하는 stream type의 Network socket과 stream type의 Unix domain socket은 사용 방법이 매우 유사하다. 둘 다 stream type이고, 소켓에 데이터를 적은 뒤의 작업은 소켓이 알아서 수행해주기 때문이다. 각각의 소켓을 이용해 서버를 띄우는 작업은 인자의 값만 조금 달라질 뿐이다. 이는 글의 하부의 코드에서 확인해볼 수 있다.&lt;/p>
+&lt;h4 id="socket과-port">Socket과 Port&lt;/h4>
+&lt;p>Network socket에 대해서는 socket과 port의 구분이나 역할이 애매하게 느껴질 수 있다. 통신을 할 때 IP 주소를 이용해 목적지인 Host를 찾을 수는 있지만 그 Host의 어떤 프로세스과 통신하려는 것인지는 알 수 없다. 올바른 프로세스를 찾을 수 있도록 프로세스와 어떠한 숫자를 매핑시키는데 이 숫자를 Port 번호라고 한다. 예를 들어 123.123.123.123:8080으로 요청을 보내는 것은 123.123.123.123의 IP 주소를 갖는 Host의 8080번 포트에 맵핑된 프로세스에 요청을 보내는 것이다.&lt;/p>
+&lt;p>이 때 Port와 프로세스를 그냥 연결할 수는 없고 Socket이라는 녀석이 필요하다. Socket은 실질적으로 어떤 프로세스를 어떤 포트에 맵핑시킬지에 대한 정보가 필요하고 네트워크 작업을 알아서 수행한다.&lt;/p>
+&lt;p>조금 비유를 해보자면 회사내에 어떤 부서가 있고 외부에서 해당 부서와 작업하기 위해선 어떠한 고유한 부서 번호가 필요하고, 이때 외부와 해당 부서간에 오가는 통신을 담당하는 담당자가 있어야하는 경우에 비유해 볼 수 있다. &amp;ldquo;어떤 부서&amp;quot;는 프로세스이고 &amp;ldquo;고유한 부서 번호&amp;quot;는 포트 번호, 통신을 담당하는 담당자는 소켓에 해당한다.&lt;/p>
+&lt;h3 id="unix-domain-socket">Unix Domain Socket&lt;/h3>
+&lt;p>Unix Domain Socket은 IPC(Inter-Process Communication, 프로세스 간 통신)의 여러 방법 중 가장 자유로우면서 사용하는 데에 있어 제한이 별로 없는 방법이다. 네트워크 소켓과 달리 같은 호스트 내의 프로세스 간 통신을 담당하기 때문에 아무런 네트워크 작업이 필요 없다. 하지만 TCP나 UDP를 이용하는 Network socket을 이용할 때와 인자 값만 조금 바꾸어 동일한 방식으로 사용이 가능하다.&lt;/p>
+&lt;h4 id="-상상의-나래---우리가-알게-모르게-겪었던-unix-domain-socket의-permission오류에-대해">🌈 상상의 나래 - 우리가 알게 모르게 겪었던 Unix domain socket의 Permission오류에 대해&lt;/h4>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ mysql
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">stat /var/lib/mysql/mysql.sock
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">stat: cannot stat &lt;span class="s1">&amp;#39;/var/lib/mysql/mysql.sock&amp;#39;&lt;/span>: Permission denied
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ docker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker: Got permission denied &lt;span class="k">while&lt;/span> trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>주로 우리가 &lt;code>MySQL&lt;/code>이나 &lt;code>Docker&lt;/code>를 &lt;code>localhost&lt;/code>에서 사용할 때 &lt;strong>unix socket에 대한 permission 에러&lt;/strong>를 겪은 적이 있을 것이다. MySQL이나 Docker를 비롯한 많은 오픈소스들이 아마 성능상의 이점을 위해 localhost에서 서비스를 이용할 경우 Network socket이 아닌 Unix domain socket을 많이들 이용하는 것으로 알고있다. 그렇기 때문에 주로 MySQL 설치 이후 Remote에서는 접속이 되는데 &lt;strong>localhost에서는 권한 문제로 접속이 안된다거나 Docker 설치 이후 사용자를 docker group에 넣어주는 경우&lt;/strong>가 많이 있다.&lt;/p>
+&lt;p>아마도 네트워크 통신을 통해 서버 소켓에 접근하는 네트워크 소켓과 달리 unix domain socket은 client process가 직접 server의 socket file에 접근하기 때문에 이때 쓰기 권한 때문에 그런 권한 오류가 생기는 것이 아닐까라는 상상의 나래를 펼쳐본다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ubuntu 사용자로 unix domain socket server 프로세스를 띄운 경우&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ubuntu 사용자로는 잘 접속이 된다.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ubuntu@ec2 $ go &lt;span class="nb">test&lt;/span> -v
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN &lt;span class="nv">TestSocket&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN TestSocket/tcp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2021/02/13 12:59:06 &lt;span class="nv">pong&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN TestSocket/unix
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2021/02/13 12:59:06 pong
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--- PASS: TestSocket &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --- PASS: TestSocket/tcp &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --- PASS: TestSocket/unix &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PASS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ok uds 0.004s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># server가 생성한 unix domain socket에 write 권한이 없는&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># guest1이라는 사용자로는 server와 unix domain socket으로는 통신할 수 없고,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 앞서 오픈소스를 이용하며 겪었던 에러와 마찬가지로 권한 이슈가 발생한다.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 하지만 TCP 소켓을 이용한 경우는 원활히 ping-pong test가 성공한 것을 볼 수 있다.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">guest1@ec2 $ go &lt;span class="nb">test&lt;/span> -v
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN &lt;span class="nv">TestSocket&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN TestSocket/tcp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2021/02/13 12:59:01 &lt;span class="nv">pong&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN TestSocket/unix
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> main_test.go:21:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Error Trace: main_test.go:21
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Error: Received unexpected error:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dial unix jinsu.sock: connect: permission denied
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Test: TestSocket/unix
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--- FAIL: TestSocket &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --- PASS: TestSocket/tcp &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --- FAIL: TestSocket/unix &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 하지만 재미있게도 guest1도 socket에 write할 수 있도록 권한을 수정해주니&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># guest1도 unix domain socket으로 무리 없이 통신이 가능했다!&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">guest1@ec2 $ sudo chmod &lt;span class="m">777&lt;/span> jinsu.sock
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">guest1@ec2 $ go &lt;span class="nb">test&lt;/span> -v
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN &lt;span class="nv">TestSocket&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN TestSocket/tcp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2021/02/13 12:59:06 &lt;span class="nv">pong&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===&lt;/span> RUN TestSocket/unix
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2021/02/13 12:59:06 pong
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--- PASS: TestSocket &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --- PASS: TestSocket/tcp &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --- PASS: TestSocket/unix &lt;span class="o">(&lt;/span>0.00s&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PASS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ok uds 0.004s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>따라서 ubuntu 사용자로 TCP socket과 Unix domain socket 두 가지 방법으로 서버 역할을 할 수 있는 프로세스를 띄운 뒤 ubuntu 사용자와 guest1 사용자로 통신 테스트를 진행해보았다.&lt;/p>
+&lt;p>서버가 생성한 unix domain socket은 &lt;code>srwxrwxr-x&lt;/code> 의 형식과 권한을 갖고 있기 때문에 guest1은 이 소켓에 대해 read와 execute 권한 뿐이고, write는 불가능하기에 unix domain socket을 이용해서는 통신할 수 없다. 따라서 우리가 평소에 오픈소스를 localhost에서 이용하면서 종종 맞이했던 소켓에 대한 permission error을 만나볼 수 있었다! 반면 socket에 대한 접근 권한이 필요 없는 TCP로는 통신이 가능했고, 놀랍게도 guest1에게 소켓 파일에 대한 write 권한을 부여해주자 Unix domain socket으로도 통신이 가능해진 것을 볼 수 있다.&lt;/p>
+&lt;p>&lt;strong>상상의 나래 정리: unix domain socket을 통해 접속을 시도할 때에는 unix domain socket file에 대한 접근을 하는 프로세스가 해당 socket file에 대한 적절한 permission을 갖고 있어야한다.&lt;/strong>&lt;/p>
+&lt;blockquote>
+&lt;p>또한 구글링 도중 보았던 재미있는 예시는 database를 통해 authentication/authorization을 수행하는 일반적인 서비스와 달리 Unix domain socket을 이용하는 경우에는 linux user 시스템을 이용해서도 권한/인증 관리를 수행하는 경우도 존재할 수 있다는 것이었다.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="벤치마킹-unix-domain-socket-vs-network-socket">벤치마킹 Unix domain socket vs Network socket&lt;/h2>
+&lt;p>Unix domain socket과 Network socket의 성능을 비교하는 벤치마크를 작성했다.
+두 경우 모두 Stream type의 socket을 이용하도록 했고, Network socket의 경우는 특히나 이 경우 TCP 프로토콜을 이용하게 된다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// main.go
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 한 프로세스 내에서 TCP Socket과 Unix Domain Socket 두 가지를 이용해
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 통신할 수 있는 프로그램
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;errors&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;io&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;log&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;net&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;os&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;time&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">go&lt;/span> &lt;span class="nf">RunTCPSocketServer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">go&lt;/span> &lt;span class="nf">RunUnixDomainSocketServer&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Dummy waiting...&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">time&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">time&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">Minute&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">RunTCPSocketServer&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Run TCPSocketServer...&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;tcp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;0.0.0.0:8080&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">RunUnixDomainSocketServer&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Run UnixDomainSocketServer...&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">serverSocketName&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="s">&amp;#34;jinsu.sock&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">os&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">serverSocketName&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;unix&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">serverSocketName&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// TCP socket을 이용해 서버를 띄우든 Unix Domain Socket을 이용해 서버를 띄우든
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 간단히 인자 값만 변경해서 이용할 수 있다!
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">network&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">address&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">buf&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="kt">byte&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1024&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">socket&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Listen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">network&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">address&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fatal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">connectedSocket&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Accept&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fatal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">go&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">n&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">connectedSocket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">buf&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">!&lt;/span>&lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Is&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">EOF&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fatal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[Error]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">network&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Client sent:&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">n&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">connectedSocket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Write&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="nb">byte&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;pong&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">connectedSocket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Close&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-go" data-lang="go">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// main_test.go
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// tcp socket과 unix domain socket을 이용해 성공적으로 서버와 통신이
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 이루어지는지 테스트하는 테스트 코드
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// tcp와 unix domain socket의 성능을 비교하는 벤치마크 코드
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;errors&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;github.com/stretchr/testify/assert&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;io&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;log&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;net&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;testing&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">TestSocket&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">t&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">T&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">args&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="p">[][]&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[]&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="s">&amp;#34;tcp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;0.0.0.0:8080&amp;#34;&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[]&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="s">&amp;#34;unix&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;jinsu.sock&amp;#34;&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">arg&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">args&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">t&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">arg&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">t&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">T&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">conn&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Dial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">arg&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">arg&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">assert&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">NoError&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">t&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">buf&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="kt">byte&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1024&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">conn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Write&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="nb">byte&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ping&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fatal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">n&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">conn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">buf&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">!&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Is&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">EOF&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">string&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">buf&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="nx">n&lt;/span>&lt;span class="p">]))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">func&lt;/span> &lt;span class="nf">BenchmarkSocket&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">args&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="p">[][]&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[]&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="s">&amp;#34;tcp&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;0.0.0.0:8080&amp;#34;&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[]&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="s">&amp;#34;unix&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;jinsu.sock&amp;#34;&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">arg&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">args&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">arg&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="kd">func&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">testing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">B&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//log.Println(&amp;#34;Out&amp;#34;) // b.N과 상관 없이 args의 길이에 따라 출력됨.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">conn&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Dial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">arg&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">arg&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">assert&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">NoError&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">buf&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="kt">byte&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1024&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">N&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//log.Println(&amp;#34;In&amp;#34;) // b.N만큼 수행됨
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">conn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Write&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="nb">byte&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ping&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">assert&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">NoError&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">b&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">conn&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">buf&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">!&lt;/span>&lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Is&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">io&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">EOF&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Fail&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">})&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ go &lt;span class="nb">test&lt;/span> -bench&lt;span class="o">=&lt;/span>. -benchtime&lt;span class="o">=&lt;/span>100000x
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">goos: linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">goarch: amd64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pkg: uds
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">BenchmarkSocket/tcp 100000 &lt;span class="m">104537&lt;/span> ns/op
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">BenchmarkSocket/unix 100000 &lt;span class="m">83456&lt;/span> ns/op
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PASS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ok uds 18.808s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>10000번의 ping-pong을 수행하는 벤치마크를 수행했다.
+그 결과 &lt;strong>TCP socket을 이용할 경우는 한 번의 ping-pong에 약 104537ns, unix domain socket을 이용할 경우는 한 번의 ping-pong에 약 83456ns&lt;/strong>가 소요된 것을 보아 &lt;strong>예상대로 네트워크 통신이 일절 필요하지 않은 unix domain socket이 좀 더 성능이 좋은 것으로 보여졌다&lt;/strong>. 사전에 자료 조사를 할 때에는 unix domain socket이 tcp socket을 이용할 때보다 약 2배가량 성능이 우월할 것이라고 들었는데, 그렇게 많은 차이가 나는 것 같지는 않다. 하지만 어느 정도 데이터의 크기나 버퍼의 크기에 따라 달라질 수도 있을 것 같고 더 깊은 원리들이 존재할 것 같아 더 자세히는 측정해보지 못했다.&lt;/p>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>사실 이번에 다룬 소켓이라는 주제는 Go로 적용해보는 Computer Science라는 이 시리즈를 정리해나가던 초기에 2번 째 글로 시도했던 주제였는데 당시엔 Go benchmark도 처음 사용해봤었고 내용이 어려웠던 터라 벤치마크도 제대로 되지 않고 정리도 하기 힘들어서 중단했던 주제이다. 하지만 이번엔 같은 내용에 대해 두 번째 정리해서인지 전보다 내용도 잘 이해됐고, 벤치마킹 코드와 결과도 깔끔하게 나왔던 것 같아 뿌듯하다.&lt;/p>
+&lt;p>그리고 그 동안 도커나 MySQL 같은 오픈소스들을 사용하면서 간혹 소켓에 대한 오류를 접할 때나 이런 저런 글에서 소켓 관련한 내용이 등장할 때 정확히 어떤 역할인지 이유가 뭔지 자세히 알지 못했는데 이번 기회덕에 앞으로는 좀 더 잘 이해해볼 수 있을 것 같다.&lt;/p>
+&lt;h2 id="참고">참고&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>소켓 &lt;a class="link" href="http://www.ktword.co.kr/abbr_view.php?nav=&amp;amp;m_temp1=280&amp;amp;id=742" target="_blank" rel="noopener"
+>http://www.ktword.co.kr/abbr_view.php?nav=&amp;m_temp1=280&amp;id=742&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>네트워크 소켓 &lt;a class="link" href="https://ko.wikipedia.org/wiki/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC_%EC%86%8C%EC%BC%93" target="_blank" rel="noopener"
+>https://ko.wikipedia.org/wiki/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC_%EC%86%8C%EC%BC%93&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>소켓 프로그래밍 &lt;a class="link" href="https://recipes4dev.tistory.com/153" target="_blank" rel="noopener"
+>https://recipes4dev.tistory.com/153&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>UDS (Unix Domain Socket) &lt;a class="link" href="http://www.dreamy.pe.kr/zbxe/CodeClip/119393" target="_blank" rel="noopener"
+>http://www.dreamy.pe.kr/zbxe/CodeClip/119393&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>[Linux/UDS/Unix Domain Socket] UDS &lt;a class="link" href="https://yaaam.tistory.com/entry/LinuxUDSUnix-Domain-Socket-UDS" target="_blank" rel="noopener"
+>https://yaaam.tistory.com/entry/LinuxUDSUnix-Domain-Socket-UDS&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Unix file type &lt;a class="link" href="https://en.wikipedia.org/wiki/Unix_file_types" target="_blank" rel="noopener"
+>https://en.wikipedia.org/wiki/Unix_file_types&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>C# - .NET Core Unix Domain Socket 사용 예제 &lt;a class="link" href="https://www.sysnet.pe.kr/2/0/11963" target="_blank" rel="noopener"
+>https://www.sysnet.pe.kr/2/0/11963&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Unix Domain Socket &lt;a class="link" href="https://www.joinc.co.kr/w/Site/system_programing/IPC/Unix_Domain_Socket" target="_blank" rel="noopener"
+>https://www.joinc.co.kr/w/Site/system_programing/IPC/Unix_Domain_Socket&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Unix Domain Socket - UDP &lt;a class="link" href="https://www.joinc.co.kr/w/Site/system_programing/IPC/Unix_Domain_Socket_UDP" target="_blank" rel="noopener"
+>https://www.joinc.co.kr/w/Site/system_programing/IPC/Unix_Domain_Socket_UDP&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>What is the difference between Unix sockets and TCP/IP sockets? &lt;a class="link" href="https://serverfault.com/questions/124517/what-is-the-difference-between-unix-sockets-and-tcp-ip-sockets" target="_blank" rel="noopener"
+>https://serverfault.com/questions/124517/what-is-the-difference-between-unix-sockets-and-tcp-ip-sockets&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>
