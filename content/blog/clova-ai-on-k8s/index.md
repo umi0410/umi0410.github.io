@@ -8,7 +8,7 @@ noDisqus: false
 draft: false
 categories:
 - devops
-- istio
+- Istio
 - cert-manager
 - kubernetes
 image: preview.png
@@ -253,7 +253,7 @@ spec:
 - Gateway는 istio ingress gateway와 다르다.
     - Gateway는 CRD이고, ingress gateway는 자신을 selector로 설정한 Gateway를 보고 해당 설정을 적용한다.
     - 마치 Ingress와 Nginx Ingress Controller 같은 느낌이랄까
-- istio ingress gateway는 보통 istio-system 네임스페이스에 존재한다.
+- Istio ingress gateway는 보통 istio-system 네임스페이스에 존재한다.
 - Gateway는 아무 네임스페이스에 만들어도 된다.
 - VirtualSevice 또한 아무 네임스페이스에 만들어도 된다.
     - 단, VirtualService의 destination은 접근 가능한 mesh 내의 호스트여야하고 네임스페이스가 다른 경우 적절한 도메인 네임을 써야할 수 있다.

@@ -4,7 +4,7 @@ date: 2022-08-11T03:20:00+09:00
 weight: 28
 categories:
   - DevOps
-  - istio
+  - Istio
   - Network
 image: preview.png
 ---
@@ -16,7 +16,7 @@ image: preview.png
 
 따라서 평소 궁금했던 내용 중 하나를 살짝 파헤쳐볼까한다.
 
-나는 주로 istio `ingress gateway`와 관련된 작업을 많이 했었고 이 경우 Virtual Service는 항상 ingress gateway를 참조하도록 설정해왔다. 근데 istio를 처음 배울 때는 분명 ‘client 측에서 outbound handler로서의 Envody 사이드카을 통해 알아서 우리가 의도하는 목적지를 찾아서 요청을 보낸다.’ 이런 식으로 배웠던 것 같은데 ‘왜 나는 Virtual Service를 이용할 때 항상 Gateway를 설정해줘야하는 것이었을까?’하는 궁금증이 생겼다.
+나는 주로 istio `ingress gateway`와 관련된 작업을 많이 했었고 이 경우 Virtual Service는 항상 ingress gateway를 참조하도록 설정해왔다. 근데 istio를 처음 배울 때는 분명 ‘client 측에서 outbound handler 역할을 하는 Envoy 사이드카을 통해 알아서 우리가 의도하는 목적지를 찾아서 요청을 보낸다.’ 이런 식으로 배웠던 것 같은데 ‘왜 나는 Virtual Service를 이용할 때 항상 Gateway를 설정해줘야하는 것이었을까?’하는 궁금증이 생겼다.
 
 - **Virtual Service는 Gateway에 ingress gateway를 설정해주지 않아도 되는 것일까?**
 - **Virtual Service에 설정한 내용은 ingress gateway로 들어온 요청뿐만 아니라 mesh 내부에서의 요청에도 적용될 수 있는 것인가?**
@@ -26,6 +26,8 @@ image: preview.png
 
 1. **ingress gateway를 통해 들어오는 요청이 아니라 mesh 내부에서 보내는 요청에 대해 적용될 수 있도록 Virtual Service를 정의한 뒤 mesh 내부에서 요청을 보내보기**
 2. **Virtual Service 없이 Destination 이용해보기**
+
+(_2022.09.30 - 지금 와서 돌이켜보니 이때 했던 내용들은 사실 Istio의 동작 방식이나 원리를 알면 당연한 내용일 수 있었을 것 같다._)
 
 ## Virtual Service와 Destination Rule에 대해 짚고 넘어가보자.
 

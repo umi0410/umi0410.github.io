@@ -4,7 +4,7 @@ date: 2022-07-17T22:00:00+09:00
 weight: 29
 categories:
   - DevOps
-  - istio
+  - Istio
   - Network
 image: preview.png
 ---
@@ -142,8 +142,8 @@ istiod-1-9-6b549b9d87-9f76b    1/1     Running   0          2m56s
 
 배포할 리소스들은 모두 다음과 같습니다.
 
-- **Namespace rev-1-9** - istio 1.9의 sidecar inject를 받을 Namespace
-- **Namespace rev-1-10** - istio 1.10의 sidecar inject를 받을 Namespace
+- **Namespace rev-1-9** - Istio 1.9의 sidecar inject를 받을 Namespace
+- **Namespace rev-1-10** - Istio 1.10의 sidecar inject를 받을 Namespace
 - **Pod netcat-client** - `default` Namespace에서 각 Service를 통해 netcat 요청을 날려줄 client
 - **Pod netcat-lo** - `lo` 인터페이스의 IP 에 netcat 서버를 띄우는 Pod.
 - **Pod netcat-eth0** - `eth0` 인터페이스의 IP에 netcat 서버를 띄우는 Pod.
