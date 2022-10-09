@@ -1,4 +1,69 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Fri, 30 Sep 2022 22:00:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>[책] Istio in Action 리뷰</title><link>https://umi0410.github.io/blog/devops/istio-in-action-review/</link><pubDate>Fri, 30 Sep 2022 22:00:00 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/istio-in-action-review/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/istio-in-action-review/preview.png" alt="Featured image of post [책] Istio in Action 리뷰" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Sun, 09 Oct 2022 19:00:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>[책] 실습과 그림으로 배우는 리눅스 구조 리뷰</title><link>https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/</link><pubDate>Sun, 09 Oct 2022 19:00:00 +0900</pubDate><guid>https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/</guid><description>&lt;img src="https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/preview.png" alt="Featured image of post [책] 실습과 그림으로 배우는 리눅스 구조 리뷰" />&lt;p>&lt;figure style="flex-grow: 211; flex-basis: 507px">
+&lt;a href="https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/book.png" data-size="4032x1908">&lt;img src="https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/book.png"
+srcset="https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/book_hu3b1ae75399002663bdce7b6d2fbad988_10544322_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/book_hu3b1ae75399002663bdce7b6d2fbad988_10544322_1024x0_resize_box_3.png 1024w"
+width="4032"
+height="1908"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>Istio in Action을 읽고난 뒤에 리눅스나 커널에 대한 책을 읽어보겠다는 계획을 갖게 되었습니다. 정확히는 &lt;a class="link" href="https://product.kyobobook.co.kr/detail/S000001033135" target="_blank" rel="noopener"
+>DevOps와 SE를 위한 리눅스 커널 이야기&lt;/a>라는 책을 읽고싶었습니다.
+기존에는 그 책이 사무실에 비치되어있었지만 이번에 사무실을 이사하면서 그 책이 어디갔는지 보이지가 않더라구요. 그래서 그냥 다른 책장에 비치되어있던 이 책을 읽어봤습니다.&lt;/p>
+&lt;p>다루고 있는 내용은 주로 리눅스 구조라기보다는 전반적인 컴퓨터 구조, 운영체제 같았습니다.&lt;/p>
+&lt;h2 id="책에-담긴-내용-간단히-정리">책에 담긴 내용 간단히 정리&lt;/h2>
+&lt;ul>
+&lt;li>커널의 역할, 운영체제의 역할이 무엇인지. 커널과 운영체제 및 드라이버들이 없다면 어떤 불편이 있을지 설명합니다.&lt;/li>
+&lt;li>syscall, interrupt에 대해 이해하기 쉽게 설명하고 어떤 플로우로 동작하는지 설명합니다.&lt;/li>
+&lt;li>CPU, 코어, 하이퍼 스레드에 대해 설명합니다.&lt;/li>
+&lt;li>메모리와 Virtual Memory, Cache, HDD, SSD의 특징과 어떻게 동작하는지를 설명합니다.&lt;/li>
+&lt;li>fork &amp;amp; execve가 어떻게 동작하는지와 계층적인 리눅스의 프로세스 관계에 대해 설명합니다.&lt;/li>
+&lt;li>파일 시스템이 무엇인지, 파일 시스템이 없다면 어떠한 불편이 있는지 설명합니다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="장단점">장단점&lt;/h2>
+&lt;h3 id="장점">장점&lt;/h3>
+&lt;ul>
+&lt;li>실제 코드와 그것에 대한 수행 결과, 개념을 나타낸 그림 등을 통해 이해를 돕습니다.&lt;/li>
+&lt;li>단순히 &amp;ldquo;이런 역할을 하는 녀석입니다.&amp;ldquo;로 설명이 끝나는 게 아니라 그 녀석이 없으면 어떤 불편이 있는지 예시를 들어줍니다.
+&lt;ul>
+&lt;li>e.g. 디바이스 드라이버가 없다면 유저들은 작성하는 모든 프로그램에서 디바이스를 어떻게 제어할지를 구현해야할 것이고, 여러 프로세스가 같은 디바이스를 사용하려는 경우 어떻게 해야할 지에 대한 문제가 생길 것이다.&lt;/li>
+&lt;li>e.g. 가상 메모리라는 개념 없이 물리 메모리를 직접 이용한다면 프로세스들이 실제로 자신의 물리메모리 주소를 관리해야하는데 이런 경우 다양한 어려움이 존재할 것이다. (너무 다양해서 이 글에선 생략.)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>평소에 궁금했던 개념들, 내가 잘 알고 있는 건지 의문이 들었던 개념들, 이것까지 알아야하나싶은 개념들에 대해 한 번 가볍게 정리해볼 수 있습니다.
+&lt;ul>
+&lt;li>예를 들면 Page cache, Hyper thread 이런 개념들은 들어보기만 많이 들어보고 가볍게 알아볼 기회가 없었는데 이번에 가볍게 &amp;lsquo;아~ 이런 거구나~&amp;rsquo; 해볼 수 있었습니다.&lt;/li>
+&lt;li>교수님께 배웠던 Virtual Memory 역할과 흔히 인터넷에서 Virtual memory를 설명하던 내용이 조금 달라서 내가 잘 알고있는 건지 의문이 들었는데 이런 의문도 해소가 됐습니다.
+&lt;ul>
+&lt;li>흔히 인터넷에서 봤던 Virtual memory의 역할은 Page라는 개념을 바탕으로 물리 메모리를 프로세스가 안전하고 편리하게 사용할 수 있도록 해주는 것이었습니다.&lt;/li>
+&lt;li>교수님께 배웠던 Virtual memory는 이뿐만 아니라 메모리를 demading page, swap 같은 응용된 내용도 있었습니다.&lt;/li>
+&lt;li>그래서 제가 인터넷에서 봤던 내용들이 맞는 건지 교수님께 배웠던 내용이 맞는 건지 궁금했는데 이 책 덕분에 &amp;lsquo;뭐 모두 맞는 내용 같다.&amp;lsquo;는 결론을 낼 수 있었습니다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="단점">단점&lt;/h3>
+&lt;ul>
+&lt;li>깊이가 깊진 않습니다. 깊이만 놓고 보면 학부생 수준의 컴퓨터구조, 운영체제 정도인 듯합니다.&lt;/li>
+&lt;li>번역이 조금 어색한 부분들이 종종 보였습니다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>&lt;figure style="flex-grow: 157; flex-basis: 377px">
+&lt;a href="https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/bookbooke.png" data-size="1080x686">&lt;img src="https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/bookbooke.png"
+srcset="https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/bookbooke_hu8f782b13d162da26e298aa87a902a883_197267_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/computer-science/linux-architecture-with-practice-and-images-review/bookbooke_hu8f782b13d162da26e298aa87a902a883_197267_1024x0_resize_box_3.png 1024w"
+width="1080"
+height="686"
+loading="lazy"
+alt="2022년 독서 현황">
+&lt;/a>
+&lt;figcaption>2022년 독서 현황&lt;/figcaption>
+&lt;/figure>&lt;/p>
+&lt;p>&amp;ldquo;북적북적&amp;quot;이라는 앱을 통해 캡쳐한 저의 2022년 독서 상태입니다. 올해에 3권을 읽는 게 목표였는데 아무래도 올해가 가기전에 한 권 정도는 더 읽어볼 수 있을 것 같습니다!
+책의 권수보다는 제가 어떤 내용을 어떤 깊이로 배워나가고 있는지가 더 중요하겠지만 일단은 뿌듯하네요! ㅎㅎ
+한국어로 된 책인데다가 친숙한 내용, 깊지 않은 깊이였던 터라 제 기준에선 꽤나 빨리 읽을 수 있었던 것 같습니다.&lt;/p>
+&lt;p>다음에 기회가 된다면 이 책처럼 컴퓨터 구조, 운영체제의 내용을 주로 다루는 책보다는 커널에 대해 다루는 책을 읽어보고 싶습니다.&lt;/p></description></item><item><title>[책] Istio in Action 리뷰</title><link>https://umi0410.github.io/blog/devops/istio-in-action-review/</link><pubDate>Fri, 30 Sep 2022 22:00:00 +0900</pubDate><guid>https://umi0410.github.io/blog/devops/istio-in-action-review/</guid><description>&lt;img src="https://umi0410.github.io/blog/devops/istio-in-action-review/preview.png" alt="Featured image of post [책] Istio in Action 리뷰" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>저는 데브옵스 엔지니어로 현재(2022년 9월)의 회사에 입사한 후, 기존에 막연하게 궁금증을 가져왔던 Istio라는 제품을 주로 담당하게 됐습니다.&lt;/p>
 &lt;p>공식 문서와 릴리즈 노트 위주로 Istio를 공부하던 중 팀원분께 &lt;strong>Istio in Action&lt;/strong>이라는 책을 추천받게 됐고, 이 책을 통해 조금
 두루뭉실했던 이해와 삽질을 바탕으로 했던 판단들이 좀 더 분명해질 수 있었던 것 같습니다.&lt;/p>
