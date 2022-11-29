@@ -100,14 +100,11 @@ mkdir -p ${HOME}/coredns-config
 `${HOME}/coredns-config` 에 core dns에 대한 설정을 담을 directory를 생성해준다.
 
 ```shell
-cat <<EOF > ${HOME}/coredns-config/Corefile
+cat << EOF > ${HOME}/coredns-config/Corefile
 .:53 {
-  forward . 8.8.8.8
-  log
-}
-
-me.:53 {
-  file /etc/coredns/config/me
+  hosts /etc/coredns/config/me me. {
+    fallthrough
+  }
   forward . 8.8.8.8
   log
 }
@@ -116,16 +113,14 @@ EOF
 
 Core DNS은 `Corefile` 을 통해 설정해줄 수 있다.
 
-구글의 DNS 서버인 8.8.8.8을 기본적으로 이용하도록 한다.
+`me.` Zone은 `hosts` plugin을 통해 `/etc/coredns/config/me` 에 `/etc/hosts` 포맷으로 정의된 레코드들을 참고하고 거기에서 원하는 레코드를 찾지 못해 질의 결과가 `NXDOMAIN`인 경우 fallthrough 하여 다음 plugin인 `forward` 를 이용하도록한다.원하는 찾는 도메인 네임이 정의되어있지 않다면 8.8.8.8로 포워드하도록 했다.
+완전히 프라이빗한 나만의 TLD를 이용하는 것이 아니라 널리 쓰이는 TLD 중 하나인 `.me` 를 이용하는 이유는 그냥 브라우저 주소창에서 `http://` 혹은 `https://` 를 사용하기 귀찮아서이다. (널리 쓰이는 TLD는 http:// 혹은 https://를 적어주지 않아도 알아서 도메인으로 접속을 시도하는데 나만의 TLD는 구글 검색을 해버림)
 
-`me.` Zone은 `/etc/coredns/config/me` 에 정의된 레코드들을 참고하고 거기에 원하는 찾는 도메인 네임이 정의되어있지 않다면 8.8.8.8로 포워드하도록 한다. 완전히 프라이빗한 나만의 TLD를 이용하는 것이 아니라 널리 쓰이는 TLD 중 하나인 `.me` 를 이용하는 이유는 그냥 브라우저 주소창에서 `http://` 혹은 `https://` 를 사용하기 귀찮아서이다. (널리 쓰이는 TLD는 http:// 혹은 https://를 적어주지 않아도 알아서 도메인으로 접속을 시도하는데 나만의 TLD는 구글 검색을 해버림)
+`me.` Zone이 아닌 다른 Zone에 대한 질의는 모두 기본적으로 8.8.8.8로 forward하도록했다.
 
 ```bash
 cat <<EOF > ${HOME}/coredns-config/me
-\$ORIGIN me.
-@       60 IN SOA dns.jinsulab.me dev.umijs.gmail.com. 1 60 60 60 60
-@ 60 IN A 192.168.219.180 ; Laptop
-laptop 60 IN A 192.168.219.180 ; Laptop
+192.168.219.180 laptop.me # Laptop
 EOF
 ```
 
@@ -138,7 +133,7 @@ for id in {200..203}; do
   if [[ $? -eq 0 ]]; then
     echo "Record about pi${id} has already exists."
   else
-    echo "pi${id} 60 IN A 192.168.219.${id} ; Raspberry Pi (id=${id})" >> ${me_zone_file} && \
+    echo "192.168.219.${id} pi${id}.me # Raspberry Pi (id=${id})" >> ${me_zone_file} && \
     echo "Added a record about pi${id}."
   fi
 done; 
@@ -255,6 +250,11 @@ $ docker logs coredns --tail 100 -f
 - 공유기 구비 - U+의 기본 제공 공유기로는 기능이 좀 부족한 면이 있다. DNS 서버 뿐만 아니라 공유기 자체도 코딩이 가능한 나만의 장비를 쓰면 좋을 듯한데 그 이유는 각 장치에게 DHCP static lease를 좀 더 잘 해주고싶기 때문이다. 현재는 공유기 관리 페이지에서 장치별로 MAC address에 따라 static lease해주고 있다. 그리고 공유기 설정 뭐만 바꾸면 몇 십초 동안 중단되어버림…
 - DNS 서버용 장치 구비 - 현재 CoreDNS가 laptop에 떠있는데 laptop이 뻗는다거나하면 U+의 보조 DNS 서버를 이용하게 된다. 따라서 이건 저렴한 장치(e.g. Raspberry Pi 3)를 DNS server dedicated로 사용하면 어떨까싶다.
 
+## Change log
+
+* [rev 2] 2022-11-29 - file plugin이 아닌 hosts plugin을 이용하도록 개선함
+  * file plugin에는 fallthrough 기능이 없었음. 따라서 CoreDNS선에서 NXDOMAIN이 발생하는 경우 다음 plugin인 forward로 8.8.8.8에 질의할 수 없었다. 이를 바로 깨닫지는 못했는데 그 이유는 초반에는 OS와 브라우저의 캐시 때문에 잘 동작했었기 때문이다. 
+* [rev 1] 2022-11-29 - file plugin으로 `me.` Zone을 이용
 ## 참고
 
 [https://kimmj.github.io/coredns/configure-dns-server/](https://kimmj.github.io/coredns/configure-dns-server/)  - 완전 처음에 coredns 띄우는 게 얼마나 쉬운지 맛보기용
