@@ -72,26 +72,21 @@
 &lt;p>그럼. Core DNS 설정을 한 번 시작해보겠다.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p &lt;span class="si">${&lt;/span>&lt;span class="nv">HOME&lt;/span>&lt;span class="si">}&lt;/span>/coredns-config
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>${HOME}/coredns-config&lt;/code> 에 core dns에 대한 설정을 담을 directory를 생성해준다.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat &lt;span class="s">&amp;lt;&amp;lt;EOF &amp;gt; ${HOME}/coredns-config/Corefile
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat &lt;span class="s">&amp;lt;&amp;lt; EOF &amp;gt; ${HOME}/coredns-config/Corefile
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">.:53 {
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> forward . 8.8.8.8
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> log
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">}
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">me.:53 {
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> file /etc/coredns/config/me
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> hosts /etc/coredns/config/me me. {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> fallthrough
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> }
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> forward . 8.8.8.8
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> log
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">}
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Core DNS은 &lt;code>Corefile&lt;/code> 을 통해 설정해줄 수 있다.&lt;/p>
-&lt;p>구글의 DNS 서버인 8.8.8.8을 기본적으로 이용하도록 한다.&lt;/p>
-&lt;p>&lt;code>me.&lt;/code> Zone은 &lt;code>/etc/coredns/config/me&lt;/code> 에 정의된 레코드들을 참고하고 거기에 원하는 찾는 도메인 네임이 정의되어있지 않다면 8.8.8.8로 포워드하도록 한다. 완전히 프라이빗한 나만의 TLD를 이용하는 것이 아니라 널리 쓰이는 TLD 중 하나인 &lt;code>.me&lt;/code> 를 이용하는 이유는 그냥 브라우저 주소창에서 &lt;code>http://&lt;/code> 혹은 &lt;code>https://&lt;/code> 를 사용하기 귀찮아서이다. (널리 쓰이는 TLD는 http:// 혹은 https://를 적어주지 않아도 알아서 도메인으로 접속을 시도하는데 나만의 TLD는 구글 검색을 해버림)&lt;/p>
+&lt;p>&lt;code>me.&lt;/code> Zone은 &lt;code>hosts&lt;/code> plugin을 통해 &lt;code>/etc/coredns/config/me&lt;/code> 에 &lt;code>/etc/hosts&lt;/code> 포맷으로 정의된 레코드들을 참고하고 거기에서 원하는 레코드를 찾지 못해 질의 결과가 &lt;code>NXDOMAIN&lt;/code>인 경우 fallthrough 하여 다음 plugin인 &lt;code>forward&lt;/code> 를 이용하도록한다.원하는 찾는 도메인 네임이 정의되어있지 않다면 8.8.8.8로 포워드하도록 했다.
+완전히 프라이빗한 나만의 TLD를 이용하는 것이 아니라 널리 쓰이는 TLD 중 하나인 &lt;code>.me&lt;/code> 를 이용하는 이유는 그냥 브라우저 주소창에서 &lt;code>http://&lt;/code> 혹은 &lt;code>https://&lt;/code> 를 사용하기 귀찮아서이다. (널리 쓰이는 TLD는 http:// 혹은 https://를 적어주지 않아도 알아서 도메인으로 접속을 시도하는데 나만의 TLD는 구글 검색을 해버림)&lt;/p>
+&lt;p>&lt;code>me.&lt;/code> Zone이 아닌 다른 Zone에 대한 질의는 모두 기본적으로 8.8.8.8로 forward하도록했다.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat &lt;span class="s">&amp;lt;&amp;lt;EOF &amp;gt; ${HOME}/coredns-config/me
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">\$ORIGIN me.
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">@ 60 IN SOA dns.jinsulab.me dev.umijs.gmail.com. 1 60 60 60 60
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">@ 60 IN A 192.168.219.180 ; Laptop
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">laptop 60 IN A 192.168.219.180 ; Laptop
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">192.168.219.180 laptop.me # Laptop
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>me.&lt;/code> Zone에 대한 파일을 &lt;code>${HOME}/coredns-config/me&lt;/code> 경로에 기본적인 내용과 함께 생성했다.&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">me_zone_file&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">HOME&lt;/span>&lt;span class="si">}&lt;/span>/coredns-config/me
@@ -100,7 +95,7 @@
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="o">[[&lt;/span> &lt;span class="nv">$?&lt;/span> -eq &lt;span class="m">0&lt;/span> &lt;span class="o">]]&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">then&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;Record about pi&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> has already exists.&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;pi&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> 60 IN A 192.168.219.&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> ; Raspberry Pi (id=&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span> &amp;gt;&amp;gt; &lt;span class="si">${&lt;/span>&lt;span class="nv">me_zone_file&lt;/span>&lt;span class="si">}&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;192.168.219.&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> pi&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">.me # Raspberry Pi (id=&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">)&amp;#34;&lt;/span> &amp;gt;&amp;gt; &lt;span class="si">${&lt;/span>&lt;span class="nv">me_zone_file&lt;/span>&lt;span class="si">}&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;Added a record about pi&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">id&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">.&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">fi&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">done&lt;/span>&lt;span class="p">;&lt;/span>
@@ -200,6 +195,15 @@ loading="lazy"
 &lt;li>Record 관리 개선 - 현재는 bash script로 레코드를 관리하는 셈인데 Git을 이용하고 자동으로 sync를 맞추든 다른 방안을 찾아보든 하면 좋겠다.&lt;/li>
 &lt;li>공유기 구비 - U+의 기본 제공 공유기로는 기능이 좀 부족한 면이 있다. DNS 서버 뿐만 아니라 공유기 자체도 코딩이 가능한 나만의 장비를 쓰면 좋을 듯한데 그 이유는 각 장치에게 DHCP static lease를 좀 더 잘 해주고싶기 때문이다. 현재는 공유기 관리 페이지에서 장치별로 MAC address에 따라 static lease해주고 있다. 그리고 공유기 설정 뭐만 바꾸면 몇 십초 동안 중단되어버림…&lt;/li>
 &lt;li>DNS 서버용 장치 구비 - 현재 CoreDNS가 laptop에 떠있는데 laptop이 뻗는다거나하면 U+의 보조 DNS 서버를 이용하게 된다. 따라서 이건 저렴한 장치(e.g. Raspberry Pi 3)를 DNS server dedicated로 사용하면 어떨까싶다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="change-log">Change log&lt;/h2>
+&lt;ul>
+&lt;li>[rev 2] 2022-11-29 - file plugin이 아닌 hosts plugin을 이용하도록 개선함
+&lt;ul>
+&lt;li>file plugin에는 fallthrough 기능이 없었음. 따라서 CoreDNS선에서 NXDOMAIN이 발생하는 경우 다음 plugin인 forward로 8.8.8.8에 질의할 수 없었다. 이를 바로 깨닫지는 못했는데 그 이유는 초반에는 OS와 브라우저의 캐시 때문에 잘 동작했었기 때문이다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>[rev 1] 2022-11-29 - file plugin으로 &lt;code>me.&lt;/code> Zone을 이용&lt;/li>
 &lt;/ul>
 &lt;h2 id="참고">참고&lt;/h2>
 &lt;p>&lt;a class="link" href="https://kimmj.github.io/coredns/configure-dns-server/" target="_blank" rel="noopener"
