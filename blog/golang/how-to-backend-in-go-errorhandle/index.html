@@ -52,7 +52,7 @@ extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-h
 </span></span><span class=line><span class=cl><span class=p>)</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>r</span> <span class=o>*</span><span class=nx>redis</span><span class=p>)</span> <span class=nf>HashGet</span><span class=p>(</span><span class=nx>key</span> <span class=kt>string</span><span class=p>)</span> <span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>Hash</span> <span class=nx>Get</span> <span class=nx>도중</span> <span class=nx>에러가</span> <span class=nx>발생한</span> <span class=nx>경우</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>Hash</span> <span class=nx>Get</span> <span class=err>도중</span> <span class=err>에러가</span> <span class=err>발생한</span> <span class=err>경우</span><span class=p>){</span>
 </span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s>&#34;&#34;</span><span class=p>,</span> <span class=nx>ErrRedisGet</span> <span class=c1>// 이 버전에서는 ErrRedisGet을 리턴함.
 </span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=o>...</span> <span class=c1>// 에러가 발생하지 않은 경우
@@ -74,7 +74,7 @@ extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-h
 </span></span><span class=line><span class=cl><span class=p>)</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>r</span> <span class=o>*</span><span class=nx>redis</span><span class=p>)</span> <span class=nf>HashGet</span><span class=p>(</span><span class=nx>key</span> <span class=kt>string</span><span class=p>)</span> <span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>{</span>
-</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>Hash</span> <span class=nx>Get</span> <span class=nx>도중</span> <span class=nx>에러가</span> <span class=nx>발생한</span> <span class=nx>경우</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>Hash</span> <span class=nx>Get</span> <span class=err>도중</span> <span class=err>에러가</span> <span class=err>발생한</span> <span class=err>경우</span><span class=p>){</span>
 </span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s>&#34;&#34;</span><span class=p>,</span> <span class=nx>ErrRedisHashGet</span> <span class=c1>// 이 버전에서는 ErrRedisGet을 리턴함.
 </span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=o>...</span> <span class=c1>// 에러가 발생하지 않은 경우
@@ -102,7 +102,7 @@ extended"><div id=article-toolbar><a href=https://umi0410.github.io class=back-h
 </span></span><span class=line><span class=cl>	<span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>)</span>
 </span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl><span class=o>...</span> <span class=nx>생략</span>
+</span></span><span class=line><span class=cl><span class=o>...</span> <span class=err>생략</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>svc</span> <span class=o>*</span><span class=nx>UserService</span><span class=p>)</span> <span class=nf>GetUserWorst</span><span class=p>(</span><span class=nx>username</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=o>*</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>user</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>users</span> <span class=p>{</span>
