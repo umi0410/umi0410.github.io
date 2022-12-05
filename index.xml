@@ -1,4 +1,293 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Wed, 30 Nov 2022 01:35:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>[반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 DNS 서버로 이용하기</title><link>https://umi0410.github.io/blog/companion-server/core-dns/</link><pubDate>Wed, 30 Nov 2022 01:35:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/core-dns/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/core-dns/preview.png" alt="Featured image of post [반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 DNS 서버로 이용하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Tue, 06 Dec 2022 01:35:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>VBoxManage(VirtualBox CLI)로 VM 생성하기</title><link>https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/</link><pubDate>Tue, 06 Dec 2022 01:35:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/preview.png" alt="Featured image of post VBoxManage(VirtualBox CLI)로 VM 생성하기" />&lt;h1 id="vboxmanagevirtualbox-cli로-vm-생성하기">VBoxManage(VirtualBox CLI)로 VM 생성하기&lt;/h1>
+&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>홈서버를 직접 구성해보면서 실제 기기 개수가 많지 않아 좀 아쉬웠는데 최근에는 이를 VM으로 충당해볼까 싶은 생각이 들기도 했다. 갖고 있는 랩탑 하나에 여러 대의 VM을 띄우면 홈서버에서 좀 더 많은 수의 노드가 있는 것처럼 이용할 수 있지 않을까 싶어 VM을 띄워보기로 했다. 하지만 이번에는 단순히 GUI로 VM을 띄우는 것이 아니라 CLI로 VM을 띄우면서 LV(Logical Volume)을 이용해봤다. 해당 내용을 까먹을까봐 이 글을 통해 한 번 정리해본다.&lt;/p>
+&lt;h2 id="실습-환경">실습 환경&lt;/h2>
+&lt;p>호스트 환경은 아래와 같다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>CPU&lt;/th>
+&lt;th>amd64, 8 Core&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>RAM&lt;/td>
+&lt;td>16GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Disk&lt;/td>
+&lt;td>256GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OS&lt;/td>
+&lt;td>Ubuntu server 22.04&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>구성하고자하는 VM은 다음과 같다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>CPU&lt;/th>
+&lt;th>amd64, 2 Core&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>RAM&lt;/td>
+&lt;td>4GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Disk&lt;/td>
+&lt;td>16GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OS&lt;/td>
+&lt;td>Ubuntu server 22.04&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>우선 내 랩탑의 OS는 Ubuntu server 22.04이기에 기본적으로 GUI 프로그램은 아예 실행이 안된다. 따라서 VirtualBox GUI는 이용할 수 없었고 VBoxManage라는 CLI 프로그램을 사용했다.&lt;/p>
+&lt;p>이번에 만들어볼 것은 Host machine의 Linux LV(Logical Volume)을 본인(VM)의 디스크 장치로 이용하는 VM이다.&lt;/p>
+&lt;p>굳이 LV를 이용하고자 했던 이유는 호스트 머신의 OS를 완전히 다시 설치하더라도 VM의 데이터는 보존되길 바랬기 때문이다. 사실 이렇게까지 할 필요는 딱히 없었는데 요즘 볼륨이나 마운트쪽이 궁금해져 이렇게 작업해봤다.&lt;/p>
+&lt;h2 id="lv-생성하기">LV 생성하기&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ lsblk
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINTS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...&lt;span class="o">(&lt;/span>생략&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sda 8:0 &lt;span class="m">0&lt;/span> 238.5G &lt;span class="m">0&lt;/span> disk
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda1 8:1 &lt;span class="m">0&lt;/span> 1G &lt;span class="m">0&lt;/span> part /boot/efi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda2 8:2 &lt;span class="m">0&lt;/span> 2G &lt;span class="m">0&lt;/span> part /boot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└─sda3 8:3 &lt;span class="m">0&lt;/span> 235.4G &lt;span class="m">0&lt;/span> part
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> └─ubuntu--vg-ubuntu--lv 253:0 &lt;span class="m">0&lt;/span> 100G &lt;span class="m">0&lt;/span> lvm /
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ sudo pvs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> PV VG Fmt Attr PSize PFree
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> /dev/sda3 ubuntu-vg lvm2 a-- 235.42g 135.42g
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ sudo vgs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> VG &lt;span class="c1">#PV #LV #SN Attr VSize VFree&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ubuntu-vg &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> &lt;span class="m">0&lt;/span> wz--n- 235.42g 135.42g
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ sudo lvs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> LV VG Attr LSize Pool Origin Data% Meta% Move Log Cpy%Sync Convert
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ubuntu-lv ubuntu-vg -wi-ao---- 100.00g
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ul>
+&lt;li>sda라는 디스크 장치에 sda1, sda2, sda3라는 Physical Volume이 존재함.&lt;/li>
+&lt;li>ubuntu-vg라는 Volume Group은 sda3라는 Physical Volume으로 구성됨.&lt;/li>
+&lt;li>ubuntu-vg라는 Volume Group 아래에는 ubuntu-lv라는 Logical Volume이 존재함.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>lsblk&lt;/code> 로 랩탑의 디바이스 정보를 출력해본 내용은 위와 같다.&lt;/p>
+&lt;p>앞으로 만들 vm1이라는 VM에게 ubuntu-vg(sda3)에 남는 135.4G 중 16GB를 Logical Volume으로 할당해줄 것이다. 따라서 LV를 만들어주자.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ sudo lvcreate -n vm1-disk -L 16G ubuntu-vg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Logical volume &lt;span class="s2">&amp;#34;vm1-disk&amp;#34;&lt;/span> created.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ sudo lvs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> LV VG Attr LSize Pool Origin Data% Meta% Move Log Cpy%Sync Convert
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ubuntu-lv ubuntu-vg -wi-ao---- 100.00g
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> vm1-disk ubuntu-vg -wi-a----- 16.00g
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>vm1이 Disk로 사용할 LV가 잘 만들어진 모습이다. 포맷하며 파일시스템을 설정해줘야하려나 싶었는데 딱히 그렇지는 않고 그냥 바로 VirtualBox가 사용하도록 해줄 수 있는 듯하다.&lt;/p>
+&lt;h2 id="이미지-준비하기">이미지 준비하기&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt install -y virtualbox virtualbox-ext-pack
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>우선 이제 슬슬 virtualbox가 필요할 것이기에 virtualbox를 설치해준다. ext-pack은 extension인데 학습할 때에는 웬만하면 있는 게 좋을 것이다. 아마 잠시 후 RDP(Remote Desktop Protocol)라는 프로토콜을 이용할 때에도 ext-pack이 있어야할 것이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo su
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">vb&lt;/span>&lt;span class="o">=&lt;/span>VBoxManage
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>이제부터는 많은 명령어들이 root 권한을 필요로 할 것이다. 따라서 대부분의 작업을 root로 수행할 것이다.&lt;/p>
+&lt;p>그리고 vboxmanage라는 커맨드가 상당히 마음에 들지 않아서 나는 &lt;code>vb&lt;/code> 라는 alias를 이용했다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb internalcommands createrawvmdk \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -filename vm1-disk.vmdk &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -rawdisk /dev/ubuntu-vg/vm1-disk
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">RAW host disk access VMDK file vm1-disk.vmdk created successfully.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>internal command를 이용해 호스트의 디스크 전체를 사용하는 VMDK 이미지를 &lt;code>vm1-disk.vmdk&lt;/code> 생성했다. 생성되는 &lt;code>.vmdk&lt;/code> 파일의 크기는 몇 백 바이트 정도로 상당히 작은데, 이 파일 자체가 데이터를 담는 것은 아니고 그냥 어떻게 호스트의 디스크(현재의 경우 vm1-disk)를 이용할 지에 대한 설정만 존재할 뿐이라서 그런 듯하다. 참고로 &lt;code>cat&lt;/code> 을 통해 내용을 확인해볼 수도 있다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">curl -LO https://mirror.kakao.com/ubuntu-releases/22.04/ubuntu-22.04.1-live-server-amd64.iso
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>그리고 이제 Ubuntu Server 22.04에 대한 .iso 이미지 파일을 다운로드 해준다. 카카오의 미러링 페이지를 이용하면 와이파이로도 빠른 경우 약 30초만에 다운로드가 가능하다. 이 이미지는 설치용 이미지이다.&lt;/p>
+&lt;p>이제 이미지 준비는 완료 됐다 🙂&lt;/p>
+&lt;h2 id="vboxmanagevirtualbox-cli를-통해-vm-생성하기">VBoxManage(VirtualBox CLI)를 통해 VM 생성하기&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">mkdir -p vbox
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>현재의 로컬 경로에 virtualbox vm이 base folder로 사용할 디렉토리를 만들어준다. 사실 글 초반에 적은 취지에 맞추려면 이 경로도 별도의 볼륨쪽이면 좋을 듯하긴한데 일단은 그냥 &lt;code>/root/vbox&lt;/code> 로 이용하려한다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb createvm --name vm1 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --basefolder&lt;span class="o">=&lt;/span>/root/vbox &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --ostype&lt;span class="o">=&lt;/span>Ubuntu_64 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --register
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Virtual machine &lt;span class="s1">&amp;#39;vm1&amp;#39;&lt;/span> is created and registered.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">UUID: 8ad1ab2c-1e7d-4e22-b65c-51ff7cacfc25
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Settings file: &lt;span class="s1">&amp;#39;/root/vbox/vm1/vm1.vbox&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>VM이 생성됐다고 한다! 하지만, VM을 실행하기 전에 몇 가지 설정을 더 해줘야한다.&lt;/p>
+&lt;p>아직 우리는 앞서 만든 image들을 mount하지도 않았기 때문이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb storagectl vm1 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --name &lt;span class="s2">&amp;#34;SATA Controller&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --add sata --bootable on
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb storageattach vm1 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --storagectl &lt;span class="s2">&amp;#34;SATA Controller&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --port &lt;span class="m">0&lt;/span> --device &lt;span class="m">0&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --type dvddrive &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --medium ubuntu-22.04.1-live-server-amd64.iso
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb storageattach vm1 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --storagectl &lt;span class="s2">&amp;#34;SATA Controller&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --port &lt;span class="m">1&lt;/span> --device &lt;span class="m">0&lt;/span> --type hdd &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --medium /root/vm1-disk.vmdk
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>SATA라는 Hard Disk Controller을 추가해준 뒤 생성해뒀던 &lt;code>vm1-disk.vmdk&lt;/code> (16GB짜리 LV 관련) 이미지를 HDD로서 추가해준다.&lt;/p>
+&lt;p>그리고 bridge network를 통해 host와 같은 네트워크를 이용할 수 있게끔할 것이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ip addr show wlp2s0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2: wlp2s0: &amp;lt;BROADCAST,MULTICAST,UP,LOWER_UP&amp;gt; mtu &lt;span class="m">1500&lt;/span> qdisc noqueue state UP group default qlen &lt;span class="m">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> link/ether 20:16:b9:9b:55:1e brd ff:ff:ff:ff:ff:ff
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet 192.168.219.180/24 metric &lt;span class="m">600&lt;/span> brd 192.168.219.255 scope global dynamic wlp2s0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> valid_lft 13790sec preferred_lft 13790sec
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet6 fe80::2216:b9ff:fe9b:551e/64 scope link
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> valid_lft forever preferred_lft forever
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb modifyvm vm1 --nic1 bridged --bridgeadapter1 wlp2s0&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>내 경우에는 &lt;code>wlp2s0&lt;/code> 라는 와이파이 네트워크 인터페이스에 bridge 할 수 있도록 설정했다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb modifyvm vm1 --memory 4092 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --cpus &lt;span class="m">2&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>앞서 언급한 대로 Memory는 4GB, CPU는 2 Core로 설정했다.&lt;/p>
+&lt;p>이제 거의 다 왔다.&lt;/p>
+&lt;p>하지만 일반적인 GUI에서 VirtualBox를 통해 VM을 실행했을 때와 달리 나의 호스트 머신의 OS는 Ubuntu Server이기 때문에 나는 설치 이미지로 VM을 시작했을 때 VM의 화면을 볼 수 없다.&lt;/p>
+&lt;p>만약 Cloud image를 이용하거나 Auto installation 설정을 잘 해뒀다면 화면 없이 어떻게 어떻게 알아서 OS를 설치하고 설정한 Bridge adapter을 이용해 DHCP해서 네트워크에 조인하고 SSH 서버가 켜질 수 있을 것이다. 이렇게 되면 GUI 없이 Host machine 및 같은 네트워크 장비에서 SSH로 접속할 수 있는 게 맞긴하다.&lt;/p>
+&lt;p>하지만 지금 이용 중인 Ubuntu server 이미지는 Cloud image도 아니고 우리는 별도로 Auto installation 설정을 한 것도 아니기에 Display 장치를 통해 화면을 보면서 키보드로 설치를 진행해야할 것이다.&lt;/p>
+&lt;p>이때 사용할 수 있는 것이 RDP(Remote Desktop Protocol)이라는 기술이다. 자세한 내용은 따로 찾아보는 걸로하고 여기선 간단히 정리하자면 그냥 Remote에서 VM의 화면을 보면서 입출력을 할 수 있는 기술을 의미한다. 나의 경우 같은 공유기 아래의 맥북에서 RDP 접속을 통해 Ubuntu Server 호스트의 Ubuntu Server Guest(VM)의 설치를 진행할 수 있었다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 745; flex-basis: 1790px">
+&lt;a href="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/mermaid-connection-flow.png" data-size="813x109">&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/mermaid-connection-flow.png"
+srcset="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/mermaid-connection-flow_hu7749fb9e9bf25ce37e865f90ba2cc26c_14638_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/mermaid-connection-flow_hu7749fb9e9bf25ce37e865f90ba2cc26c_14638_1024x0_resize_box_3.png 1024w"
+width="813"
+height="109"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>위의 그림과 같이 맥북을 통해 호스트 머신에 RDP로 접속하면 Guset에 연결될 수 있을 것이다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 227; flex-basis: 544px">
+&lt;a href="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/microsoft-remote-desktop.png" data-size="1912x842">&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/microsoft-remote-desktop.png"
+srcset="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/microsoft-remote-desktop_hu2524cf3bdcb3adef8cf4101d9218953f_210336_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/microsoft-remote-desktop_hu2524cf3bdcb3adef8cf4101d9218953f_210336_1024x0_resize_box_3.png 1024w"
+width="1912"
+height="842"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>RDP를 이용하기 위해선 클라이언트 프로그램이 필요할 것이다.&lt;/p>
+&lt;p>OSX에서는 remote desktop 클라이언트로 Microsoft Remote Desktop이 가장 좋은 듯했다. 나머지는 유료거나 자기들이 개발한 자체 프로토콜 or http 등을 이용하는 것 같았다.&lt;/p>
+&lt;p>RDP 프로토콜에서 인증이 필수는 아닐 것 같은데 아쉽게도 이 훌륭한 클라이언트의 단점이 하나 있다면 인증이 강제되는 것 같다는 것이다.&lt;/p>
+&lt;p>따라서 VM에 RDP 설정을 켜고, 인증을 활성화 해야한다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># export VRDE_USERNAME=foo&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># export VRDE_PASSWORD=bar&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>위와 같이 RDP 인증에 사용할 username, password를 설정해준다. 이후 커맨드에서 사용하게 될 환경변수이다. 그냥 VRDE는 VirtualBox에서 RDP를 부르는 말 정도로만 알고 넘어가도 될 듯하다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb setproperty vrdeauthlibrary VBoxAuthSimple&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb modifyvm vm1 --vrde on \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --vrdeport &lt;span class="m">3389&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --vrdeauthtype external
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># export PASSWORD_HASHED=$(vb internalcommands passwordhash $VRDE_PASSWORD | \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sed &lt;span class="s1">&amp;#39;s/^Password hash: //&amp;#39;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb setextradata vm1 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> VBoxAuthSimple/users/&lt;span class="nv">$VRDE_USERNAME&lt;/span> &lt;span class="nv">$PASSWORD_HASHED&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb getextradata vm1 enumerate | \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> grep &lt;span class="s2">&amp;#34;VBoxAuthSimple/users/&lt;/span>&lt;span class="nv">$VRDE_USERNAME&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>좀 복잡하긴한데 쉽게 요약하면 그냥 RDP 인증을 VBoxAuthSimple이라는 방식을 통해 진행하겠다는 거고 그를 위한 username, password를 설정하는 작업이다.&lt;/p>
+&lt;p>좀 더 자세히 설명하자면 다음과 같다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb internalcommands passwordhash $VRDE_PASSWORD&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Password hash: fcde2b2edba56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>password를 설정하기 위해 password를 해시하는 커맨드이다. plain password를 그대로 설정하지 않고 한 번 미리 해시한 뒤에 그 값을 전달해줘야한다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb getextradata vm1 enumerate | \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> grep &lt;span class="s2">&amp;#34;VBoxAuthSimple/users/&lt;/span>&lt;span class="nv">$VRDE_USERNAME&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Key: VBoxAuthSimple/users/foo, Value: fcde2b2edba56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>extradata를 조회해봄으로써 &lt;code>foo&lt;/code> 라는 유저의 해쉬된 패스워드 값을 확인해볼 수 있다.&lt;/p>
+&lt;p>이 값이 조회되지 않으면 인증 설정이 제대로 적용되지 않은 것이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb startvm vm1 --type headless&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>드디어! vm을 시작할 때가 됐다. &lt;code>--type headless&lt;/code> 인자를 주게 되면 VM의 화면을 바로 GUI로 띄우지 않고 headless mode로 시작한다. GUI로 띄우기 위한 도구들이 호스트에 제대로 설치되어있지 않다면 에러가 날 것이고 나의 랩탑 또한 거의 순정 상태의 Ubuntu server였기 때문에 headless mode로 시작해야만 했다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 277; flex-basis: 665px">
+&lt;a href="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/microsoft-remote-desktop-connect.png" data-size="1962x708">&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/microsoft-remote-desktop-connect.png"
+srcset="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/microsoft-remote-desktop-connect_hu0135d8f9d5ad1022e5fa8dd0554fb333_367603_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/microsoft-remote-desktop-connect_hu0135d8f9d5ad1022e5fa8dd0554fb333_367603_1024x0_resize_box_3.png 1024w"
+width="1962"
+height="708"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>RDP Client(e.g. Microsoft Remote Desktop)에서 위와 같이 설정해주면 될 것이다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 211; flex-basis: 508px">
+&lt;a href="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-1.png" data-size="1021x482">&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-1.png"
+srcset="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-1_hu4618397b7581852c0b647ff44c653258_52041_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-1_hu4618397b7581852c0b647ff44c653258_52041_1024x0_resize_box_3.png 1024w"
+width="1021"
+height="482"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 384; flex-basis: 922px">
+&lt;a href="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-2.png" data-size="826x215">&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-2.png"
+srcset="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-2_hu4d83c2a522737fa70c79baad2bc0090d_28789_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-2_hu4d83c2a522737fa70c79baad2bc0090d_28789_1024x0_resize_box_3.png 1024w"
+width="826"
+height="215"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>🎉 RDP를 통해 성공적으로 연결되면 이렇게 설치 화면을 볼 수 있을 것이다!&lt;/p>
+&lt;p>와우.. 드디어 VBoxManage로 VM을 띄우는 데에 성공했다. 호스트의 공유기에 붙은 인터페이스를 브릿지 어댑터로 설정하니 호스트와 같이 공유기에 DHCP로 IP를 할당받는 것도 성공한 모습이다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 211; flex-basis: 508px">
+&lt;a href="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-1.png" data-size="1021x482">&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-1.png"
+srcset="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-1_hu4618397b7581852c0b647ff44c653258_52041_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-1_hu4618397b7581852c0b647ff44c653258_52041_1024x0_resize_box_3.png 1024w"
+width="1021"
+height="482"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>설치가 완료된 뒤 RDP로 연결된 화면에서 몇 가지 명령어를 사용해봤다. 🙂 설치가 완료되면 이제 RDP는 굳이 사용하지 않아도 된다. 기본적으로 같은 네트워크의 어떤 장비에서든 설치 시에 입력한 username, password로 SSH 접속이 가능할 것이다. 예를 들면 다음과 같이 말이다.&lt;/p>
+&lt;p>&lt;figure style="flex-grow: 384; flex-basis: 922px">
+&lt;a href="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-2.png" data-size="826x215">&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-2.png"
+srcset="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-2_hu4d83c2a522737fa70c79baad2bc0090d_28789_480x0_resize_box_3.png 480w, https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/installation-2_hu4d83c2a522737fa70c79baad2bc0090d_28789_1024x0_resize_box_3.png 1024w"
+width="826"
+height="215"
+loading="lazy"
+>
+&lt;/a>
+&lt;/figure>&lt;/p>
+&lt;p>👆 같은 네트워크의 맥북에서 VM에 SSH 접속을 해서 아무 명령어나 실행해본 예시&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb controlvm vm1 poweroff&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb storageattach vm1 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --storagectl &lt;span class="s2">&amp;#34;SATA Controller&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --port &lt;span class="m">0&lt;/span> --device &lt;span class="m">0&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --medium none
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb storageattach vm1 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --storagectl &lt;span class="s2">&amp;#34;SATA Controller&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --port &lt;span class="m">1&lt;/span> --device &lt;span class="m">0&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --medium none
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb storageattach vm1 \&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --storagectl &lt;span class="s2">&amp;#34;SATA Controller&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --port &lt;span class="m">0&lt;/span> --device &lt;span class="m">0&lt;/span> --type hdd &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --medium /root/vm1-disk.vmdk
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># vb startvm vm1 --type headless&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>그리고 이제 설치가 완료됐으니 더 이상 설치용 이미지인 &lt;code>ubuntu-22.04.1-live-server-amd64.iso&lt;/code> 를 dvddrive로 붙여줄 필요도 없다. 꼭 해야하는 작업은 아니긴하지만 &lt;code>--medium none&lt;/code> 을 통해 장치들을 모두 연결 해제한 뒤 그냥 &lt;code>.vmdk&lt;/code> 를 0번 포트에 연결해줄 수 있다.&lt;/p>
+&lt;h2 id="배운-것-얻은-것">배운 것, 얻은 것&lt;/h2>
+&lt;ul>
+&lt;li>PV, VG, LV 등 Linux의 LVM(Logical Volume Manager)의 개념을 접해볼 수 있었다.&lt;/li>
+&lt;li>‘VirtualBox의 모든 기능을 VBoxManage로 사용할 수 있구나’싶었다.&lt;/li>
+&lt;li>RDP, VRDE라는 개념을 접해볼 수 있었다.&lt;/li>
+&lt;li>Bridge Adapter, NAT, NAT Network, Host only 등 VirtualBox에서 사용하는 네트워크 형태를 한 번 더 경험해볼 수 있었다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="글에서-다룬-내용-외에-더-해볼-만한-것">글에서 다룬 내용 외에 더 해볼 만한 것&lt;/h2>
+&lt;ul>
+&lt;li>cloud-init 볼륨을 통한 auto installation - cloud-init이라는 방식을 이용하면 직접 설치 과정을 하나 하나 진행할 필요 없이 설치와 초기 설정을 자동화 할 수 있다.&lt;/li>
+&lt;li>Live 이미지가 아닌 Cloud image 이용하기 - Cloud image를 이용하면 auto install하는 게 기본 설정인듯 함. 좀 더 손쉽게 auto install할 수 있는 느낌이랄까.&lt;/li>
+&lt;li>PXE 네트워크 부팅&lt;/li>
+&lt;li>qemu, lima 등 다른 가상화 도구를 통해 VM을 이용해보기&lt;/li>
+&lt;li>원하는 다양한 네트워크 토폴로지 구성해보기&lt;/li>
+&lt;/ul>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>며칠 전에 VirtualBox로 VM을 만들 때 Ubuntu server에서 CLI인 VBoxManage로 만들어보겠다고 꽤나 많은 삽질을 했었다. 뿐만 아니라 요즘 pxe, qemu, bridge interface, kubespray 등등으로 인해 많은 삽질이 계속되고 있었다. 본업은 본업대로 하고 퇴근 후에 취미로 공부하다보니 시간이 많지 않다보니 계속 삽질만 하고 배운 내용을 복습/정리하지 못한 것 같아서 한 번 정리해봤다.&lt;/p>
+&lt;p>LVM, IDE와 SATA의 차이, RDP라는 새로운 프로토콜, img와 iso, 등등… 많은 새로운 개념 혹은 들어만 봤던 개념들을 직접 이용해보려하니 GUI에서는 정말 쉬웠던 작업을 진행하는 데에 많은 삽질이 수반됐다.&lt;/p>
+&lt;p>다음에는 qemu로 VM 띄우는 내용을 작성해볼까하는데 시간이 될지는 모르겠다 화이팅..! 💪&lt;/p></description></item><item><title>[반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 DNS 서버로 이용하기</title><link>https://umi0410.github.io/blog/companion-server/core-dns/</link><pubDate>Wed, 30 Nov 2022 01:35:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/core-dns/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/core-dns/preview.png" alt="Featured image of post [반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 DNS 서버로 이용하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>“반려 서버 키우기”라는 건전한 취미 생활을 본격적으로 시작하기 전에 그 사전 작업 중 하나로 Core DNS를 찍먹해보려한다.&lt;/p>
 &lt;p>현재 나의 홈랩 상황은 다음과 같다.&lt;/p>
 &lt;ul>
