@@ -3,7 +3,7 @@ title: "[반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 
 date: 2022-11-30T01:35:00+09:00
 weight: 25
 categories:
-- 반려 서버 키우기
+- companion-server
 image: preview.png
 ---
 
