@@ -14,16 +14,18 @@ image: preview.png
 
 호스트 환경은 아래와 같다.
 
-| CPU | amd64, 8 Core |
-| --- | --- |
-| RAM | 16GB |
-| Disk | 256GB |
-| OS | Ubuntu server 22.04 |
+| 항목   | 정보                  |
+|------|---------------------|
+| CPU  | amd64, 8 Core       |
+| RAM  | 16GB                |
+| Disk | 256GB               |
+| OS   | Ubuntu server 22.04 |
 
 구성하고자하는 VM은 다음과 같다.
 
-| CPU | amd64, 2 Core |
+| 항목   | 정보                  |
 | --- | --- |
+| CPU | amd64, 2 Core |
 | RAM | 4GB |
 | Disk | 16GB |
 | OS | Ubuntu server 22.04 |
