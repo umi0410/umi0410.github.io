@@ -319,3 +319,15 @@ RDP Client(e.g. Microsoft Remote Desktop)에서 위와 같이 설정해주면 �
 LVM, IDE와 SATA의 차이, RDP라는 새로운 프로토콜, img와 iso, 등등… 많은 새로운 개념 혹은 들어만 봤던 개념들을 직접 이용해보려하니 GUI에서는 정말 쉬웠던 작업을 진행하는 데에 많은 삽질이 수반됐다.
 
 다음에는 qemu로 VM 띄우는 내용을 작성해볼까하는데 시간이 될지는 모르겠다 화이팅..! 💪
+
+## 참고 자료
+
+* https://www.manualfactory.net/14379 - LV 만드는 법, LVM 개념 참고함
+* https://virtualbox.org/manual/UserManual.html - VBoxManage의 각종 커맨드를 참고함
+* https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifyvm.html - VBoxManage의 각종 커맨드를 참고함
+* https://unix.stackexchange.com/a/16317 - VBoxManage에서 LVM을 직접 이용하는 방법
+* https://www.arthurkoziel.com/vboxmanage-cli-ubuntu-20-04/ - VBoxManage에서 Storage 설정하는 방법 참고함
+* https://stackoverflow.com/a/71745701/8768651 - GUI가 불가능한 환경에서 `--headless`로 에러를 해결하는 방법
+* https://takudaddy.tistory.com/352 - VirtualBox 네트워크 종류별 정리
+* https://serverfault.com/questions/819466/how-to-achieve-virtualbox-like-bridging-under-kvm - virtualbox의 브릿지 네트워크 원리
+* https://gist.github.com/leogallego/a614c61457ed22cb1d960b32de4a1b01 - cloud-localds를 이용해 cloud-init 이미지 만들기
