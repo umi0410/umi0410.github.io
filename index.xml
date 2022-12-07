@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Tue, 06 Dec 2022 23:01:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>QEMU로 Ubuntu Server VM 생성하기</title><link>https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/</link><pubDate>Tue, 06 Dec 2022 23:01:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/preview.png" alt="Featured image of post QEMU로 Ubuntu Server VM 생성하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Thu, 08 Dec 2022 01:31:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>QEMU로 Ubuntu Server VM 생성하기</title><link>https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/</link><pubDate>Thu, 08 Dec 2022 01:31:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/preview.png" alt="Featured image of post QEMU로 Ubuntu Server VM 생성하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>직접 구축하는 홈서버에 VM도 추가하고 싶어졌고 이전 글&lt;a class="link" href="../create-vm-by-vboxmanage/" >[1]&lt;/a>과 마찬가지로 CLI로 VM을 띄워보고 싶었다.
 이전 글에서는 VirtualBox를 이용했지만 이번에는 qemu라는 도구를 이용해 VM을 만들어보고자한다.&lt;/p>
 &lt;p>qemu는 VM을 띄우는 도구들 중에서도 꽤나 로우한 레벨에 있으면서 손쉽게 다양한 아키텍쳐를 가상화해서 사용할 수 있게 해준다.
@@ -665,7 +665,28 @@ loading="lazy"
 &lt;h2 id="마치며">마치며&lt;/h2>
 &lt;p>며칠 전에 VirtualBox로 VM을 만들 때 Ubuntu server에서 CLI인 VBoxManage로 만들어보겠다고 꽤나 많은 삽질을 했었다. 뿐만 아니라 요즘 pxe, qemu, bridge interface, kubespray 등등으로 인해 많은 삽질이 계속되고 있었다. 본업은 본업대로 하고 퇴근 후에 취미로 공부하다보니 시간이 많지 않다보니 계속 삽질만 하고 배운 내용을 복습/정리하지 못한 것 같아서 한 번 정리해봤다.&lt;/p>
 &lt;p>LVM, IDE와 SATA의 차이, RDP라는 새로운 프로토콜, img와 iso, 등등… 많은 새로운 개념 혹은 들어만 봤던 개념들을 직접 이용해보려하니 GUI에서는 정말 쉬웠던 작업을 진행하는 데에 많은 삽질이 수반됐다.&lt;/p>
-&lt;p>다음에는 qemu로 VM 띄우는 내용을 작성해볼까하는데 시간이 될지는 모르겠다 화이팅..! 💪&lt;/p></description></item><item><title>[반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 DNS 서버로 이용하기</title><link>https://umi0410.github.io/blog/companion-server/core-dns/</link><pubDate>Wed, 30 Nov 2022 01:35:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/core-dns/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/core-dns/preview.png" alt="Featured image of post [반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 DNS 서버로 이용하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>다음에는 qemu로 VM 띄우는 내용을 작성해볼까하는데 시간이 될지는 모르겠다 화이팅..! 💪&lt;/p>
+&lt;h2 id="참고-자료">참고 자료&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.manualfactory.net/14379" target="_blank" rel="noopener"
+>https://www.manualfactory.net/14379&lt;/a> - LV 만드는 법, LVM 개념 참고함&lt;/li>
+&lt;li>&lt;a class="link" href="https://virtualbox.org/manual/UserManual.html" target="_blank" rel="noopener"
+>https://virtualbox.org/manual/UserManual.html&lt;/a> - VBoxManage의 각종 커맨드를 참고함&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifyvm.html" target="_blank" rel="noopener"
+>https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifyvm.html&lt;/a> - VBoxManage의 각종 커맨드를 참고함&lt;/li>
+&lt;li>&lt;a class="link" href="https://unix.stackexchange.com/a/16317" target="_blank" rel="noopener"
+>https://unix.stackexchange.com/a/16317&lt;/a> - VBoxManage에서 LVM을 직접 이용하는 방법&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.arthurkoziel.com/vboxmanage-cli-ubuntu-20-04/" target="_blank" rel="noopener"
+>https://www.arthurkoziel.com/vboxmanage-cli-ubuntu-20-04/&lt;/a> - VBoxManage에서 Storage 설정하는 방법 참고함&lt;/li>
+&lt;li>&lt;a class="link" href="https://stackoverflow.com/a/71745701/8768651" target="_blank" rel="noopener"
+>https://stackoverflow.com/a/71745701/8768651&lt;/a> - GUI가 불가능한 환경에서 &lt;code>--headless&lt;/code>로 에러를 해결하는 방법&lt;/li>
+&lt;li>&lt;a class="link" href="https://takudaddy.tistory.com/352" target="_blank" rel="noopener"
+>https://takudaddy.tistory.com/352&lt;/a> - VirtualBox 네트워크 종류별 정리&lt;/li>
+&lt;li>&lt;a class="link" href="https://serverfault.com/questions/819466/how-to-achieve-virtualbox-like-bridging-under-kvm" target="_blank" rel="noopener"
+>https://serverfault.com/questions/819466/how-to-achieve-virtualbox-like-bridging-under-kvm&lt;/a> - virtualbox의 브릿지 네트워크 원리&lt;/li>
+&lt;li>&lt;a class="link" href="https://gist.github.com/leogallego/a614c61457ed22cb1d960b32de4a1b01" target="_blank" rel="noopener"
+>https://gist.github.com/leogallego/a614c61457ed22cb1d960b32de4a1b01&lt;/a> - cloud-localds를 이용해 cloud-init 이미지 만들기&lt;/li>
+&lt;/ul></description></item><item><title>[반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 DNS 서버로 이용하기</title><link>https://umi0410.github.io/blog/companion-server/core-dns/</link><pubDate>Wed, 30 Nov 2022 01:35:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/core-dns/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/core-dns/preview.png" alt="Featured image of post [반려 서버 키우기 사전 작업] Core DNS를 홈랩의 커스텀 DNS 서버로 이용하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
 &lt;p>“반려 서버 키우기”라는 건전한 취미 생활을 본격적으로 시작하기 전에 그 사전 작업 중 하나로 Core DNS를 찍먹해보려한다.&lt;/p>
 &lt;p>현재 나의 홈랩 상황은 다음과 같다.&lt;/p>
 &lt;ul>
