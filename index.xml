@@ -1,15 +1,22 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Tue, 06 Dec 2022 01:35:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>VBoxManage(VirtualBox CLI)로 VM 생성하기</title><link>https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/</link><pubDate>Tue, 06 Dec 2022 01:35:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/preview.png" alt="Featured image of post VBoxManage(VirtualBox CLI)로 VM 생성하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
-&lt;p>홈서버를 직접 구성해보면서 실제 기기 개수가 많지 않아 좀 아쉬웠는데 최근에는 이를 VM으로 충당해볼까 싶은 생각이 들기도 했다. 갖고 있는 랩탑 하나에 여러 대의 VM을 띄우면 홈서버에서 좀 더 많은 수의 노드가 있는 것처럼 이용할 수 있지 않을까 싶어 VM을 띄워보기로 했다. 하지만 이번에는 단순히 GUI로 VM을 띄우는 것이 아니라 CLI로 VM을 띄우면서 LV(Logical Volume)을 이용해봤다. 해당 내용을 까먹을까봐 이 글을 통해 한 번 정리해본다.&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jinsu Playground</title><link>https://umi0410.github.io/</link><description>Recent content on Jinsu Playground</description><generator>Hugo -- gohugo.io</generator><language>ko-kr</language><lastBuildDate>Tue, 06 Dec 2022 23:01:00 +0900</lastBuildDate><atom:link href="https://umi0410.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>QEMU로 Ubuntu Server VM 생성하기</title><link>https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/</link><pubDate>Tue, 06 Dec 2022 23:01:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-qemu/preview.png" alt="Featured image of post QEMU로 Ubuntu Server VM 생성하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>직접 구축하는 홈서버에 VM도 추가하고 싶어졌고 이전 글&lt;a class="link" href="../create-vm-by-vboxmanage/" >[1]&lt;/a>과 마찬가지로 CLI로 VM을 띄워보고 싶었다.
+이전 글에서는 VirtualBox를 이용했지만 이번에는 qemu라는 도구를 이용해 VM을 만들어보고자한다.&lt;/p>
+&lt;p>qemu는 VM을 띄우는 도구들 중에서도 꽤나 로우한 레벨에 있으면서 손쉽게 다양한 아키텍쳐를 가상화해서 사용할 수 있게 해준다.
+또한 CLI로 실행하는 프로그램이기에 VM을 손쉽게 띄워보고 싶은 나 같은 경우에 적합하다.&lt;/p>
 &lt;h2 id="실습-환경">실습 환경&lt;/h2>
 &lt;p>호스트 환경은 아래와 같다.&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>CPU&lt;/th>
-&lt;th>amd64, 8 Core&lt;/th>
+&lt;th>항목&lt;/th>
+&lt;th>정보&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
+&lt;tr>
+&lt;td>CPU&lt;/td>
+&lt;td>amd64, 8 Core&lt;/td>
+&lt;/tr>
 &lt;tr>
 &lt;td>RAM&lt;/td>
 &lt;td>16GB&lt;/td>
@@ -28,11 +35,383 @@
 &lt;table>
 &lt;thead>
 &lt;tr>
-&lt;th>CPU&lt;/th>
-&lt;th>amd64, 2 Core&lt;/th>
+&lt;th>항목&lt;/th>
+&lt;th>정보&lt;/th>
 &lt;/tr>
 &lt;/thead>
 &lt;tbody>
+&lt;tr>
+&lt;td>CPU&lt;/td>
+&lt;td>amd64, 2 Core&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>RAM&lt;/td>
+&lt;td>4GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Disk&lt;/td>
+&lt;td>16GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OS&lt;/td>
+&lt;td>Ubuntu server 22.04&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>VM을 생성하는 작업은 root 권한을 많이 필요로 할 수 있어 이번 글에서 수행하는 커맨드는 대부분 root 권한으로 수행해야 올바르게 동작할 것이다.
+커맨드를 표기할 때에는 root 권한으로 실행한다하더라도 편의상 &lt;code>#&lt;/code>이 아닌 &lt;code>$&lt;/code> 문자를 커맨드의 맨 앞에 적어뒀다.&lt;/p>
+&lt;h2 id="설치하기">설치하기&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># on linux&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ sudo apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ sudo apt-get install qemu-kvm qemu
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># on OSX&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ brew install qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>위와 같이 간단히 qemu를 설치해볼 수 있다. 설치가 잘 됐으면 다음 명령어로 설치된 버전을 확인해볼 수 있을 것이다.
+x86_64 아키텍쳐의 VM을 이용할 것이기에 이번 글에서는 &lt;code>qemu-system-x86_64&lt;/code>라는 명령어를 사용할 것이다.
+편의상 &lt;code>qemu-system-x86_64&lt;/code> 명령어에 대해 &lt;code>qs&lt;/code>라는 alias를 설정하고 진행하도록 하겠다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ &lt;span class="nb">alias&lt;/span> &lt;span class="nv">qs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;qemu-system-x86_64&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ qs --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">QEMU emulator version 6.2.0 &lt;span class="o">(&lt;/span>Debian 1:6.2+dfsg-2ubuntu6.5&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Copyright &lt;span class="o">(&lt;/span>c&lt;span class="o">)&lt;/span> 2003-2021 Fabrice Bellard and the QEMU Project developers
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="이미지-생성하기">이미지 생성하기&lt;/h2>
+&lt;p>이미지는 VM의 저장장치로서 사용될 수 있다. 운영체제 설치파일이나 루트로 사용할 저장장치 등이 이미지로 정의된다.&lt;/p>
+&lt;p>qemu와 사용할 수 있는 이미지 타입은 &lt;code>raw&lt;/code>와 &lt;code>qcow2&lt;/code> 이렇게 두 개가 있다. 처음에는 raw를 사용할까싶긴 했지만
+스냅샷이나 암호화, 자동화, 압축, 저장공간 효율 등의 측면에서 &lt;code>qcow2&lt;/code>를 사용하는 게 더 적합할 것 같았다.
+아무래도 &lt;code>raw&lt;/code> 타입의 장점은 실제 물리 장비에 근접한 성능인 듯한데 요즘은 &lt;code>qcow2&lt;/code>도 성능이 좋다는 것 같았다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ mkdir -p vm1 &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">cd&lt;/span> vm1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ curl -LO https://cloud-images.ubuntu.com/releases/jammy/release-20221201/ubuntu-22.04-server-cloudimg-amd64.img
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>이번 글에서는 Ubuntu Server 22.04 클라우드 이미지를 통해 운영체제를 자동으로 설치할 것이다.
+vm의 이름은 vm1이라고 하고 vm1이라는 디렉토리에서 작업해나갈 것이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ qemu-img info ubuntu-22.04-server-cloudimg-amd64.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">image: ubuntu-22.04-server-cloudimg-amd64.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">file format: qcow2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">virtual size: 2.2 GiB &lt;span class="o">(&lt;/span>&lt;span class="m">2361393152&lt;/span> bytes&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">disk size: &lt;span class="m">636&lt;/span> MiB
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cluster_size: &lt;span class="m">65536&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Format specific information:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> compat: 0.10
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> compression type: zlib
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> refcount bits: &lt;span class="m">16&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>qemu-img라는 프로그램을 통해 다운로드 받은 이미지를 살펴봤다. qemu-img는 qemu의 디스크 이미지와 관련된 편의 도구이다.
+이미지를 살펴보니 가상 사이즈가 2.2G로 잡혀있다. VM에서는 자신의 디스크의 크기를 2.2G로 인식할 듯하다.
+이를 넉넉하게 16G로 늘려주자.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ qemu-img resize ubuntu-22.04-server-cloudimg-amd64.img 16G
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Image resized.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ qemu-img info ubuntu-22.04-server-cloudimg-amd64.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">image: ubuntu-22.04-server-cloudimg-amd64.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">file format: qcow2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">virtual size: &lt;span class="m">16&lt;/span> GiB &lt;span class="o">(&lt;/span>&lt;span class="m">17179869184&lt;/span> bytes&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">disk size: &lt;span class="m">636&lt;/span> MiB
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cluster_size: &lt;span class="m">65536&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Format specific information:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> compat: 0.10
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> compression type: zlib
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> refcount bits: &lt;span class="m">16&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>이미지를 16G로 resize 해준 뒤 다시 info를 통해 정보를 조회해보면 virtual size가 16G로 늘어난 것을 확인할 수 있다.&lt;/p>
+&lt;p>이제 Auto install 시에 사용할 설정 정보를 정의하는 디스크 이미지를 만들 차례이다. 이와 관련해서는 cloud-init이나 user-data 같은 키워드들이가 존재하니
+자세한 사항이 필요하면 별도로 찾아보는 게 나을 듯하다. 대충 &lt;a class="link" href="https://cloudinit.readthedocs.io/en/latest/topics/examples.html" target="_blank" rel="noopener"
+>이곳의 예시&lt;/a>처럼 생겼다.&lt;/p>
+&lt;p>간략히 설명하면 ubuntu를 자동 설치할 때 &lt;code>user-data&lt;/code>나 &lt;code>metadata&lt;/code>라는 파일을 통해 초기 설정을 정의할 수 있다.
+이를 통해 나는 나의 ssh 공개키나 vm의 hostname등을 정의해보려한다. ssh 공개키를 정의하는 PC에서 VM에 SSH 접속 시 사용하기 위해서이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c">#cloud-config&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">ssh_authorized_keys&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- {{&lt;span class="w"> &lt;/span>&lt;span class="l">본인이 SSH 접속 시 사용하는 비밀키에 대한 공개키 }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>user-data&lt;/code> 파일을 위와 같이 작성해줬다. SSH 공개키는 나의 경우 &lt;code>ssh-ed25519 FooBar(생략) Jinsu&lt;/code> 뭐 이런 식으로 생겼다.
+주의할 점은 첫 문장은 주석일지라도 &lt;code>#cloud-config&lt;/code>로 적어줘야 인식이 된다는 점이다! 그냥 user-data, cloud-init 스펙이 그렇다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">local-hostname&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">vm1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>앞서 언급한 대로 VM의 이름은 vm1을 사용할 것이므로 hostname을 vm1으로 변경해봤다.&lt;/p>
+&lt;p>그럼 이제 &lt;code>user-data&lt;/code>와 &lt;code>metadata&lt;/code>라는 두 파일을 볼륨으로서 사용할 수 있게 해주는 이미지를 만들어줘야한다.
+이때에는 cloud-localds라는 도구를 이용하는 것이 편리했다. Cloud Init 설정용 볼륨이라는 것을 인식하기 위해서는 해당 볼륨에 CI 등의 라벨이 달려있어야하며 몇몇의 특정 파일 시스템을 이용해야한다고 한다.
+cloud-localds는 그런 조건을 만족시키는 볼륨의 이미지를 알아서 잘 만들어준다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ apt install -y cloud-image-utils
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ cloud-localds seed.img user-data metadata
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>해당 이미지의 이름은 &lt;code>seed.img&lt;/code>라고 지어줬다. 이 이미지는 &lt;code>user-data&lt;/code>와 &lt;code>metadata&lt;/code> 두 파일만을 포함하는 볼륨을 나타낼 것이다.
+좀 더 확인해보고 싶다면 다음 명령어로 확인해볼 수 있었다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ mkdir -p /mnt/vm1-seed
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ mount seed.img /mnt/vm1-seed
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ ls -al /mnt/vm1-seed
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">total &lt;span class="m">7&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">dr-xr-xr-x &lt;span class="m">2&lt;/span> root root &lt;span class="m">2048&lt;/span> Dec &lt;span class="m">7&lt;/span> 14:43 .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">drwxr-xr-x &lt;span class="m">7&lt;/span> root root &lt;span class="m">4096&lt;/span> Dec &lt;span class="m">7&lt;/span> 14:44 ..
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">-rw-r--r-- &lt;span class="m">1&lt;/span> root root &lt;span class="m">20&lt;/span> Dec &lt;span class="m">7&lt;/span> 14:43 meta-data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">-rw-r--r-- &lt;span class="m">1&lt;/span> root root &lt;span class="m">144&lt;/span> Dec &lt;span class="m">7&lt;/span> 14:43 user-data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 다시 umount하고 /mnt/vm1-seed 디렉토리 삭제&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ umount seed.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ rm -r /mnt/vm1-seed
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ umount /mnt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ lsblk -f
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">root@whale-home:~/vm1# lsblk -f
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME FSTYPE FSVER LABEL UUID FSAVAIL FSUSE% MOUNTPOINTS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">loop0 iso9660 Joliet Extension cidata 2022-12-07-14-43-10-00 &lt;span class="m">0&lt;/span> 100% /mnt/seed
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">(&lt;/span>...생략&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sda
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda1 vfat FAT32 B125-AD84 1G 0% /boot/efi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda2 ext4 1.0 a472b2ba-5b46-4495-8dc6-abe59a2e5153 1.5G 13% /boot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└─sda3 LVM2_member LVM2 &lt;span class="m">001&lt;/span> D94K0G-n2UY-sxNu-nw23-962h-ZVSa-njxMOk
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> └─ubuntu--vg-ubuntu--lv ext4 1.0 6f3fa5e0-59bb-4cea-97e0-aa86b7cb68c7 53.9G 40% /
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="1차로-vm-띄워보기">1차로 VM 띄워보기&lt;/h2>
+&lt;p>이제 네트워크 설정만 남긴했는데 일단 우선 한 번 정도는 VM을 뜨기는 하는지를 확인해보려한다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># qs는 alias qs=qemu-system-x86_64 로 설정된 alias이다.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ qs -machine &lt;span class="nv">accel&lt;/span>&lt;span class="o">=&lt;/span>kvm,type&lt;span class="o">=&lt;/span>q35 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -cpu host &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -smp &lt;span class="m">2&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -m 4G &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --nographic &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -drive &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>virtio,format&lt;span class="o">=&lt;/span>qcow2,file&lt;span class="o">=&lt;/span>ubuntu-22.04-server-cloudimg-amd64.img &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -drive &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>virtio,format&lt;span class="o">=&lt;/span>raw,file&lt;span class="o">=&lt;/span>seed.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">(&lt;/span>...생략&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Ubuntu 22.04.1 LTS vm1 ttyS0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">vm1 login: ubuntu
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">password:
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>인자가 의미하는 바는 대충 이곳 링크&lt;a class="link" href="https://www.arthurkoziel.com/qemu-ubuntu-20-04/" target="_blank" rel="noopener"
+>[2]&lt;/a>에 잘 정리되어있었다.
+혹은 그냥 qemu-system-x86_64 &amp;ndash;help 에 나오는 인자 설명을 봐도 대충은 이해는 된다. 몇몇 인자에 대한 설명은 좀 이해가 안 돼서 따로 찾아봐야하긴 하지만..&lt;/p>
+&lt;p>대충 로그인하고 패스워드를 초기화하고 나면 쉘에 접속하게 된다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">df -h /dev/vda1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Filesystem Size Used Avail Use% Mounted on
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/dev/vda1 16G 1.5G 14G 10% /
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>로그인해서 루트 파일시스템의 크기를 조회해보니 우리가 &lt;code>.img&lt;/code> 파일을 resize한 대로 16G로 잘 늘어나서 설정되어있는 모습이다!&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ubuntu@vm1:~$ ping google.com -c &lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PING google.com &lt;span class="o">(&lt;/span>142.250.66.78&lt;span class="o">)&lt;/span> 56&lt;span class="o">(&lt;/span>84&lt;span class="o">)&lt;/span> bytes of data.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="m">64&lt;/span> bytes from hkg12s27-in-f14.1e100.net &lt;span class="o">(&lt;/span>142.250.66.78&lt;span class="o">)&lt;/span>: &lt;span class="nv">icmp_seq&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span> &lt;span class="nv">ttl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">255&lt;/span> &lt;span class="nv">time&lt;/span>&lt;span class="o">=&lt;/span>44.9 ms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--- google.com ping statistics ---
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="m">1&lt;/span> packets transmitted, &lt;span class="m">1&lt;/span> received, 0% packet loss, &lt;span class="nb">time&lt;/span> 0ms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">rtt min/avg/max/mdev &lt;span class="o">=&lt;/span> 44.868/44.868/44.868/0.000 ms
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Google에 ping을 때려보니 인터넷 통신은 가능한 듯하긴하지만 호스트가 사용 중인 공유기를 통해
+같은 네트워크를 이용하고 있는 상태는 아니다. 즉, 호스트 -&amp;gt; VM 혹은 공유기 네트워크 -&amp;gt; VM으로의 접근은 불가능한 상태이다.
+따라서 추가적인 네트워크 설정이 필요하다.&lt;/p>
+&lt;p>host로 돌아가려면 VM을 종료시키면 된다. 프로세스를 kill해도 되긴 하지만 &lt;code>sudo shutdown -h now&lt;/code> 명령어를 통해 VM 내부에서 안전히 종료할 수도 있다.&lt;/p>
+&lt;p>참고) 참고로 VM에서 네트워크 통신이 원활하지 않은 경우 &lt;code>sudo sysctl net.ipv4.ip_forward=1&lt;/code>로 packet forward를 활성화시켜줘야할 수 있다고한다.
+나의 경우에는 이 값과 무관하게 잘 동작하긴했다.&lt;/p>
+&lt;h2 id="브릿지-네트워크-설정하기">브릿지 네트워크 설정하기&lt;/h2>
+&lt;p>이제 네트워크 설정만 해주면 된다. 나 같은 경우에는 VM이 호스트와 동일한 공유기 네트워크를 이용하도록 하여 VM의 인터넷 통신, VM &amp;lt;-&amp;gt; 호스트 머신 간의 통신, 그리고 VM &amp;lt;-&amp;gt; 공유기 내의 디바이스들 간의 통신이 가능하도록 하고 싶다.
+따라서 퍼블릭 브릿지 방식을 이용할 것이다.&lt;/p>
+&lt;p>하지만 이 부분이 VirtualBox를 썼을 때와는 달리 처음 경험해보는 사람에게는 약간 지옥일 수 있다. 마음을 열고 Tap network, Bridge 같은 내용을 공부해봐야 이해하고 작업이 가능하다.
+VirtualBox를 이용하든 qemu를 이용하는 원리는 같긴하다. bridge용 interface를 생성하고 호스트가 공유기랑 사용하던 인터페이스를
+브릿지용 인터페이스에 묶어주고 VM은 Tap 네트워크의 장치를 이용해 자신의 네트워크 인터페이스 카드를 가상화하는 듯하다. 완전 정확히 공부해보진 않았지만 대충 흐름은 그렇다.
+VirtualBox는 이런 과정을 알아서 수행해주는 듯하지만 qemu는 그렇지 않으므로 직접 구성해야한다.&lt;/p>
+&lt;p>브릿지 네트워크를 구성하는 방법은 호스트의 환경마다 상이할 것이다. 나같은 경우에는 호스트 머신 또한 Ubuntu Server 22.04이므로
+이를 바탕으로 적어보겠다. 잘못된 작업은 호스트 머신의 네트워크에 장애를 낳을 수 있으니 백업을 떠놓거나 네트워크 없이도 얼마든지 접속이 가능한
+상황에서 작업을 하는 것을 추천한다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /etc/netplan/00-installer-config-wifi.yaml&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 기존 설정&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">network:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> version: &lt;span class="m">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ethernets:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> eth0:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dhcp4: &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dhcp6: &lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> match:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> macaddress: 00:e0:4c:36:3f:c6
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> set-name: eth0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> wifis:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> wlp2s0:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> access-points:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">{{&lt;/span> YOUR AP NAME &lt;span class="o">}}&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> password: &lt;span class="o">{{&lt;/span> YOUR AP PASSWORD &lt;span class="o">}}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dhcp4: &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dhcp6: &lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ ifconfig eth0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">eth0: &lt;span class="nv">flags&lt;/span>&lt;span class="o">=&lt;/span>4163&amp;lt;UP,BROADCAST,RUNNING,MULTICAST&amp;gt; mtu &lt;span class="m">1500&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet 192.168.219.183 netmask 255.255.255.0 broadcast 192.168.219.255
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">(&lt;/span>...생략&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>기존에는 위와 같이 공유기와 이더넷으로 연결된 인터페이스가 IP를 갖고 있는 모습이다.
+이제 이 인터페이스에 대한 DHCP를 비활성화 시키고 bridge 인터페이스로 브릿지될 인터페이스 목록에 이 인터페이스(&lt;code>eth0&lt;/code>)를 추가해주면
+eth0의 IP는 사라지고 브릿지 인터페이스가 IP를 발급받게 될 것이다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># /etc/netplan/00-installer-config-wifi.yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># 변경한 설정&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">network&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ethernets&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">eth0&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp4&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp6&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">match&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">macaddress&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="l">e0:4c:36:3f:c6&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">set-name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">eth0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">wifis&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">wlp2s0&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">access-points&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>{{&lt;span class="w"> &lt;/span>&lt;span class="nt">YOUR AP NAME }}&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{{&lt;span class="w"> &lt;/span>&lt;span class="l">YOUR AP PASSWORD }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp4&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp6&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">bridges&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">br0&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp4&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp6&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">interfaces&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="l">eth0]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>그를 위해 위와 같이 netplan 설정을 변경해줬다. eth0의 DHCP를 끄고 브릿지 인터페이스를 추가해줬다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ sudo netplan apply
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ sudo systemctl restart systemd-networkd
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>설정을 적용해줬다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ ifconfig eth0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">eth0: &lt;span class="nv">flags&lt;/span>&lt;span class="o">=&lt;/span>4163&amp;lt;UP,BROADCAST,RUNNING,MULTICAST&amp;gt; mtu &lt;span class="m">1500&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ether 00:e0:4c:36:3f:c6 txqueuelen &lt;span class="m">1000&lt;/span> &lt;span class="o">(&lt;/span>Ethernet&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> RX packets &lt;span class="m">431&lt;/span> bytes &lt;span class="m">48373&lt;/span> &lt;span class="o">(&lt;/span>48.3 KB&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> RX errors &lt;span class="m">0&lt;/span> dropped &lt;span class="m">4&lt;/span> overruns &lt;span class="m">0&lt;/span> frame &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> TX packets &lt;span class="m">438&lt;/span> bytes &lt;span class="m">68498&lt;/span> &lt;span class="o">(&lt;/span>68.4 KB&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> TX errors &lt;span class="m">0&lt;/span> dropped &lt;span class="m">0&lt;/span> overruns &lt;span class="m">0&lt;/span> carrier &lt;span class="m">0&lt;/span> collisions &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ ifconfig br0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">br0: &lt;span class="nv">flags&lt;/span>&lt;span class="o">=&lt;/span>4163&amp;lt;UP,BROADCAST,RUNNING,MULTICAST&amp;gt; mtu &lt;span class="m">1500&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet 192.168.219.121 netmask 255.255.255.0 broadcast 192.168.219.255
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet6 fe80::a0e8:49ff:fe15:547c prefixlen &lt;span class="m">64&lt;/span> scopeid 0x20&amp;lt;link&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ether a2:e8:49:15:54:7c txqueuelen &lt;span class="m">1000&lt;/span> &lt;span class="o">(&lt;/span>Ethernet&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> RX packets &lt;span class="m">150&lt;/span> bytes &lt;span class="m">14431&lt;/span> &lt;span class="o">(&lt;/span>14.4 KB&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> RX errors &lt;span class="m">0&lt;/span> dropped &lt;span class="m">0&lt;/span> overruns &lt;span class="m">0&lt;/span> frame &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> TX packets &lt;span class="m">94&lt;/span> bytes &lt;span class="m">14486&lt;/span> &lt;span class="o">(&lt;/span>14.4 KB&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> TX errors &lt;span class="m">0&lt;/span> dropped &lt;span class="m">0&lt;/span> overruns &lt;span class="m">0&lt;/span> carrier &lt;span class="m">0&lt;/span> collisions &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>브릿지가 잘 적용된 모습이다. &lt;code>brctl&lt;/code>이라는 브릿지 관리 도구로도 정보를 확인해볼 수 있다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ sudo apt install -y bridge-utils
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ brctl show
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bridge name bridge id STP enabled interfaces
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">br0 8000.a2e84915547c no eth0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ qs -machine &lt;span class="nv">accel&lt;/span>&lt;span class="o">=&lt;/span>kvm,type&lt;span class="o">=&lt;/span>q35 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -cpu host &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -smp &lt;span class="m">2&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -m 4G &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --nographic &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -drive &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>virtio,format&lt;span class="o">=&lt;/span>qcow2,file&lt;span class="o">=&lt;/span>ubuntu-22.04-server-cloudimg-amd64.img &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -drive &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>virtio,format&lt;span class="o">=&lt;/span>raw,file&lt;span class="o">=&lt;/span>seed.img &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -nic bridge,br&lt;span class="o">=&lt;/span>br0,model&lt;span class="o">=&lt;/span>virtio-net-pci
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>VM을 띄우되 bridge network 설정을 위해 앞서 VM을 띄웠던 명령어에서 &lt;code>-nic bridge,br=br0,model=virtio-net-pci&lt;/code> 인자만 추가해줬다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ubuntu@vm1:~$ ip addr show enp0s2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">2: enp0s2: &amp;lt;BROADCAST,MULTICAST,UP,LOWER_UP&amp;gt; mtu &lt;span class="m">1500&lt;/span> qdisc fq_codel state UP group default qlen &lt;span class="m">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> link/ether 52:54:00:12:34:56 brd ff:ff:ff:ff:ff:ff
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet 192.168.219.185/24 metric &lt;span class="m">100&lt;/span> brd 192.168.219.255 scope global dynamic enp0s2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> valid_lft 21557sec preferred_lft 21557sec
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet6 fe80::5054:ff:fe12:3456/64 scope link
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> valid_lft forever preferred_lft forever
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ubuntu@vm1:~$ ping 192.168.219.180 -c &lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PING 192.168.219.180 &lt;span class="o">(&lt;/span>192.168.219.180&lt;span class="o">)&lt;/span> 56&lt;span class="o">(&lt;/span>84&lt;span class="o">)&lt;/span> bytes of data.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="m">64&lt;/span> bytes from 192.168.219.180: &lt;span class="nv">icmp_seq&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span> &lt;span class="nv">ttl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">64&lt;/span> &lt;span class="nv">time&lt;/span>&lt;span class="o">=&lt;/span>2.89 ms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--- 192.168.219.180 ping statistics ---
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="m">1&lt;/span> packets transmitted, &lt;span class="m">1&lt;/span> received, 0% packet loss, &lt;span class="nb">time&lt;/span> 0ms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">rtt min/avg/max/mdev &lt;span class="o">=&lt;/span> 2.887/2.887/2.887/0.000 ms
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>호스트가 이용 중인 &lt;code>192.168.219.0/24&lt;/code> 네트워크의 IP를 이용하고 있으며 현재 내 호스트 머신의 IP인 192.168.219.180로 Ping도 가능하다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ brctl show
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bridge name bridge id STP enabled interfaces
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">br0 8000.a2e84915547c no eth0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> tap0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ ifconfig tap0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tap0: &lt;span class="nv">flags&lt;/span>&lt;span class="o">=&lt;/span>4163&amp;lt;UP,BROADCAST,RUNNING,MULTICAST&amp;gt; mtu &lt;span class="m">1500&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet6 fe80::fc35:9dff:fe3f:86b0 prefixlen &lt;span class="m">64&lt;/span> scopeid 0x20&amp;lt;link&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ether fe:35:9d:3f:86:b0 txqueuelen &lt;span class="m">1000&lt;/span> &lt;span class="o">(&lt;/span>Ethernet&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">(&lt;/span>...생략&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>참고용) 참고로 vm이 실행될 때는 이렇게 아까 생성한 bridge interface에 tap network interface가 묶인다.&lt;/p>
+&lt;h2 id="최종적으로-vm을-백그라운드에서-띄우기">최종적으로 VM을 백그라운드에서 띄우기&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ qs -machine &lt;span class="nv">accel&lt;/span>&lt;span class="o">=&lt;/span>kvm,type&lt;span class="o">=&lt;/span>q35 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -name vm1 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -cpu host &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -smp &lt;span class="m">2&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -m 4G &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -daemonize &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -display none &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -drive &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>virtio,format&lt;span class="o">=&lt;/span>qcow2,file&lt;span class="o">=&lt;/span>ubuntu-22.04-server-cloudimg-amd64.img &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -drive &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>virtio,format&lt;span class="o">=&lt;/span>raw,file&lt;span class="o">=&lt;/span>seed.img &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -nic bridge,br&lt;span class="o">=&lt;/span>br0,model&lt;span class="o">=&lt;/span>virtio-net-pci
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>-nograhic&lt;/code> -&amp;gt; &lt;code>-display none&lt;/code> 으로 변경하고 &lt;code>-daemonize&lt;/code> 인자를 통해 백그라운드에서 돌 수 있게 해줬다.&lt;/p>
+&lt;p>🎉 이렇게 QEMU로 VM 띄워보기 완료~!&lt;/p>
+&lt;h2 id="배운-것-얻은-것">배운 것, 얻은 것&lt;/h2>
+&lt;ul>
+&lt;li>QEMU가 뭔지, KVM이 뭔지, 어떻게 쓰는 건지&lt;/li>
+&lt;li>브릿지 네트워크 설정 방법&lt;/li>
+&lt;li>TAP 네트워크 개념&lt;/li>
+&lt;li>가상 이미지 타입(RAW, QCOW2)&lt;/li>
+&lt;/ul>
+&lt;h2 id="글에서-다룬-내용-외에-더-해볼-만한-것">글에서 다룬 내용 외에 더 해볼 만한 것&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>-daemonize&lt;/code>를 통해 백그라운드에서 VM을 돌리도록 하긴했지만 호스트가 재부팅되거나
+해당 qemu-system-x86_64 프로세스가 죽으면 VM이 재시작되지 못하는 형태인데 이를 개선해볼 수 있을 것이다.&lt;/li>
+&lt;li>QEMU를 직접 사용하는 것은 한 번 해봤으니 이를 좀 더 편리하게 쓸 수 있는 proxmox나 virtsh 같은 도구들이 있는 것 같은데 실제로
+VM을 통해 홈랩을 구축하려면 굳이 수작업으로 하거나 직접 만들지 않고 이런 도구들을 도입해보는 게 좋을 듯.&lt;/li>
+&lt;/ul>
+&lt;h2 id="마치며">마치며&lt;/h2>
+&lt;p>VirtualBox를 CLI로 이용했을 때에는 VirtualBox가 CLI 친화적인 느낌은 아니었던 것도 있고, 클라우드 이미지가 아닌 단순 live 이미지로 이용하다보니
+VM 띄우는 것 자체는 그리 간단하게 느껴지지 않았던 반면 네트워크 설정은 VirtualBox가 알아서 잡아주는 게 많으니 되게 간단하다고 느껴졌다.&lt;/p>
+&lt;p>반면 QEMU는 CLI 친화적인 데다가 이번에는 클라우드 이미지를 써봤더니 VM을 띄우는 것 자체는 엄청나게 간단했다. 반면
+브릿지 네트워크를 설정하는 게 처음이다보니 쉽지는 않았던 것 같다.&lt;/p>
+&lt;h2 id="참고-자료">참고 자료&lt;/h2>
+&lt;p>&lt;em>&lt;a class="link" href="../create-vm-by-vboxmanage/" >[1] - VBoxManage(VirtualBox CLI)로 VM 생성하기&lt;/a>&lt;/em>&lt;/p>
+&lt;p>&lt;em>&lt;a class="link" href="https://www.arthurkoziel.com/qemu-ubuntu-20-04/" target="_blank" rel="noopener"
+>[2] - Using QEMU to create a Ubuntu 20.04 Desktop VM on macOS&lt;/a>&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://levelup.gitconnected.com/how-to-setup-bridge-networking-with-kvm-on-ubuntu-20-04-9c560b3e3991" target="_blank" rel="noopener"
+>https://levelup.gitconnected.com/how-to-setup-bridge-networking-with-kvm-on-ubuntu-20-04-9c560b3e3991&lt;/a> - 브릿지 설정법을 참고함&lt;/li>
+&lt;li>&lt;a class="link" href="https://superuser.com/questions/1490188/what-is-the-difference-and-relationship-between-kvm-virt-manager-qemu-and-libv/1490196#1490196" target="_blank" rel="noopener"
+>https://superuser.com/questions/1490188/what-is-the-difference-and-relationship-between-kvm-virt-manager-qemu-and-libv/1490196#1490196&lt;/a> - KVM과 QEMU의 차이를 간단히 알려줌.&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.vinchin.com/en/blog/raw-vs-qcow2.html" target="_blank" rel="noopener"
+>https://www.vinchin.com/en/blog/raw-vs-qcow2.html&lt;/a> - RAW 이미지 타입과 QCOW2 이미지 타입에 대한 내용이 잘 정리됨&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.joinc.co.kr/w/Site/cloud/Qemu/Network" target="_blank" rel="noopener"
+>https://www.joinc.co.kr/w/Site/cloud/Qemu/Network&lt;/a> - qemu 에서 다양한 네트워크 설정을 이용하는 예시를 보여줌&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.qemu.org/2018/05/31/nic-parameter/" target="_blank" rel="noopener"
+>https://www.qemu.org/2018/05/31/nic-parameter/&lt;/a> - net, netdev, device, nic 등 헷갈리는 qemu 실행 인자를 정리해줌&lt;/li>
+&lt;li>&lt;a class="link" href="https://skylit.tistory.com/215" target="_blank" rel="noopener"
+>https://skylit.tistory.com/215&lt;/a> - 구버전 우분투에 대한 bridge 설정인듯함&lt;/li>
+&lt;li>&lt;a class="link" href="https://ubuntu.com/server/docs/virtualization-libvirt" target="_blank" rel="noopener"
+>https://ubuntu.com/server/docs/virtualization-libvirt&lt;/a> - libvirt, virsh 등의 내용을 훑어봄&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.snel.com/support/nstall-qemu-guest-agent-for-debian-ubuntu/" target="_blank" rel="noopener"
+>https://www.snel.com/support/nstall-qemu-guest-agent-for-debian-ubuntu/&lt;/a> - qemu-guest-agent에 대한 내용을 잠깐 살펴봄&lt;/li>
+&lt;/ul></description></item><item><title>VBoxManage(VirtualBox CLI)로 VM 생성하기</title><link>https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/</link><pubDate>Tue, 06 Dec 2022 01:35:00 +0900</pubDate><guid>https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/</guid><description>&lt;img src="https://umi0410.github.io/blog/companion-server/create-vm-by-vboxmanage/preview.png" alt="Featured image of post VBoxManage(VirtualBox CLI)로 VM 생성하기" />&lt;h2 id="시작하며">시작하며&lt;/h2>
+&lt;p>홈서버를 직접 구성해보면서 실제 기기 개수가 많지 않아 좀 아쉬웠는데 최근에는 이를 VM으로 충당해볼까 싶은 생각이 들기도 했다. 갖고 있는 랩탑 하나에 여러 대의 VM을 띄우면 홈서버에서 좀 더 많은 수의 노드가 있는 것처럼 이용할 수 있지 않을까 싶어 VM을 띄워보기로 했다. 하지만 이번에는 단순히 GUI로 VM을 띄우는 것이 아니라 CLI로 VM을 띄우면서 LV(Logical Volume)을 이용해봤다. 해당 내용을 까먹을까봐 이 글을 통해 한 번 정리해본다.&lt;/p>
+&lt;h2 id="실습-환경">실습 환경&lt;/h2>
+&lt;p>호스트 환경은 아래와 같다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>정보&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>CPU&lt;/td>
+&lt;td>amd64, 8 Core&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>RAM&lt;/td>
+&lt;td>16GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Disk&lt;/td>
+&lt;td>256GB&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OS&lt;/td>
+&lt;td>Ubuntu server 22.04&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>구성하고자하는 VM은 다음과 같다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>정보&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>CPU&lt;/td>
+&lt;td>amd64, 2 Core&lt;/td>
+&lt;/tr>
 &lt;tr>
 &lt;td>RAM&lt;/td>
 &lt;td>4GB&lt;/td>
