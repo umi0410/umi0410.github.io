@@ -240,7 +240,7 @@ VirtualBox는 이런 과정을 알아서 수행해주는 듯하지만 qemu는 �
 이를 바탕으로 적어보겠다. 잘못된 작업은 호스트 머신의 네트워크에 장애를 낳을 수 있으니 백업을 떠놓거나 네트워크 없이도 얼마든지 접속이 가능한
 상황에서 작업을 하는 것을 추천한다.
 
-```shell
+```yaml
 # /etc/netplan/00-installer-config-wifi.yaml
 # 기존 설정
 network:
@@ -337,6 +337,8 @@ bridge name	bridge id		STP enabled	interfaces
 br0		8000.a2e84915547c	no		eth0
 ```
 
+이제 브릿지 네트워크 설정이 잘 된 듯하다. VM을 다시 띄워봤다.
+
 ```shell
 $ qs -machine accel=kvm,type=q35 \
   -cpu host \
@@ -383,7 +385,7 @@ tap0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         (...생략)
 ```
 
-참고용) 참고로 vm이 실행될 때는 이렇게 아까 생성한 bridge interface에 tap network interface가 묶인다.
+참고) 참고로 vm이 실행될 때는 자동으로 이렇게 아까 생성한 bridge interface에 tap network interface가 묶인다. 따라서 br0에 eth0를 추가해줬던 것처럼 수동으로 tap0 인터페이스를 만들고 추가해주지는 않아도 된다.
 
 ## 최종적으로 VM을 백그라운드에서 띄우기
 
