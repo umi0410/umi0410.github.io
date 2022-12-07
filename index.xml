@@ -205,25 +205,25 @@ VirtualBox는 이런 과정을 알아서 수행해주는 듯하지만 qemu는 �
 &lt;p>브릿지 네트워크를 구성하는 방법은 호스트의 환경마다 상이할 것이다. 나같은 경우에는 호스트 머신 또한 Ubuntu Server 22.04이므로
 이를 바탕으로 적어보겠다. 잘못된 작업은 호스트 머신의 네트워크에 장애를 낳을 수 있으니 백업을 떠놓거나 네트워크 없이도 얼마든지 접속이 가능한
 상황에서 작업을 하는 것을 추천한다.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /etc/netplan/00-installer-config-wifi.yaml&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 기존 설정&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">network:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> version: &lt;span class="m">2&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ethernets:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> eth0:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dhcp4: &lt;span class="nb">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dhcp6: &lt;span class="nb">false&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> match:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> macaddress: 00:e0:4c:36:3f:c6
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> set-name: eth0
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> wifis:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> wlp2s0:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> access-points:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">{{&lt;/span> YOUR AP NAME &lt;span class="o">}}&lt;/span>:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> password: &lt;span class="o">{{&lt;/span> YOUR AP PASSWORD &lt;span class="o">}}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dhcp4: &lt;span class="nb">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dhcp6: &lt;span class="nb">false&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ ifconfig eth0
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># /etc/netplan/00-installer-config-wifi.yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># 기존 설정&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">network&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ethernets&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">eth0&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp4&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp6&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">match&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">macaddress&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">00&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="l">e0:4c:36:3f:c6&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">set-name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">eth0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">wifis&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">wlp2s0&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">access-points&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>{{&lt;span class="w"> &lt;/span>&lt;span class="nt">YOUR AP NAME }}&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{{&lt;span class="w"> &lt;/span>&lt;span class="l">YOUR AP PASSWORD }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp4&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">dhcp6&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ ifconfig eth0
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">eth0: &lt;span class="nv">flags&lt;/span>&lt;span class="o">=&lt;/span>4163&amp;lt;UP,BROADCAST,RUNNING,MULTICAST&amp;gt; mtu &lt;span class="m">1500&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet 192.168.219.183 netmask 255.255.255.0 broadcast 192.168.219.255
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">(&lt;/span>...생략&lt;span class="o">)&lt;/span>
@@ -280,7 +280,8 @@ eth0의 IP는 사라지고 브릿지 인터페이스가 IP를 발급받게 될 �
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ brctl show
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">bridge name bridge id STP enabled interfaces
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">br0 8000.a2e84915547c no eth0
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ qs -machine &lt;span class="nv">accel&lt;/span>&lt;span class="o">=&lt;/span>kvm,type&lt;span class="o">=&lt;/span>q35 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>이제 브릿지 네트워크 설정이 잘 된 듯하다. VM을 다시 띄워봤다.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ qs -machine &lt;span class="nv">accel&lt;/span>&lt;span class="o">=&lt;/span>kvm,type&lt;span class="o">=&lt;/span>q35 &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -cpu host &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -smp &lt;span class="m">2&lt;/span> &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -m 4G &lt;span class="se">\
@@ -315,7 +316,7 @@ eth0의 IP는 사라지고 브릿지 인터페이스가 IP를 발급받게 될 �
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet6 fe80::fc35:9dff:fe3f:86b0 prefixlen &lt;span class="m">64&lt;/span> scopeid 0x20&amp;lt;link&amp;gt;
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ether fe:35:9d:3f:86:b0 txqueuelen &lt;span class="m">1000&lt;/span> &lt;span class="o">(&lt;/span>Ethernet&lt;span class="o">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">(&lt;/span>...생략&lt;span class="o">)&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>참고용) 참고로 vm이 실행될 때는 이렇게 아까 생성한 bridge interface에 tap network interface가 묶인다.&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>참고) 참고로 vm이 실행될 때는 자동으로 이렇게 아까 생성한 bridge interface에 tap network interface가 묶인다. 따라서 br0에 eth0를 추가해줬던 것처럼 수동으로 tap0 인터페이스를 만들고 추가해주지는 않아도 된다.&lt;/p>
 &lt;h2 id="최종적으로-vm을-백그라운드에서-띄우기">최종적으로 VM을 백그라운드에서 띄우기&lt;/h2>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ qs -machine &lt;span class="nv">accel&lt;/span>&lt;span class="o">=&lt;/span>kvm,type&lt;span class="o">=&lt;/span>q35 &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -name vm1 &lt;span class="se">\

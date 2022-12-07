@@ -128,25 +128,25 @@ VirtualBox를 이용하든 qemu를 이용하는 원리는 같긴하다. bridge�
 브릿지용 인터페이스에 묶어주고 VM은 Tap 네트워크의 장치를 이용해 자신의 네트워크 인터페이스 카드를 가상화하는 듯하다. 완전 정확히 공부해보진 않았지만 대충 흐름은 그렇다.
 VirtualBox는 이런 과정을 알아서 수행해주는 듯하지만 qemu는 그렇지 않으므로 직접 구성해야한다.</p><p>브릿지 네트워크를 구성하는 방법은 호스트의 환경마다 상이할 것이다. 나같은 경우에는 호스트 머신 또한 Ubuntu Server 22.04이므로
 이를 바탕으로 적어보겠다. 잘못된 작업은 호스트 머신의 네트워크에 장애를 낳을 수 있으니 백업을 떠놓거나 네트워크 없이도 얼마든지 접속이 가능한
-상황에서 작업을 하는 것을 추천한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># /etc/netplan/00-installer-config-wifi.yaml</span>
-</span></span><span class=line><span class=cl><span class=c1># 기존 설정</span>
-</span></span><span class=line><span class=cl>network:
-</span></span><span class=line><span class=cl>  version: <span class=m>2</span>
-</span></span><span class=line><span class=cl>  ethernets:
-</span></span><span class=line><span class=cl>    eth0:
-</span></span><span class=line><span class=cl>      dhcp4: <span class=nb>true</span>
-</span></span><span class=line><span class=cl>      dhcp6: <span class=nb>false</span>
-</span></span><span class=line><span class=cl>      match:
-</span></span><span class=line><span class=cl>        macaddress: 00:e0:4c:36:3f:c6
-</span></span><span class=line><span class=cl>      set-name: eth0
-</span></span><span class=line><span class=cl>  wifis:
-</span></span><span class=line><span class=cl>    wlp2s0:
-</span></span><span class=line><span class=cl>      access-points:
-</span></span><span class=line><span class=cl>        <span class=o>{{</span> YOUR AP NAME <span class=o>}}</span>:
-</span></span><span class=line><span class=cl>          password: <span class=o>{{</span> YOUR AP PASSWORD <span class=o>}}</span>
-</span></span><span class=line><span class=cl>      dhcp4: <span class=nb>true</span>
-</span></span><span class=line><span class=cl>      dhcp6: <span class=nb>false</span>
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ ifconfig eth0
+상황에서 작업을 하는 것을 추천한다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># /etc/netplan/00-installer-config-wifi.yaml</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># 기존 설정</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>network</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=m>2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ethernets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>eth0</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>dhcp4</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>dhcp6</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>match</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>macaddress</span><span class=p>:</span><span class=w> </span><span class=m>00</span><span class=p>:</span><span class=l>e0:4c:36:3f:c6</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>set-name</span><span class=p>:</span><span class=w> </span><span class=l>eth0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>wifis</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>wlp2s0</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>access-points</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>{{<span class=w> </span><span class=nt>YOUR AP NAME }}</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>password</span><span class=p>:</span><span class=w> </span>{{<span class=w> </span><span class=l>YOUR AP PASSWORD }}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>dhcp4</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>dhcp6</span><span class=p>:</span><span class=w> </span><span class=kc>false</span><span class=w>
+</span></span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ ifconfig eth0
 </span></span><span class=line><span class=cl>eth0: <span class=nv>flags</span><span class=o>=</span>4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu <span class=m>1500</span>
 </span></span><span class=line><span class=cl>        inet 192.168.219.183  netmask 255.255.255.0  broadcast 192.168.219.255
 </span></span><span class=line><span class=cl>        <span class=o>(</span>...생략<span class=o>)</span>
@@ -199,7 +199,7 @@ eth0의 IP는 사라지고 브릿지 인터페이스가 IP를 발급받게 될 �
 </span></span><span class=line><span class=cl>$ brctl show
 </span></span><span class=line><span class=cl>bridge name	bridge id		STP enabled	interfaces
 </span></span><span class=line><span class=cl>br0		8000.a2e84915547c	no		eth0
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ qs -machine <span class=nv>accel</span><span class=o>=</span>kvm,type<span class=o>=</span>q35 <span class=se>\
+</span></span></code></pre></div><p>이제 브릿지 네트워크 설정이 잘 된 듯하다. VM을 다시 띄워봤다.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ qs -machine <span class=nv>accel</span><span class=o>=</span>kvm,type<span class=o>=</span>q35 <span class=se>\
 </span></span></span><span class=line><span class=cl><span class=se></span>  -cpu host <span class=se>\
 </span></span></span><span class=line><span class=cl><span class=se></span>  -smp <span class=m>2</span> <span class=se>\
 </span></span></span><span class=line><span class=cl><span class=se></span>  -m 4G <span class=se>\
@@ -232,7 +232,7 @@ eth0의 IP는 사라지고 브릿지 인터페이스가 IP를 발급받게 될 �
 </span></span><span class=line><span class=cl>        inet6 fe80::fc35:9dff:fe3f:86b0  prefixlen <span class=m>64</span>  scopeid 0x20&lt;link&gt;
 </span></span><span class=line><span class=cl>        ether fe:35:9d:3f:86:b0  txqueuelen <span class=m>1000</span>  <span class=o>(</span>Ethernet<span class=o>)</span>
 </span></span><span class=line><span class=cl>        <span class=o>(</span>...생략<span class=o>)</span>
-</span></span></code></pre></div><p>참고용) 참고로 vm이 실행될 때는 이렇게 아까 생성한 bridge interface에 tap network interface가 묶인다.</p><h2 id=최종적으로-vm을-백그라운드에서-띄우기>최종적으로 VM을 백그라운드에서 띄우기</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ qs -machine <span class=nv>accel</span><span class=o>=</span>kvm,type<span class=o>=</span>q35 <span class=se>\
+</span></span></code></pre></div><p>참고) 참고로 vm이 실행될 때는 자동으로 이렇게 아까 생성한 bridge interface에 tap network interface가 묶인다. 따라서 br0에 eth0를 추가해줬던 것처럼 수동으로 tap0 인터페이스를 만들고 추가해주지는 않아도 된다.</p><h2 id=최종적으로-vm을-백그라운드에서-띄우기>최종적으로 VM을 백그라운드에서 띄우기</h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ qs -machine <span class=nv>accel</span><span class=o>=</span>kvm,type<span class=o>=</span>q35 <span class=se>\
 </span></span></span><span class=line><span class=cl><span class=se></span>    -name vm1 <span class=se>\
 </span></span></span><span class=line><span class=cl><span class=se></span>    -cpu host <span class=se>\
 </span></span></span><span class=line><span class=cl><span class=se></span>    -smp <span class=m>2</span> <span class=se>\
