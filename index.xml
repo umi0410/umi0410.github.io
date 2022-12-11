@@ -891,7 +891,12 @@ loading="lazy"
 &lt;/ul>
 &lt;h2 id="change-log">Change log&lt;/h2>
 &lt;ul>
-&lt;li>[rev 3] 2022-12-11 - OSX에서는 자꾸만 DNS가 캐시되어버려서 public한 TLD인 &lt;code>.me&lt;/code>가 아닌 private한 TLD인 &lt;code>.lab&lt;/code>으로 TLD를 변경함&lt;/li>
+&lt;li>[rev 3] 2022-12-11
+&lt;ul>
+&lt;li>OSX에서는 자꾸만 DNS가 캐시되어버려서 public한 TLD인 &lt;code>.me&lt;/code>가 아닌 private한 TLD인 &lt;code>.lab&lt;/code>으로 TLD를 변경함&lt;/li>
+&lt;li>laptop과 pi뿐만 아니라 vm도 추가함&lt;/li>
+&lt;/ul>
+&lt;/li>
 &lt;li>[rev 2] 2022-11-29 - file plugin이 아닌 hosts plugin을 이용하도록 개선함
 &lt;ul>
 &lt;li>file plugin에는 fallthrough 기능이 없었음. 따라서 CoreDNS선에서 NXDOMAIN이 발생하는 경우 다음 plugin인 forward로 8.8.8.8에 질의할 수 없었다. 이를 바로 깨닫지는 못했는데 그 이유는 초반에는 OS와 브라우저의 캐시 때문에 잘 동작했었기 때문이다.&lt;/li>
