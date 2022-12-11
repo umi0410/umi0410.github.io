@@ -14,11 +14,11 @@ image: preview.png
 현재 나의 홈랩 상황은 다음과 같다.
 
 - (서버 및 장난감) 라즈베리파이 4대
-- (서버 및 장난감) 랩탑 1대
+- (서버 및 장난감) 랩탑 1대 + 그 위의 VM 3대
 - (서버 관리용) PC 2대
 - 핸드폰 2개
 
-즉 나의 반려 서버는 5대, 반려 서버에 접속하는 장비는 4대(PC + 핸드폰) 정도라고 볼 수 있다.
+즉 나의 반려 서버는 8대, 반려 서버에 접속하는 장비는 4대(PC + 핸드폰) 정도라고 볼 수 있다.
 
 기존에는 매번 사용하는 PC의 `/etc/hosts` 를 편집해서 도메인 네임을 이용하곤 했는데 한 대의 PC로만 접속하는 게 아니라 여러 장비로 서버에 접속하게 될 수 있다보니 매번 /etc/hosts를 편집하는 것이 그닥 유쾌하진 않았고, 심지어 모바일에서는 `/etc/hosts` 를 제어할 수 없어 IP로 직접 접근해야했다.
 
@@ -54,9 +54,9 @@ _udp.jinsu.com.		0	IN	SRV	0 0 46738 .
 ;; Query time: 4 msec
 ```
 
-docker을 통해 기본 옵션으로 컨테이너를 실행하면 아무 hostname(e.g. [jinsu.com](http://jinsu.com))으로든 쿼리하면 위와 같이 `172.17.0.1` 이 조회된다. `jinsu.com` 을 조회하든 `jinsu.me`를 조회하든 `foo.bar`을 조회하든 결과는 똑같다. whoami plugin만 활성화된 fake dns server이기 때문이다.
+docker을 통해 기본 옵션으로 core-dns 컨테이너를 실행하면 어떤 hostname(e.g. [jinsu.com](http://jinsu.com))으로 쿼리하든 위와 같이 `172.17.0.1` 이 조회된다. `jinsu.com` 을 조회하든 `jinsu.me`를 조회하든 `foo.bar`을 조회하든 결과는 똑같다. whoami plugin만 활성화된 fake dns server이기 때문이다.
 
-(그냥 추가적으로 적어보는 내용) `172.17.0.1` 라는 IP가 낯이 익을 수 있다. 이는 Docker의 bridge network interface의 IP이다.
+_(참고) `172.17.0.1` 라는 IP가 낯익을 수 있다. 이는 Docker의 bridge network interface의 IP이다._
 
 ```shell
 $ ifconfig docker0 | grep inet
@@ -77,17 +77,17 @@ $ docker inspect coredns | jq '.[0]["NetworkSettings"]["Networks"]'
 
 위와 같이 `172.17.0.1` 은 docker의 brige network interface의 IP임을 확인해볼 수 있다. 그리고 `$ docker run` 명령어에 `--net host` 인자를 전달해 bridge network가 아닌 host network을 이용하면 DNS 질의 시 `172.17.0.1` 이 아닌 `127.0.0.1` 를 응답으로 받을 수 있을 것이다. (OSX에서는 동일하게 브릿지 IP인듯 함.)
 
-## configuration을 정의해보기
+## Configuration을 정의하기
 
 우선 나의 홈랩 상황과 목표는 다음과 같다.
 
 - 보유한 공유기: LG U+에서 임대해준 평범한 공유기. `192.168.219.0/24` 네트워크를 이용.
-- `me.` Zone에 Raspberry Pi 4대, DNS 서버로 사용할 Laptop 1대에 대한 A 레코드를 생성할 것임.
-    - 공유기에 연결된 장비로 [laptop.me](http://laptop.me) 혹은 pi20[0-3]\.me (regex) 에 접속했을 때 올바르게 해당하는 장비에 접속할 수 있도록하기.
-    - [laptop.me](http://laptop.me) - 192.168.219.180
-    - [pi200.me](https://www.notion.so/3a7d41a0b980428a9fef195def5b3b75) - 192.168.219.201
-    - …
-    - [pi203.me](https://www.notion.so/3a7d41a0b980428a9fef195def5b3b75) - 192.168.219.203
+- `lab.` Zone에 Raspberry Pi 4대, DNS 서버로 사용할 Laptop 1대에 대한 A 레코드를 생성할 것임.
+    - 공유기에 연결된 장비로 `laptop.lab` 혹은 `vm[19[0-3]\.lab`, `pi20[0-3]\.lab`에 접속했을 때 올바르게 해당하는 장비에 접속.
+      - laptop.lab - 192.168.219.180
+      - vm190.lab - 1902.168.219.190
+      - …
+      - pi203.lab - 192.168.219.203
 - 코드를 통해 직관적이고 수월하고 멱등적이게 작업할 수 있도록 하기.
     - 추후에 장비가 추가될 때에도 손쉽게 레코드를 추가할 수 있기를 바람.
 
@@ -102,7 +102,7 @@ mkdir -p ${HOME}/coredns-config
 ```shell
 cat << EOF > ${HOME}/coredns-config/Corefile
 .:53 {
-  hosts /etc/coredns/config/me me. {
+  hosts /etc/coredns/config/lab lab. {
     fallthrough
   }
   forward . 8.8.8.8
@@ -111,30 +111,31 @@ cat << EOF > ${HOME}/coredns-config/Corefile
 EOF
 ```
 
-Core DNS은 `Corefile` 을 통해 설정해줄 수 있다.
+Core DNS은 위와 같이 `Corefile` 파일을 통해 설정해줄 수 있다.
 
-`me.` Zone은 `hosts` plugin을 통해 `/etc/coredns/config/me` 에 `/etc/hosts` 포맷으로 정의된 레코드들을 참고하고 거기에서 원하는 레코드를 찾지 못해 질의 결과가 `NXDOMAIN`인 경우 fallthrough 하여 다음 plugin인 `forward` 를 이용하도록한다.원하는 찾는 도메인 네임이 정의되어있지 않다면 8.8.8.8로 포워드하도록 했다.
-완전히 프라이빗한 나만의 TLD를 이용하는 것이 아니라 널리 쓰이는 TLD 중 하나인 `.me` 를 이용하는 이유는 그냥 브라우저 주소창에서 `http://` 혹은 `https://` 를 사용하기 귀찮아서이다. (널리 쓰이는 TLD는 http:// 혹은 https://를 적어주지 않아도 알아서 도메인으로 접속을 시도하는데 나만의 TLD는 구글 검색을 해버림)
-
-`me.` Zone이 아닌 다른 Zone에 대한 질의는 모두 기본적으로 8.8.8.8로 forward하도록했다.
+`lab.` Zone이 아닌 다른 Zone에 대한 질의는 모두 기본적으로 8.8.8.8로 forward하도록했다. 이제 `lab.` Zone에 대해
+좀 더 자세히 설정해보겠다.
 
 ```bash
-cat <<EOF > ${HOME}/coredns-config/me
-192.168.219.180 laptop.me # Laptop
+cat <<EOF > ${HOME}/coredns-config/lab
+192.168.219.180 laptop.lab
 EOF
 ```
 
-`me.` Zone에 대한 파일을 `${HOME}/coredns-config/me` 경로에 기본적인 내용과 함께 생성했다.
+위와 같이 `${HOME}/coredns-config/lab` 파일에 `lab.` Zone에 대한 레코드 정보를 정의해줬다.
 
 ```bash
-me_zone_file=${HOME}/coredns-config/me
-for id in {200..203}; do
-  cat ${me_zone_file} | grep "pi${id}"
+lab_zone_file=${HOME}/coredns-config/lab
+
+for name in vm{190..192} pi{200..203}; do
+  # e.g. If name is "vm190", id should be "190"
+  id=$(echo ${name} | sed 's/[a-z]*//g')
+  cat ${lab_zone_file} | grep "192.168.219.${id}"
   if [[ $? -eq 0 ]]; then
-    echo "Record about pi${id} has already exists."
+    echo "Record about ${name} has already exists."
   else
-    echo "192.168.219.${id} pi${id}.me # Raspberry Pi (id=${id})" >> ${me_zone_file} && \
-    echo "Added a record about pi${id}."
+    echo "192.168.219.${id} ${name}.lab # Generated by a script" >> ${lab_zone_file} && \
+    echo "Added a record about ${name}."
   fi
 done; 
 ```
@@ -150,20 +151,23 @@ docker run --rm --name coredns -p 53:53/udp \
 위에서 작성한 설정들을 bind mount 해서 coredns를 실행시켜보자.
 
 ```bash
-echo -n "laptop.me: "
-dig +short @127.0.0.1 -p 53 laptop.me
+echo -n "laptop.lab: "
+dig +short @127.0.0.1 -p 53 laptop.lab
 
-for id in {200..203}; do
-  echo -n "pi${id}.me: "
-  dig +short @127.0.0.1 -p 53 pi${id}.me
+for name in vm{190..192} pi{200..203}; do
+  echo -n "${name}.lab: "
+  dig +short @127.0.0.1 -p 53 ${name}.lab
 done;
 
 # Expected output:
-laptop.me: 192.168.219.180
-pi200.me: 192.168.219.200
-pi201.me: 192.168.219.201
-pi202.me: 192.168.219.202
-pi203.me: 192.168.219.203
+laptop.lab: 192.168.219.180
+vm190.lab: 192.168.219.190
+vm191.lab: 192.168.219.191
+vm192.lab: 192.168.219.192
+pi200.lab: 192.168.219.200
+pi201.lab: 192.168.219.201
+pi202.lab: 192.168.219.202
+pi203.lab: 192.168.219.203
 ```
 
 dig를 통해 조회했을 때 잘 조회되는지 확인해봤다.
@@ -194,53 +198,53 @@ docker run --name coredns -p 53:53/udp \
 끝으로 PC에서는 자신의 DNS 설정이 공유기가 전달해주는 값으로 잘 사용 중인지 확인해본다. 이전에 내가 내 맥북에게 `8.8.8.8` 을 강제한 적이 있었는지 8.8.8.8으로 설정이 고정되어있었고 `/etc/hosts` 에서 레코드 설정을 지웠을 때 도메인 네임을 원활히 이용할 수 없었다. 위와 같이 고정값을 제거해주니 도메인 네임을 잘 이용할 수 있었다.
 
 ```bash
-for domain in "laptop.me" "pi"{200..204}".me"; do
+for domain in "laptop.lab" "pi"{200..204}".lab"; do
   ping $domain -c 1
   echo ''
 done;
 
 # Expected output:
-PING laptop.me (192.168.219.180): 56 data bytes
+PING laptop.lab (192.168.219.180): 56 data bytes
 64 bytes from 192.168.219.180: icmp_seq=0 ttl=64 time=6.245 ms
 
---- laptop.me ping statistics ---
+--- laptop.lab ping statistics ---
 1 packets transmitted, 1 packets received, 0.0% packet loss
 round-trip min/avg/max/stddev = 6.245/6.245/6.245/0.000 ms
 
-PING pi200.me (192.168.219.200): 56 data bytes
+PING pi200.lab (192.168.219.200): 56 data bytes
 64 bytes from 192.168.219.200: icmp_seq=0 ttl=64 time=5.037 ms
 
---- pi200.me ping statistics ---
+--- pi200.lab ping statistics ---
 1 packets transmitted, 1 packets received, 0.0% packet loss
 round-trip min/avg/max/stddev = 5.037/5.037/5.037/0.000 ms
 
 ...(생략)
 
-PING pi203.me (192.168.219.203): 56 data bytes
+PING pi203.lab (192.168.219.203): 56 data bytes
 64 bytes from 192.168.219.203: icmp_seq=0 ttl=64 time=4.532 ms
 
---- pi203.me ping statistics ---
+--- pi203.lab ping statistics ---
 1 packets transmitted, 1 packets received, 0.0% packet loss
 round-trip min/avg/max/stddev = 4.532/4.532/4.236/0.000 ms
 ```
 
-끝으로 실제로 접속이 가능한지도 ping을 통해 확인해봤다. 잘 되는 듯하다.
+끝으로 실제로 접속이 가능한지도 ping을 통해 확인해봤다.잘 되는 듯하다. _(vm19[0-2]는 편의상 생략함.)_
 
-혹시.. 다른 dns server에게 질의하고서 다른 엔드포인트에게 ping을 날린 것은 아닐까 걱정됐다. 그럴 땐 로그를 확인하면 된다.
+혹시 다른 dns server에게 질의하고서 다른 엔드포인트에게 ping을 날린 것은 아닐까 걱정됐다. 그럴 땐 로그를 확인하면 된다.
 
 ```shell
 $ docker logs coredns --tail 100 -f
 
 # Exptected output
 ...(생략)
-[INFO] 192.168.219.103:60949 - 45524 "A IN laptop.me. udp 27 false 512" NOERROR qr,aa,rd 52 0.000251775s
-[INFO] 192.168.219.103:63828 - 32218 "A IN pi200.me. udp 26 false 512" NOERROR qr,aa,rd 50 0.000233695s
-[INFO] 192.168.219.103:52154 - 19774 "A IN pi201.me. udp 26 false 512" NOERROR qr,aa,rd 50 0.000224735s
-[INFO] 192.168.219.103:49555 - 29706 "A IN pi202.me. udp 26 false 512" NOERROR qr,aa,rd 50 0.000230596s
-[INFO] 192.168.219.103:53338 - 47975 "A IN pi203.me. udp 26 false 512" NOERROR qr,aa,rd 50 0.000225897s
+[INFO] 192.168.219.103:60949 - 45524 "A IN laptop.lab. udp 27 false 512" NOERROR qr,aa,rd 52 0.000251775s
+[INFO] 192.168.219.103:63828 - 32218 "A IN pi200.lab. udp 26 false 512" NOERROR qr,aa,rd 50 0.000233695s
+[INFO] 192.168.219.103:52154 - 19774 "A IN pi201.lab. udp 26 false 512" NOERROR qr,aa,rd 50 0.000224735s
+[INFO] 192.168.219.103:49555 - 29706 "A IN pi202.lab. udp 26 false 512" NOERROR qr,aa,rd 50 0.000230596s
+[INFO] 192.168.219.103:53338 - 47975 "A IN pi203.lab. udp 26 false 512" NOERROR qr,aa,rd 50 0.000225897s
 ```
 
-로그도 나의 dns server가 잘 동작한다는 것을 보여준다. 🙂 얏호~!
+로그도 나의 dns server가 잘 동작한다는 것을 보여준다. 🙂 얏호~!
 
 ## TODO
 
@@ -252,21 +256,18 @@ $ docker logs coredns --tail 100 -f
 
 ## Change log
 
+* [rev 3] 2022-12-11
+  * OSX에서는 자꾸만 DNS가 캐시되어버려서 public한 TLD인 `.me`가 아닌 private한 TLD인 `.lab`으로 TLD를 변경함
+  * laptop과 pi뿐만 아니라 vm도 추가함
 * [rev 2] 2022-11-29 - file plugin이 아닌 hosts plugin을 이용하도록 개선함
   * file plugin에는 fallthrough 기능이 없었음. 따라서 CoreDNS선에서 NXDOMAIN이 발생하는 경우 다음 plugin인 forward로 8.8.8.8에 질의할 수 없었다. 이를 바로 깨닫지는 못했는데 그 이유는 초반에는 OS와 브라우저의 캐시 때문에 잘 동작했었기 때문이다. 
-* [rev 1] 2022-11-29 - file plugin으로 `me.` Zone을 이용
+* [rev 1] 2022-11-29 - file plugin으로 `me.` Zone에 대한 레코드 정보 제공
 ## 참고
 
-[https://kimmj.github.io/coredns/configure-dns-server/](https://kimmj.github.io/coredns/configure-dns-server/)  - 완전 처음에 coredns 띄우는 게 얼마나 쉬운지 맛보기용
-
-[https://coredns.io/manual/toc/#configuration](https://coredns.io/manual/toc/#configuration) - core dns 공식 문서
-
-[https://coredns.io/plugins/file/](https://coredns.io/plugins/file/) - coredns의 file plugin
-
-[https://coredns.io/2017/03/01/how-to-add-plugins-to-coredns/](https://coredns.io/2017/03/01/how-to-add-plugins-to-coredns/) - whoami 플러그인 개발 관련
-
-[https://easydmarc.com/blog/what-is-soa-record-in-dns/](https://easydmarc.com/blog/what-is-soa-record-in-dns/) - SOA 를 어떻게 설정해야할지
-
-[https://blog.naver.com/techtrip/222154620404](https://blog.naver.com/techtrip/222154620404) - zone 설정에서 `IN` 이 있어야하는지 없어도 되는지
-
-[https://github.com/carlpett/tfz53/issues/2](https://github.com/carlpett/tfz53/issues/2) - zone file에서 주석 쓰는 방법
+* [https://kimmj.github.io/coredns/configure-dns-server/](https://kimmj.github.io/coredns/configure-dns-server/)  - 완전 처음에 coredns 띄우는 게 얼마나 쉬운지 맛보기용
+* [https://coredns.io/manual/toc/#configuration](https://coredns.io/manual/toc/#configuration) - core dns 공식 문서
+* [https://coredns.io/plugins/file/](https://coredns.io/plugins/file/) - coredns의 file plugin
+* [https://coredns.io/2017/03/01/how-to-add-plugins-to-coredns/](https://coredns.io/2017/03/01/how-to-add-plugins-to-coredns/) - whoami 플러그인 개발 관련
+* [https://easydmarc.com/blog/what-is-soa-record-in-dns/](https://easydmarc.com/blog/what-is-soa-record-in-dns/) - SOA 를 어떻게 설정해야할지
+* [https://blog.naver.com/techtrip/222154620404](https://blog.naver.com/techtrip/222154620404) - zone 설정에서 `IN` 이 있어야하는지 없어도 되는지
+* [https://github.com/carlpett/tfz53/issues/2](https://github.com/carlpett/tfz53/issues/2) - zone file에서 주석 쓰는 방법
