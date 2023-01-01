@@ -1,48 +1,59 @@
 ---
 title: About me
 slug: /about
-description: 안녕하세요. 백엔드 개발자 Jinsu Park(umi0410)에 대해 소개합니다!
+# description: "" 
 weight: 1
 chapter: false
 pre: ""
 noDisqus: true
 menu:
-    main: 
-        weight: -90
-        pre: user
+  main: 
+    weight: -90
+    pre: user
 ---
 
 ## 😄 소개
 
 * **이름**: 박진수
-* **학력**: 경희대학교 컴퓨터공학과
-* **자기소개**
-  
-  **Golang**, **Spring**, **클라우드 인프라**, **MSA**, **컨테이너**와 **자동화**, 대규모 트래픽과 확장성을 고려한 **설계** 등에 관심이 많습니다.
-  
-  어떤 기술을 배우거나 적용시킬 때 **"언제", "왜" 그 기술이 필요한지**에 대해 생각해보는 것을 좋아합니다. 그런 **생각을 자유롭게 공유하는 자리를 사랑**합니다 :)
+* **학력**: 경희대학교 컴퓨터공학과 졸업
 
-  특히나 요즘은 대용량 트래픽, 대규모 프로젝트에 대비한 **캐싱**이나 **데이터베이스 설계**, **CQRS**에 관심이 많습니다.
+깊이 파고들고 싶은 데브옵스 엔지니어 박진수입니다.
 
-  위와 같은 주제로 **자유롭게 의견을 공유하는 것을 좋아하는 팀원들을 만나 좋은 케미를 내며 개발해나가는 게 꿈**입니다.
+현재 데브시스터즈에서 데브옵스 엔지니어로서 쿠버네티스 클러스터를 관리하며 여러 클라우드 네이티브 기술들을 활용해 문제를 해결해나가고 있습니다.
+
+여러 클라우드 네이티브 제품 중에서는 주로 `Istio`와 `ArgoCD`, `Argo Rollout`을 주로 담당하고 있습니다.
 
 ---
 
 ## 기술 스택 및 관심사
 
-* 깔끔하고 튼튼한 백엔드 구조 및 설계
-  * Java Spring Boot, JPA
+* Kubernetes
+* Istio
+* ArgoCD
+* Argo Rollout
+* Helm3
+* Terraform
+* Backend
   * Golang
+  * Java Spring Boot, JPA
   * MSA, DDD, CQRS, 메시지 큐, 이벤트 드리븐 아키텍쳐
-  * TDD, Mocking
-  * 테스트 및 배포 자동화
-* 컨테이너
-* 클라우드 인프라
-  * 상황에 맞는 AWS 인프라 설계
-  * CI/CD 파이프라인
+  * TDD
+
 ---
 
 ## 💼 경력 사항
+
+### [데브시스터즈]() 인프라 팀 데브옵스 엔지니어 (2022.05~)
+
+- Istio, ArgoRollout, ArgoCD, Github Action, Helm을 이용해 Kubernetes에서 손쉽게 Canary 배포할 수 있는 인프라, CI/CD를 구축
+- 서비스메쉬(Istio) 관련 업무 수행
+  - Istio 버전 업그레이드를 진행
+  - 성능 및 모니터링 개선
+  - Istio를 운영하면서 수시로 발생하는 문제들 트러블슈팅
+- ArgoCD 관련 업무 수행
+  - ArgoCD 버전 업그레이드 진행, 새로운 기능 도입
+
+---
 
 ### [당근마켓](https://www.daangn.com/) 플랫폼 팀 서버 엔지니어 인턴 [2021.12~2022.02]
 
@@ -130,9 +141,3 @@ menu:
 * **[오픈 소스 컨트리뷰톤: 오픈스택 팀 멘티](/experiences/open-source/open-source-contributhon-2020)** [2020.08~2020.09]
 * **한국 AWS Communitiy KRUG의 대학생 그룹 [AUSG](https://ausg.me)에서 3기로 활동 중** [2019.06~]
 * **경희대학교 소프트웨어 페스티발 웹/앱 최우수상 수상** [2019.11]
-
-
-
-  
-
-
