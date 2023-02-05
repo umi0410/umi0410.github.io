@@ -18,7 +18,7 @@ Pod가 종료되는 경우는 `kubectl delete`를 통해 직접 Pod를 죽이는
 다양한 경우의 수가 있을 수 있겠지만 아마 대부분 사이드카로 뜨는 `istio-proxy` 컨테이너가 애플리케이션 컨테이너보다 먼저 종료되는 것이
 원인일 것이라고 생각한다.
 
-v1.12 이전의 Istio를 이용하던 사람들은 다음과 같이 `istio-proxy` 컨테이너에 `preStop` 웹훅을 추가해 해당 컨테이너에 커넥션이 모두
+v1.12 이전의 Istio를 이용하던 사람들은 다음과 같이 `istio-proxy` 컨테이너에 `preStop` 설정을 추가해 해당 컨테이너에 커넥션이 모두
 종료된 후 `istio-proxy` 컨테이너가 종료되도록 하곤했다.
 
 ```yaml
@@ -53,7 +53,7 @@ containers:
 관련 내용을 찾아볼 수 있었다. [`pilot-agent` 커맨드 문서](https://preliminary.istio.io/v1.12/docs/reference/commands/pilot-agent/)에서도 관련 내용을 찾아볼 수 있다.
 그 외에 `MINIMUM_DRAIN_DURATION` 라는 설정도 존재하는데 이것이 앞에서 말한 envoy proxy의 draining duration이다.
 
-`EXIT_ON_ZERO_ACTIVE_CONNECTIONS`를 활성화하지 않으면 envoy-proxy는 `MINIMUM_DRAIN_DURATION` 경과 후 종료되겠지만 `EXIT_ON_ZERO_ACTIVE_CONNECTIONS`를 활성화함으로써
+`EXIT_ON_ZERO_ACTIVE_CONNECTIONS`를 활성화하지 않으면 envoy proxy는 `MINIMUM_DRAIN_DURATION` 경과 후 종료되겠지만 `EXIT_ON_ZERO_ACTIVE_CONNECTIONS`를 활성화함으로써
 envoy proxy가 커넥션이 모두 종료될 때까지 기다린 후 종료되도록 할 수 있다. 이 경우 애플리케이션이 해당 커넥션을 통한 요청에 대한 처리를 하던 중 envoy proxy가 먼저 죽어버려 커넥션이
 끊기는 에러 케이스를 방지할 수 있을 것이다.
 
@@ -72,7 +72,7 @@ envoy proxy가 커넥션이 모두 종료될 때까지 기다린 후 종료되�
 _* 테스트에서는 여건 상 편의를 위해 Istio 1.12 버전이 아닌 1.16 버전을 사용했다._
 
 `kennethreitz/httpbin` 이미지는 간단한 http 서버가 필요할 때 유용하게 사용할 수 있다. 
-`/delay/:seconds`라는 엔드포이는 `GET` 요청이 들어올 경우 `:seconds`만큼의 딜레이 후 응답한다. 이를 통해
+`/delay/:seconds`라는 엔드포인트는 `GET` 요청이 들어올 경우 `:seconds`만큼의 딜레이 후 응답한다. 이를 통해
 처리 시간이 긴 애플리케이션을 흉내내어 `EXIT_ON_ZERO_ACTIVE_CONNECTIONS` 라는 해결 방법이 올바르게 동작하는지 확인해볼 수 있을 것이다.
 
 우선 `EXIT_ON_ZERO_ACTIVE_CONNECTIONS`을 설정하지 않은 경우 필자가 언급한 것과 같이
