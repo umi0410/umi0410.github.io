@@ -45,6 +45,7 @@ params:
   #        lastUpdated: Jan 02, 2006 15:04 MST
 
   sidebar:
+    compact: false
     emoji: 🧸
     subtitle: 깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!
     avatar:
@@ -96,17 +97,16 @@ params:
         admin: Admin
 
   widgets:
-    enabled: []
-    # 어차피 사이드바에 다 있구먼
-    #            - search
-    #            - archives
-    #            - tag-cloud
-
-    archives:
-      limit: 5
-
-    tagCloud:
-      limit: 10
+#    homepage:
+#    - type: search
+#    - type: archives
+#      params:
+#        limit: 5
+#    - type: categories
+#      params:
+#        limit: 10
+    page:
+    - type: toc
 
   opengraph:
     twitter:
@@ -175,7 +175,7 @@ related:
 
 markup:
   tableOfContents:
-    endLevel: 4
+    endLevel: 5
     ordered: true
     startLevel: 2
   highlight:
