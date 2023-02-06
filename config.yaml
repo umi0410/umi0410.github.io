@@ -46,8 +46,8 @@ params:
 
   sidebar:
     compact: false
-    emoji: 🧸
-    subtitle: 깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!
+    emoji: 🚀
+    # subtitle: 깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!
     avatar:
       local: true
       src: media/profile-4.png
