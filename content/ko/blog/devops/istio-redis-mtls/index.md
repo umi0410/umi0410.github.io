@@ -400,7 +400,6 @@ $ istioctl pc all deployment/redis-client-istio -o yaml | yq | grep "envoy.filte
 
 더 자세한 내용은 [protocol selection](https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/) 문서에서
 찾아볼 수 있을 것이다.
-서비스 appProtocol!!!
 
 ## 마치며
 
