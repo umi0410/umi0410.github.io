@@ -151,7 +151,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: ca-issuer
+  name: leaf-issuer
 spec:
   ca:
     secretName: self-signed-ca-tls
@@ -186,7 +186,7 @@ spec:
     - foo-redis-master.istio-redis-mtls
     - foo-redis-master.istio-redis-mtls.svc.cluster.local
   issuerRef:
-    name: ca-issuer
+    name: leaf-issuer
     kind: Issuer
     group: cert-manager.io
 ---
@@ -208,7 +208,7 @@ spec:
     - client auth
     - server auth
   issuerRef:
-    name: ca-issuer
+    name: leaf-issuer
     kind: Issuer
     group: cert-manager.io
 ```

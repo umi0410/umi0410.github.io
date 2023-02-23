@@ -1,5 +1,5 @@
 ---
-title: '쿠버네티스에서 Pod 종료 시 Istio proxy 컨테이너가 애플리케이션 컨테이너보다 먼저 죽을 때의 해결책: EXIT_ON_ZERO_ACTIVE_CONNECTIONS'
+title: '쿠버네티스에서 Pod 종료 시 Istio proxy 컨테이너가 애플리케이션 컨테이너보다 먼저 종료될 때의 해결책: EXIT_ON_ZERO_ACTIVE_CONNECTIONS'
 date: 2023-02-04T02:00:00+09:00
 weight: 19
 categories:
