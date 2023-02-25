@@ -17,10 +17,10 @@ K8s에서 Istio를 통해 서비스 메쉬를 구현하는 경우, Istio는 알�
 
 하지만 메쉬 내부에서 뿐만 아니라 메쉬 외부와도 mTLS로 시큐어하게 통신하고 싶은 경우에는 어떨까?
 
-예를 들어보자면 내 서비스에 VPN 없이 퍼블릭하게 인터넷으로 접근은 가능하지만 해당 서비스를 나만 이용하고 싶은 경우, 내 디바이스에 설치된 인증서를 이용해
+예를 들어 내 서비스에 VPN 없이 퍼블릭하게 인터넷으로 접근은 가능하지만 해당 서비스를 나만 이용하고 싶은 경우, 내 디바이스에 설치된 인증서를 이용해
 내 서버와 mTLS로 통신을 하려면 어떻게 해야할까?
 
-Istio를 이용하면 손쉽게 Ingress gateway단에서 클라이언트(나를 비롯한 유저들)과 mTLS 통신을 지원할 수 있다.
+다음 몇 가지 요소들만으로도 Istio를 통해 손쉽게 Ingress gateway단에서 클라이언트(나를 비롯한 유저들)과 mTLS 통신을 지원할 수 있다.
 
 1. **Istio의 Gateway**
 2. 부모 CA의 인증서
@@ -34,7 +34,7 @@ Istio를 이용하면 손쉽게 Ingress gateway단에서 클라이언트(나를 
 
 이번 글에서 실습할 내용은 다음과 같다.
 
-1. 내가 시큐어하게 접속하고 싶은 서버 띄우기 (Deployment, Service, VirtualService)
+1. 시큐어하게만 접속을 허용할 서버 띄우기 (Deployment, Service, VirtualService)
 2. Cert-Manager를 통해 부모 CA의 인증서 및 해당 CA에게 인증받은 서버 인증서와 클라이언트 인증서 발급 받기
 3. 해당 서버 인증서를 사용하는 Gateway 만들기
 4. 클라이언트 인증서를 내 디바이스에 설치하기
@@ -102,7 +102,7 @@ metadata:
   name: server
 spec:
   hosts:
-  # NOTE: please update this value to your hosts
+  # NOTE: Please update this value to your hosts
   - istio-server-mtls.dev.lab.jinsu.me
   gateways:
   - istio-system/mtls-gateway
@@ -132,9 +132,9 @@ virtualservice.networking.istio.io/server created
 이제 다음은 Cert manager을 통해 생성할 ClusterIssuer 및 Certificate라는 CR에 대한 manifest이다. ClusterIssuer는 Namespace scoped resource가 아닌
 cluster-wide한 리소스이기에 혹시 자신이 ClusterIssuer을 사용 중이라면 영향이 없는지 한 번쯤 체크해보도록 한다.
 
-내용이 다소 많게 느껴질 수 있는데 그냥 self-signed-ca의 인증서를 발급 받고, self-signed-ca에게 서버 인증서와 클라이언트 인증서를 발급
-받는 것이다. 직접 openssl 커맨드로 인증서를 발급한 뒤 k8s Secret을 만들어주고 해당 Secret을 다음 단계에서 Gateway가 잘 가져갈 수 있도록
-설정해줄 수도 있긴하다. 하지만 실제로는 cert-manager을 이용하는 것이 인증서 갱신이나 권한 관리, 쿠버네티스에 친숙한 형태 등의 측면에서 여러 장점을 갖는다.
+다음에 등장할 manifest의 양이 다소 많게 느껴질 수 있는데 그냥 self-signed-ca의 인증서를 발급 받고, self-signed-ca에게 서버 인증서와 클라이언트 인증서를 발급
+받는 것에 대한 manifest일 뿐이다. Cert manager을 이용하지 않고 직접 openssl 커맨드로 인증서를 발급한 뒤 k8s Secret을 만들어주고 해당 Secret을 다음 단계에서 Gateway가 잘 가져갈 수 있도록
+설정해줄 수도 있긴하다. 하지만 대부분의 경우 cert-manager을 이용하는 것이 인증서 갱신이나 권한 관리, 쿠버네티스에 친숙한 형태 등의 측면에서 여러 장점을 갖는다.
 
 ```yaml
 # certificates.yaml
@@ -219,6 +219,7 @@ spec:
   usages:
     - client auth
   uris:
+    # NOTE: I'll cover this at the bottom.
     - spiffe://jinsu-macbook
   issuerRef:
     name: leaf-issuer
@@ -294,7 +295,9 @@ spec:
         # which contains your server certificates and ca bundles.
         # (e.g. the secret resource from the certificate issued
         # by cert-manager)
-        mode: SIMPLE # MUTUAL
+        #
+        # I'll update this value to MUTUAL in a few minutes.
+        mode: SIMPLE
         credentialName: server-tls
 ```
 ---
@@ -326,7 +329,9 @@ OSX 기준, 다음과 같이 Keychain Access에서 ca.crt 파일을 드래그해
 
 ![](server-cert-install.png)![](server-cert-trust.png)
 
-그 뒤에 브라우저로 다시 접속하면 다음과 같이 잘 응답을 받을 수 있다. 여전히 인증서 에러가 난다면 브라우저를 재시작해보자.
+🎉 그 뒤에 브라우저로 다시 접속하면 다음과 같이 잘 응답을 받을 수 있다!
+
+여전히 인증서 에러가 난다면 브라우저를 재시작해보자.
 
 ![](tls-mode-simple-browser-ok.png)
 
@@ -334,25 +339,27 @@ OSX 기준, 다음과 같이 Keychain Access에서 ca.crt 파일을 드래그해
 ### 4. 클라이언트 인증서 설치하기
 
 이제 단순 TLS가 아닌 mTLS를 활성화함으로써 인증과 암호화 두 가지를 모두 누려볼 것이다.
-위에서는 Gateway의 tls mode를 `SIMPLE`로 설정했지만 이를 `MUTUAL`로 변경해주자.
+위에서는 단순 TLS를 이용하기 위해 Gateway의 tls mode를 `SIMPLE`로 설정했었던 것이고 이제는
+mTLS를 이용하기 위해 해당 값을 `MUTUAL`로 변경해주자.
 
 ```yaml
 tls:
   mode: MUTUAL # This was SIMPLE just before
 ```
 
-그럼 아까와 달리 `ca.crt`를 디바이스(내 컴퓨터)에 설치했더라도 다음과 같이 에러가 날 것이다.
-**이제 유효한 클라이언트 인증서가 없는 클라이언트는 우리의 서버와 올바르게 통신할 수 없어진 것이다.**
+그럼 `ca.crt` 인증서만을 설치한 디바이스(내 컴퓨터)에서는 아까와 달리 SSL 관련 에러가 날 것이다.
+**올바른 통신을 위해서는 이제 클라이언트도 자신을 증명할 수 있는 인증서를 서버에게 제출해야하게 된 것이다.**
 
 ![](tls-mode-mutual-browser-no-client-cert.png)
 
-이제 여기서 재미있걸 하나 해볼 것이다. 우리는 클라이언트 인증서도 로컬에 설치하고 브라우저는 이를 인식해 서버와
-mTLS handshake를 할 때 사용할 수 있다! 주의할 점은 대부분의 브라우저들이 `.crt`나 `.key` 형태의
+재밌게도 우리는 클라이언트 인증서도 로컬에 설치하고 브라우저는 이를 인식해 서버와
+mTLS 통신할 때 해당 인증서를 사용할 수 있다! 주의할 점은 대부분의 브라우저들이 `.crt`나 `.key` 형태의
 인증서나 비밀키 자체는 인식하지 못하고 인증서와 비밀키를 함께 묶은 PKCS#12라는 `.p12` 형태의
 파일을 인식하는 경우가 많다는 것이다.
 
-다음 명령어를 통해 `.p12` 명령어를 만들고 설치해줬다. 비밀번호는 뭐 자유롭게 설정하면 된다.
-이번에는 Keychain Access에서 좌측의 login 탭을 이용했다.
+따라서 다음 명령어를 통헤 방금 다운받은 `.crt` 파일과 `.key` 파일을 하나의
+`.p12` 파일로 묶어주어야한다. 비밀번호는 자유롭게 설정하면 된다.
+이번에는 Keychain Access에서 좌측의 login 탭을 선택한 뒤 인증서를 설치해줬다.
 
 ```shell
 $ openssl pkcs12 -export -inkey jinsu-macbook-tls.key \
@@ -364,11 +371,11 @@ Verifying - Enter Export Password:
 
 ![](jinsu-macbook-cert-install.png)
 
-클라이언트 인증서를 잘 설치했다면 재접속 시 다음과 같이 사용 가능한 인증서 목록을 띄워줄 것이다!
+클라이언트 인증서를 잘 설치했다면 브라우저에서 재접속 시 다음과 같이 사용 가능한 인증서 목록을 띄워줄 것이다!
 
 ![](browser-select-cert.png)
 
-해당 인증서가 유효해 mTLS로 서버(Istio ingress gateway)와 잘 통신한다면 다음과 같이
+해당 인증서가 유효하고 mTLS로 서버(Istio ingress gateway)와 잘 통신이 가능하다면 다음과 같이
 성공적인 응답을 전달받을 수 있을 것이다 :)
 
 ![](tls-mode-mutual-browser-ok.png)
@@ -379,12 +386,15 @@ Verifying - Enter Export Password:
 보면 AuthorizationPolicy라는 CR을 이용해 권한 제어를 하는 방법이 소개되어있고, 여기에는 mTLS로 인증한 경우 `principal`이라는
 필드를 통해 접근 제한이 가능하다고 한다.
 
-근데 이 `principal`이라는 필드가 낯설어 좀 알아봤다. 우리는 `principal`을 어디서, 어떻게, 무엇으로 정의해야하는 걸까?
-Istio는 [SPIFFE](https://spiffe.io/docs/latest/spiffe-about/overview/)라고 하는 도구를 내부적으로 이용 중이기에 이 도구가 제공해주는
-형태에 맞게 값을 정의해주면 된다.
+이 `principal`이라는 필드가 낯설어 보였다. 우리는 `principal`을 어디서, 어떻게, 무엇으로 정의해야하는 걸까? Common name이
+principal로 인식되는 걸까?
 
-조금 어려울 수 있는데 예를 들어 어떤 Pod이 갖고 있는 principal을 뜯어보면 내용물이 다음과 같이 SPIFFE ID가 들어있다.
-istio-ingressgateway Pod가 들고 있는 ServiceAccount를 바탕으로 한 인증서를 한 번 파보면 SPIFFE ID가 들어있을까 싶은 생각이 들었다.
+아니다. Istio는 [SPIFFE](https://spiffe.io/docs/latest/spiffe-about/overview/)라고하는 분산 환경에서 사용 가능한 인증 시스템을
+사용 중이기에 이 시스템이 identity를 정의하는 형태와 동일하게 값을 정의해주면 된다.
+
+조금 어려울 수 있는데 예를 들어 어떤 Pod이 갖고 있는 principal을 뜯어보면 내용물이 SPIFFE ID가 들어있을 것이라는 의미이다.
+한 번 istio-ingressgateway Pod가 들고 있는 ServiceAccount를 바탕으로 한 인증서를 파보자.
+그럼 다음과 같이 특정 ServiceAccount를 의미하는 SPIFFE ID가 인증서 안에 정의되어있음을 확인할 수 있다.
 
 ```shell
 # istioctl을 통해 어떤 Pod(istio-ingressgateway-6fc4d9f8d-72wwc)의 istio 관련 secret 정보들을 조회해본 값은 다음과 같았다. 
@@ -434,13 +444,14 @@ $ istioctl pc secret -n istio-system istio-ingressgateway-6fc4d9f8d-72wwc -o yam
                 URI:spiffe://cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
 ```
 
-아하! 인증서 발급시에 x509 v3 extension 중에 SAN을 이용해 `URI:spiffe://` 형태의 설정을 해주면 Istio가 잘 알아듣겠구나.
+아하! 그럼 우리도 인증서 발급시에 x509 v3 extension 중에 SAN을 이용해 `URI:spiffe://` 형태의 설정을 해주면 Istio가 잘 알아듣겠구나.
 
 \* _`istioctl pc log ...` 커맨드를 통해 로그 레벨을 낮추고 AuthorizationPolicy에서 principal에 대한 설정한 뒤 로그를 살펴보면 실제로 `spiffe://`을 prefix로 갖는
 형태로 SAN이 생성되어야겠구나라는 것을 알 수 있다. [istio/istio Github comment](https://github.com/istio/istio/issues/29891#issuecomment-755839402) 등을 통해서도
 좀 팁을 얻을 수 있을 것이다_
 
-위에서 잠시 Cert manager로 발급받을 Certificate CR에 대해 다음 설정에 대한 설명을 건너뛰었는데 방금 설명한 `SPIFFE` 관련 내용이 다음 설정이 필요했던 이유이다.
+이 글의 윗부분에서 잠시 Cert manager로 발급받을 Certificate CR에 대해 다음과 같은 spiffe id 관련 설정에 대한 설명을 건너뛰었는데
+방금 설명한 `SPIFFE` 관련 내용이 바로 그 설정이 필요했던 이유이다.
 
 ```yaml
 # certificates.yaml
@@ -462,8 +473,8 @@ spec:
     - spiffe://jinsu-macbook
 ```
 
-그럼 위와 같이 Certificate를 만들었었으니 해당 인증서의 principal은 `jinsu-macbook`으로 인식될 것이다.
-그럼 이제 드디어 `AuthorizationPolicy`를 통해 `jinsu-macbook`이라는 principal의 요청을 deny해보자.
+위와 같이 Certificate를 만들었었으니 해당 인증서의 principal은 `jinsu-macbook`으로 인식될 것이다.
+이제 `AuthorizationPolicy`를 통해 `jinsu-macbook`이라는 principal로부터 발생한 요청은 deny해보자.
 성공적으로 deny가 된다면 해당 인증서가 설치된 나의 맥북에서는 접속 시 에러가 발생해야하고, 다른 디바이스들에서는 모두 잘 접속되어야한다.
 
 ```yaml
@@ -494,7 +505,7 @@ source의 principal이 `jinsu-macbook`인 요청은 istio-ingressgateway 단에�
 
 ![](istio-rbac-denied.png)
 
-이로써 실습은 마친다.
+이로써 실습을 마친다.
 
 ## 마치며
 
