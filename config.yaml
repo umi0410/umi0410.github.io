@@ -8,7 +8,7 @@ title: Jinsu Playground
 disqusShortname: umi0410
 
 # GA Tracking ID
-googleAnalytics: UA-177403492-1
+GoogleAnalytics: G-MSQXG4N1BQ
 
 
 # Theme i18n support
@@ -144,22 +144,26 @@ menu:
       name: Home
       url: /
       weight: -100
-      pre: home
+      params:
+        icon: home
     - identifier: about
       name: About me
       url: https://github.com/umi0410/umi0410
       weight: -90
-      pre: user
+      params:
+        icon: user
     - identifier: categories
       name: Categories
       url: /categories
       weight: -88
-      pre: archives
+      params:
+        icon: archives
     - identifier: github
       name: Github
       url: https://github.com/umi0410/
       weight: 10
-      pre: github
+      params:
+        icon: github
 
 
 related:
