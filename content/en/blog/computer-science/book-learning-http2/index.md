@@ -14,6 +14,8 @@ image: preview.png
 This book provides valuable practical handson examples and clear explanations of the progress of HTTP protocols.
 It also offers a clear comparison between HTTP 2 and HTTP 1.
 
+The link about this book is [_Learning HTTP/2_](https://www.oreilly.com/library/view/learning-http2/9781491962435/).
+
 ## Impressions
 
 - I appreciated the book's inclusion the history of HTTP protocols.
