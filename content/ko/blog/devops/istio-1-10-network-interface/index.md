@@ -1,5 +1,5 @@
 ---
-title: istio와 envoy proxy를 통해 경험해보는 네트워크 인터페이스 (istio 1.10)
+title: Istio와 envoy proxy를 통해 경험해보는 네트워크 인터페이스 (istio 1.10)
 date: 2022-07-17T22:00:00+09:00
 weight: 29
 categories:
