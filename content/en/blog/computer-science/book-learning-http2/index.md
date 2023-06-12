@@ -18,8 +18,8 @@ The link about this book is [_Learning HTTP/2_](https://www.oreilly.com/library/
 
 ## Impressions
 
-- I appreciated the book's inclusion the history of HTTP protocols.
-  - What I value most in technical books like this is actually the clusion of historical context.
+- I appreciated the book's inclusion of the history of HTTP protocols.
+  - What I value most in technical books like this is actually the inclusion of historical context.
     While I can learn about the specifications and features of technologies through
     videos and articles in the internet, 
     understanding the history of a technology is something I can only achieve through books.
