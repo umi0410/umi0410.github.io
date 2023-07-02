@@ -110,7 +110,7 @@ Engineers who are currently working in related fields can also review overall co
     - A ticket server to issue unique IDs
         - A ticket server is a dedicated server to issue unique IDs but this is a SPOF and which is hard to be replicated due to the synchronization and inconsistency.
     - Twitter snowflakes
-        - A method of "divide and conquer". This method divided an ID into several parts
+        - A kind of the method of "divide and conquer". This method divided an ID into several parts
         - <timestamp, datacenter id, server id, sequence>
             - timestamp - A timestamp after start time defined by twitter
             - sequence - An incremental number within the current millisecond.
@@ -194,7 +194,9 @@ Engineers who are currently working in related fields can also review overall co
 - This book also unquestionably advocated the use of S3 as a vast storage system.
 - Compressing, archiving and caching were mentioned as well.
 
-### Chapter 16: The Learning Continues - Nothing special
+### Chapter 16: The Learning Continues
+
+- Nothing special
 
 ## Conclusions
 
