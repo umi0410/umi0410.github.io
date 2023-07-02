@@ -143,9 +143,7 @@ Engineers who are currently working in related fields can also review overall co
 ### Chapter 11: Design A News Feed System
 
 - Which I didn't understand when I first came across the same pattern(push on write) in Redis in Action.
-    
-    When someone writes a twit, the timelines of the followers will be updated by pushing the information about the new twit(fan out to followers) to the ZSETs of each of them. So their timelines kept up-to-date. This is called as "push on write". 
-    
+  - When someone writes a twit, the timelines of the followers will be updated by pushing the information about the new twit(fan out to followers) to the ZSETs of each of them. So their timelines kept up-to-date. This is called as "push on write". 
 - Initially, I didn't fully resonate with the system because of the inefficiency from muted followers and dormant users. But this book let me know about the techniques to filter them beforehand. They were filtering and "pulling on write"
 - Comparison between "push on write" and "pull on read" based on pros and cons
 - Caching was also actively used here.
@@ -156,16 +154,15 @@ Engineers who are currently working in related fields can also review overall co
 - Preserving connections is efficient in case of high demand for writing. It reduces the overhead of creating a new connection every time.
 - Polling: after preserving a connection, we can poll the new data periodically from the servers.
 - Websocket: Furthermore, we can also utilize WebSocket.
-    - Once a connection is formed, the protocol is upgraded from simple http to websocket.
-    - Services to maintain connections alive tend to be stateful services.
+  - Once a connection is formed, the protocol is upgraded from simple http to websocket.
+  - Services to maintain connections alive tend to be stateful services.
 - The book said the table structures of the database differ slightly depending on their purpose, which means they **vary** based on
-  whether they're designed for 1 on 1 chat or group chat. In the case of group chat, the group id column is added    
-  
-  ⬆️ I didn't fully agree with this part, because we can just treat 1 on 1 chat and group chat the same way in terms of the table structures.
+  whether they're designed for 1 on 1 chat or group chat. In the case of group chat, the group id column is added.    
+  - ⬆️ I didn't fully agree with this part, because we can just treat 1 on 1 chat and group chat the same way in terms of the table structures.
     
-  According to the pattern described in this book for handling a case with fewer users in the same chat room, there could be a substantial number of message queues, as it creates a message queue for each user or device.
+    According to the pattern described in this book for handling a case with fewer users in the same chat room, there could be a substantial number of message queues, as it creates a message queue for each user or device.
     
-  At this part, I was concerned about the possibility of having an excessive number of queues when using Kafka or any other message queues.
+    At this part, I was concerned about the possibility of having an excessive number of queues when using Kafka or any other message queues.
     
 
 ### Chapter 13: Design A Search Autocomplete System
