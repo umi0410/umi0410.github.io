@@ -115,7 +115,7 @@ You can check out more detailed logs by lowering the log level of envoy. Here is
 Now, finally let's try configuring `EXIT_ON_ZERO_ACTIVE_CONNECTIONS`.
 I annotated to pods to be created via the pod template of the _Deployment_. 
 
-```shell
+```yaml
 proxy.istio.io/config: |
   proxyMetadata:
     EXIT_ON_ZERO_ACTIVE_CONNECTIONS: 'true'
@@ -160,7 +160,7 @@ I'd like to thank the engineers who tried to develop the feature.
 
 Can I become a global engineer who can have a positive effect to huge open source projects? I hope so. :)
 
-## 참고 자료
+## References
 
 * [[Github Issue] envoy drain duration should adapt to pod spec](https://github.com/istio/istio/issues/34855)
 * [pilot-agent command docs](https://preliminary.istio.io/v1.12/docs/reference/commands/pilot-agent/)

@@ -186,7 +186,7 @@ httpbin.org 클러스터로의 요청임이 인식될 것이고, 그 목적지�
 여전히 application container와 외부 서비스 간에 암호화되어 전송되는 L7 패킷을
 envoy가 decrypt할 수는 없기에 L7에 대한 가시성은 확보할 수 없다.
 
-그나마 다음과 같이 L7 metric에서 service name이 인식되어 이제는 Passthrough 클러스터로 처리되진 않고
+그나마 다음과 같이 L4 metric에서 service name이 인식되어 이제는 Passthrough 클러스터로 처리되진 않고
 `httpbin.org`라는 이름의 클러스터로 처리됨을 확인할 수 있다. 
 
 ![](prom-l4-serviceentry.png)
@@ -209,7 +209,7 @@ httpbin.org                                       443       -          outbound 
 
 해당 클러스터에 대한 endpoint는 Envoy가 주기적으로 dns를 조회해 얻은 IP가 된다.
 
-```yaml
+```bash
 $ istioctl pc endpoint -n test-ext-svc $(kubectl get pod -n test-ext-svc -o name)
 ENDPOINT                                                STATUS      OUTLIER CHECK     CLUSTER
 ...
@@ -228,7 +228,7 @@ egress 트래픽에 대한 TLS Orgination을 application이 수행하지 않고 
 적용해야한다. 흐름은 대략 다음과 같다.
 
 1. Application container은 plaintext로 외부 서비스에 HTTP 요청을 보낸다. (e.g., http://httpbin.org:80)
-2. **Istio 사이드카**에서 cluster:80 포트에 대한 egress 요청에 대해 **서버측과 TLS** 통신을 수행할 예정이다.
+2. **Istio 사이드카**에서 <Cluster:80> 포트에 대한 egress 요청에 대해 **서버측과 TLS** 통신을 수행할 예정이다.
 3. Istio 사이드카에서 `<Cluster>:80` → `<Endpoint>:443`으로 Host와 Port를 변경해 실제 요청을 보낸다. 이때 2번에서 예정한대로 TLS로 요청을 보낸다.
 4. 결과적으로 사이드카는 https://httpbin.org:443 으로 요청을 수행한다.
 
@@ -246,6 +246,7 @@ spec:
   location: MESH_EXTERNAL
   ports:
     - number: 80
+      # The `targetPort` configuration has been added.
       targetPort: 443
       name: http
       protocol: HTTP
@@ -319,9 +320,9 @@ istio_requests_total{reporter="source",source_workload="curl",source_canonical_s
 istio_requests_total{reporter="source",source_workload="curl",source_canonical_service="curl",source_canonical_revision="latest",source_workload_namespace="test-ext-svc",source_principal="unknown",source_app="curl",source_version="",source_cluster="Kubernetes",destination_workload="unknown",destination_workload_namespace="unknown",destination_principal="unknown",destination_app="unknown",destination_version="unknown",destination_service="httpbin.org",destination_canonical_service="unknown",destination_canonical_revision="latest",destination_service_name="httpbin.org",destination_service_namespace="unknown",destination_cluster="unknown",request_protocol="http",response_code="504",grpc_response_status="",response_flags="-",connection_security_policy="unknown"} 3
 ```
 
-```yaml
+```bash
 # 기존과 달리 istio_를 포함하는 metric 항목들이 굉장히 많아졌음.
-kubectl exec -n test-ext-svc $(kubectl get pod -n test-ext-svc -o name) -- curl -s localhost:15000/stats/prometheus | grep istio_ | wc -l
+$ kubectl exec -n test-ext-svc $(kubectl get pod -n test-ext-svc -o name) -- curl -s localhost:15000/stats/prometheus | grep istio_ | wc -l
      207
 ```
 
@@ -355,7 +356,7 @@ host도 지원해보고 싶었다. 예를 들어 `foo.bar.baz.example.com`와 �
 DestinationRule이 적용되지 않는 이슈, DestinationRule은 적용하더라도 그래서 Host header와 SNI는 어떤
 값으로 조작해줘야하는 지에 대한 설정 기능 부재 등 다양한 어려움이 있어 지원하지 못했다.
 
-# 마치며
+## 마치며
 
 최근 회사 업무로 Istio 업그레이드를 준비하면서 버전이 올라감에 따라 새롭게 추가된 기능이나
 그동안 내가 놓쳐왔던 문서들을 좀 살펴봤다.
@@ -365,7 +366,7 @@ DestinationRule이 적용되지 않는 이슈, DestinationRule은 적용하더�
 개인적으로는 시간만 된다면 Istio 업그레이드를 하면서 겪었던 breaking change로 인한 고생이나
 새로운 기능으로 인한 편리함에 대해서도 다뤄보고 싶다.
 
-# 참고한 자료
+## 참고한 자료
 
 - [https://istio.io/latest/blog/2019/monitoring-external-service-traffic/](https://istio.io/latest/blog/2019/monitoring-external-service-traffic/)
 - [https://istio.io/latest/docs/tasks/traffic-management/egress/egress-tls-origination/](https://istio.io/latest/docs/tasks/traffic-management/egress/egress-tls-origination/)

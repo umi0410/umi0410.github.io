@@ -116,7 +116,7 @@ istio-ingressgateway가 connection reset 에러를 받고서는 클라이언트(
 
 자! 그럼 드디어 `EXIT_ON_ZERO_ACTIVE_CONNECTIONS` 을 설정해보겠다. Deployment의 pod template을 통해 pod에 다음과 같은 annotation이 달리도록 설정해준다.
 
-```shell
+```yaml
 proxy.istio.io/config: |
   proxyMetadata:
     EXIT_ON_ZERO_ACTIVE_CONNECTIONS: 'true'
