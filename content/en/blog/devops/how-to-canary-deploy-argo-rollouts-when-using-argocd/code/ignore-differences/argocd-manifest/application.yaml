@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rollouts-demo-ignore-differences
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/umi0410/umi0410.github.io
+    targetRevision: master
+    path: content/en/blog/devops/how-to-canary-deploy-argo-rollouts-when-using-argocd/code/ignore-differences/backend-manifest
+  destination:
+    name: in-cluster
+    namespace: rollouts-demo-ignore-differences
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: networking.istio.io
+      kind: VirtualService
+      jqPathExpressions:
+        - ".spec.http[] | select(.name == \"rollouts-demo\") | .route[] | .weight"

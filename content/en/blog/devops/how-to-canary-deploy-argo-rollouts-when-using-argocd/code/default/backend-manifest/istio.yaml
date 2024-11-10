@@ -1,0 +1,45 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: rollouts-demo
+spec:
+  selector:
+    istio: ingress
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - '*'
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: rollouts-demo
+spec:
+  hosts:
+    - '*'
+  gateways:
+    - rollouts-demo
+  http:
+    - name: rollouts-demo
+      route:
+        - destination:
+            host: rollouts-demo
+            port:
+              number: 80
+          weight: 100
+        - destination:
+            host: rollouts-demo-canary
+            port:
+              number: 80
+          weight: 0
+    - name: nginx
+      route:
+        - destination:
+            host: nginx
+            port:
+              number:
+                80
+          weight: 100

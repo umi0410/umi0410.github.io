@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rollouts-demo
+  template:
+    metadata:
+      labels:
+        app: rollouts-demo
+    spec:
+      containers:
+        - name: rollouts-demo
+          image: argoproj/rollouts-demo:blue
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 5m
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: {}
+      canaryService: rollouts-demo-canary
+      stableService: rollouts-demo
+      trafficRouting:
+        istio:
+          virtualService:
+            name: rollouts-demo
+            routes:
+              - rollouts-demo
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollouts-demo
+  labels:
+    app: rollouts-demo
+spec:
+  selector:
+    app: rollouts-demo
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollouts-demo-canary
+  labels:
+    app: rollouts-demo
+spec:
+  selector:
+    app: rollouts-demo
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP

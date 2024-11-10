@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rollouts-demo-default
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/umi0410/umi0410.github.io
+    targetRevision: master
+    path: content/en/blog/devops/how-to-canary-deploy-argo-rollouts-when-using-argocd/code/default/backend-manifest
+  destination:
+    name: in-cluster
+    namespace: rollouts-demo-default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
