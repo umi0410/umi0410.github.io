@@ -38,12 +38,6 @@ spec:
     - name: nginx
       route:
         - destination:
-            host: nginx-1
+            host: nginx
             port:
               number: 80
-          weight: 50
-        - destination:
-            host: nginx-2
-            port:
-              number: 80
-          weight: 50

@@ -28,7 +28,7 @@ spec:
     canary:
       steps:
         - setWeight: 20
-        - pause: { }
+        - pause: {}
       canaryService: rollouts-demo-canary
       stableService: rollouts-demo
       trafficRouting:
