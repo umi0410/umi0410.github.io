@@ -11,7 +11,8 @@ categories:
 - Istio
 - cert-manager
 - kubernetes
-image: preview.png
+cover:
+  image: preview.png
 description: |
   Clova AI Custom Extension을 보다 재미있게 쿠버네티스로 배포해봤습니다. 
 ---

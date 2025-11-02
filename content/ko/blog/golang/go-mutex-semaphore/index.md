@@ -10,7 +10,8 @@ draft: false
 categories:
   - Golang
   - cs-with-golang
-image: mutex-2.png
+cover:
+  image: mutex-2.png
 description: |
   Computer Science의 주요 파트 중 하나인 운영체제에서 이론적으로는 흔히 접할 수 있는 Mutex와 Semaphore가
   실제로는 어떤 식으로 사용될 수 있을 지 Go 언어를 통해 직접 적용시키며 알아보았습니다.

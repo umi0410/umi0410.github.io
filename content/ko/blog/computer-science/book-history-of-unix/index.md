@@ -6,7 +6,8 @@ categories:
   - Computer Science
   - Linux
   - Book
-image: preview.jpeg
+cover:
+  image: preview.jpeg
 ---
 ## 시작하며
 

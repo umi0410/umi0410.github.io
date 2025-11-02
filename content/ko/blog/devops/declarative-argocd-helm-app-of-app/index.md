@@ -4,7 +4,8 @@ date: 2022-04-22T14:11:07+09:00
 weight: 33
 categories:
   - DevOps
-image: logo.png
+cover:
+  image: logo.png
 ---
 ## 시작하며
 

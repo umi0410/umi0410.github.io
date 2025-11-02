@@ -7,7 +7,8 @@ weight: 902
 categories:
   - experiences
   - megazone-cloud-internship
-image: ci-cd-pipeline.png
+cover:
+  image: ci-cd-pipeline.png
 description: |
   Github Action과 Spinnaker을 이용한 CI/CD 파이프라인 구축기
 ---

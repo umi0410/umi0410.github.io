@@ -6,7 +6,8 @@ noDisqus: false
 draft: false
 categories:
   - thought
-image: preview.png
+cover:
+  image: preview.png
 description: |
   이번 글은 회고라고 적기는 했으나 취준 과정 그리고 입사 이후에 대한 일기
 ---

@@ -5,7 +5,8 @@ weight: 17
 categories:
   - Book
   - Network
-image: preview.png
+cover:
+  image: preview.png
 ---
 ## tl;dr
 

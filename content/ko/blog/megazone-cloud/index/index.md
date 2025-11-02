@@ -8,11 +8,8 @@ weight: 500
 categories:
   - experiences
   - megazone-cloud-internship
-image: mzcloud-logo.png
-description: |
-  안녕하세요. 이번에 메가존 클라우드에서 데브옵스 인턴으로 근무를 하게되었던 박진수입니다.
-  너무 좋은 팀원들과 많은 경험을 하며 단시간에 성장할 수 있었고, 일하는 동안 매 순간 순간이 너무
-  행복했었기에 이렇게 인턴 후기를 작성해봅니다.
+cover:
+  image: mzcloud-logo.png
 ---
 
 ![mzc_logo](mzcloud-logo.png)

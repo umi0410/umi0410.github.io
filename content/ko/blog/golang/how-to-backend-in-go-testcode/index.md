@@ -6,7 +6,8 @@ noDisqus: false
 draft: false
 categories:
   - Golang
-image: test-with-ide.png
+cover:
+  image: test-with-ide.png
 ---
 ## 시작하며
 

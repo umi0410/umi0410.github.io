@@ -6,7 +6,8 @@ categories:
   - DevOps
   - Istio
   - Network
-image: preview.png
+cover:
+  image: preview.png
 ---
 ## Introduction
 

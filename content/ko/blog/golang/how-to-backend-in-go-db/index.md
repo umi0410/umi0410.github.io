@@ -6,7 +6,8 @@ noDisqus: false
 draft: false
 categories:
   - Golang
-image: o2m-relation.png
+cover:
+  image: o2m-relation.png
 ---
 ## 시작하며
 

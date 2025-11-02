@@ -7,7 +7,8 @@ pre: "<b></b>"
 weight: 60
 noDisqus: false
 draft: false
-image: pprof-debugging-1.png
+cover:
+  image: pprof-debugging-1.png
 categories:
   - Golang
   - cs-with-golang

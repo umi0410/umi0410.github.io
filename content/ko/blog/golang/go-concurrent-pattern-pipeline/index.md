@@ -7,7 +7,8 @@ pre: "<b></b>"
 weight: 110
 noDisqus: false
 draft: true
-image: illustration.png
+cover:
+  image: illustration.png
 categories:
   - Golang
 description: |

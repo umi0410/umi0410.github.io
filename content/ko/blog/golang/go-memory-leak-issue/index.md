@@ -7,7 +7,8 @@ pre: "<b></b>"
 weight: 100
 noDisqus: false
 draft: false
-image: memory-leak-graph.png
+cover:
+  image: memory-leak-graph.png
 categories:
   - Golang
 description: |

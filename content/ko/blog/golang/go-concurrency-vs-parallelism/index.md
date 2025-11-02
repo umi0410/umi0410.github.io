@@ -7,7 +7,8 @@ pre: "<b></b>"
 weight: 80
 noDisqus: false
 draft: false
-image: concurrency-vs-parallelism.jpg
+cover:
+  image: concurrency-vs-parallelism.jpg
 categories:
   - Golang
 description: |

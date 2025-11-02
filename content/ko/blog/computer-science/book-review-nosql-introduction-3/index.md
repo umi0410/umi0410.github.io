@@ -9,7 +9,8 @@ draft: false
 categories:
   - 도서
   - 데이터베이스
-image: cassandra-modeling.png
+cover:
+  image: cassandra-modeling.png
 description: |
   "NoSQL 철저 입문"이라는 책을 읽고 작성한 후기 시리즈의 마지막 편인 세 번째 편 입니다. 
   Column-Family DB와 Graph DB를 정리해봤습니다.

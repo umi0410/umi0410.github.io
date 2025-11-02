@@ -4,7 +4,8 @@ date: 2020-09-06T19:11:07+09:00
 weight: 48
 categories:
   - Algorithm
-image: illust.jpg
+cover:
+  image: illust.jpg
 ---
 ## 문제 설명
 
@@ -17,7 +18,7 @@ image: illust.jpg
 
 ## 문제 접근
 
-![illust.jpg](/home/jinsu/workspace/umi0410/umi0410.github.io/content/blog/algorithm/kakao-gem-shopping/illust.jpg)
+![illust.jpg](illust.jpg)
 
 우선 단순하게 문제의 조건을 그림으로 나타내면 위와 같다. 결국 1번 상점부터 방문하는 경우, 2번 상점부터 방문하는 경우, ... 이런 식으로 진행해나간 뒤 가장 보석을 적게, 앞의 상점에서 사는 경우를 구하면 된다.
 

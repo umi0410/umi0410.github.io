@@ -5,7 +5,8 @@ weight: 15
 categories:
   - Istio
   - DevOps
-image: preview.png
+cover:
+  image: preview.png
 ---
 
 ## 시작하며

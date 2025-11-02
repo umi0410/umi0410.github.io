@@ -5,7 +5,8 @@ weight: 16
 categories:
   - Book
   - System Design
-image: preview.png
+cover:
+  image: preview.png
 ---
 
 > _⚠️ 이 글은 **기계 번역** 위주로 번역되었습니다._

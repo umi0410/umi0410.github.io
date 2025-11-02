@@ -11,7 +11,8 @@ categories:
   - infrastructure
   - container
   - docker
-image: preview.png
+cover:
+  image: preview.png
 description: |
   IBM Technology에서 Containerization(컨테이너화)에 관해 다룬 영상을 번역해봤어요.
 ---

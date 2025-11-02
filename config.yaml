@@ -1,8 +1,10 @@
 baseurl: https://umi0410.github.io
 languageCode: ko-kr
-theme: hugo-theme-stack
-paginate: 10
-title: Jinsu Playground
+theme: [PaperMod]
+pagination:
+  pagerSize: 10
+title: 'Software Engineer - Jinsu Park'
+
 
 # Change it to your Disqus shortname before using
 disqusShortname: umi0410
@@ -27,160 +29,128 @@ permalinks:
   page: /:slug/
 
 params:
-  mainSections:
-    #        - categories
-    #        - page
-    - post
-    - blog
-  featuredImageField: image
-  rssFullContent: true
-  favicon: https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/241/whale_1f40b.png
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  title: 'Software Engineer - Jinsu Park'
+  description: "Hello, this is a tech blog of a software engineer."
+  keywords: [DevOps, SRE, Software, Blog, Tech Blog, Kubernetes, Cloud Infrastructure ]
+  DateFormat: "January 2, 2006"
+  defaultTheme: auto # dark, light
+  disableThemeToggle: false
+  ShowReadingTime: true
+  ShowShareButtons: false
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: false
+  ShowRssButtonInSectionTermList: true
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  comments: false
+  hidemeta: false
+  hideSummary: false
+  ShowToc: true
+  TocOpen: false
 
-  footer:
-    since: 2020
-    customText:
+  assets:
+    # disableHLJS: true # to disable highlight.js
+    # disableFingerprinting: true
+    favicon: "<link / abs url>"
+    favicon16x16: "<link / abs url>"
+    favicon32x32: "<link / abs url>"
+    apple_touch_icon: "<link / abs url>"
+    safari_pinned_tab: "<link / abs url>"
 
-  dateFormat:
-    published: Jan 02, 2006
-  #        lastUpdated: Jan 02, 2006 15:04 MST
+  label:
+    # text: "Software Engineering"
+    # icon: /apple-touch-icon.png
+    iconHeight: 35
+  # profileMode: {}
 
-  sidebar:
-    compact: false
-    emoji: 🚀
-    # subtitle: 깔끔하고 튼튼한 서버 개발과 인프라를 즐기는 박진수입니다~!
-    avatar:
-      local: true
-      src: media/profile-4.png
 
-  article:
-    math: false # 수식 표현
-    toc: true
-    license:
-      enabled: true
-      default: Licensed under CC BY-NC-SA 4.0
+  # home-info mode
+  homeInfoParams:
+     Title: "Software Engineer - Jinsu Park"
+     Content: |
+       _DevOps Engineer / SRE at a game publishing company_
+       <br/><br/>
+       ## What I'm intereted in
+       
+       > - Cloud-native systems(e.g. Istio, ArgoCD, Kubernetes)
+       > - Public cloud services (e.g. AWS, GCP)
+       > - On-premise infrastructure
+       
+       ## Specialization
+       
+       > - Istio - I'm managing Istio on Kubernetes clusters and can make use of its various features and configurations.
+       > - Argo projects like argo-cd, argo-rollouts, notifications-engine
+       > - Kubernetes
+       > - Platform Engineering
 
-  comments:
-    enabled: true
-    provider: disqus
+  socialIcons:
+    - name: github
+      url: https://github.com/umi0410
+    - name: linkedin
+      url: https://www.linkedin.com/in/jinsu-park-dev/
 
-    utterances:
-      repo:
-      issueTerm: pathname
-      label:
+  analytics:
+    google:
+      SiteVerificationTag: "XYZabc"
 
-    remark42:
-      host:
-      site:
-      locale:
+  cover:
+    hidden: false # hide everywhere but not in structured data
+    hiddenInList: false # hide on list pages and home
+    hiddenInSingle: false # hide on single page
 
-    vssue:
-      platform:
-      owner:
-      repo:
-      clientId:
-      clientSecret:
-
-    # Waline client configuration see: https://waline.js.org/en/reference/client.html
-    waline:
-      serverURL:
-      lang:
-      visitor:
-      avatar:
-      emoji:
-        - https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo
-      requiredMeta:
-        - name
-        - email
-        - url
-      placeholder:
-      locale:
-        admin: Admin
-
-  widgets:
-#    homepage:
-#    - type: search
-#    - type: archives
-#      params:
-#        limit: 5
-#    - type: categories
-#      params:
-#        limit: 10
-    page:
-    - type: toc
-
-  opengraph:
-    twitter:
-      # Your Twitter username
-      site:
-
-      # Available values: summary, summary_large_image
-      card: summary_large_image
-
-  defaultImage:
-    opengraph:
-      enabled: false
-      local: false
-      src:
-
-  colorScheme:
-    # Display toggle
-    toggle: true
-
-    # Available values: auto, light, dark
-    default: dark
-
-  imageProcessing:
-    cover:
-      enabled: true
-    content:
-      enabled: true
-
-### Custom menu
-### See https://docs.stack.jimmycai.com/configuration/custom-menu
-### To remove about, archive and search page menu item, remove `menu` field from their FrontMatter
+  editPost: {}
+  # for search
+  # https://fusejs.io/api/options.html
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    limit: 10 # refer: https://www.fusejs.io/api/methods.html#search
+    keys: [ "title", "permalink", "summary", "content" ]
 menu:
   main:
-    - identifier: home
-      name: Home
-      url: /
-      weight: -100
-      params:
-        icon: home
-    - identifier: about
-      name: About me
-      url: https://github.com/umi0410/umi0410
-      weight: -90
-      params:
-        icon: user
+    - identifier: search
+      name: Search
+      url: /search/
+      weight: 40
+    - identifier: archives
+      name: Archives
+      url: /archives/
+      weight: 41
     - identifier: categories
       name: Categories
-      url: /categories
-      weight: -88
-      params:
-        icon: archives
+      url: /categories/
+      weight: 50
     - identifier: github
-      name: Github
-      url: https://github.com/umi0410/
-      weight: 10
-      params:
-        icon: github
-
-
-related:
-  includeNewer: true
-  threshold: 60
-  toLower: false
-  indices:
-    - name: tags
-      weight: 100
-
-    - name: categories
-      weight: 200
-
+      name: GitHub
+      url: https://github.com/umi0410
+    - identifier: linkedin
+      name: LinkedIn
+      url: https://www.linkedin.com/in/jinsu-park-dev/
+# Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
+pygmentsUseClasses: true
 markup:
-  tableOfContents:
-    endLevel: 5
-    ordered: true
-    startLevel: 2
+  goldmark:
+    renderer:
+      unsafe: true
   highlight:
     noClasses: false
+    anchorLineNos: false
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    # style: monokai
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON

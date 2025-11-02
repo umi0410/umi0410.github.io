@@ -6,7 +6,8 @@ noDisqus: false
 draft: false
 categories:
   - Golang
-image: chain.png
+cover:
+  image: chain.png
 ---
 ## 시작하며
 

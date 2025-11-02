@@ -7,7 +7,8 @@ draft: false
 categories:
   - khumu
   - golang
-image: thumbnail-wide.png
+cover:
+  image: thumbnail-wide.png
 description: |
   경희대학교 커뮤니티 "쿠뮤"를 개발하면서 겪었던 경험이나 느낀 점들을 MVP 출시를 기념 삼아
   정리해보려 합니다.

@@ -3,7 +3,8 @@ title: "쿼리 최적화하기 - 조회수와 같은 Count 성격의 작업 최�
 date: 2021-11-24T3:46:54+09:00
 weight: 38
 categories: [golang, spring, jpa]
-image: index.png
+cover:
+  image: index.png
 description: |
   백엔드 개발을 하며 흔히 겪을 수 있는 N+1 문제나 비효율적 쿼리 문제, 그 중에서도 조회수와 같은 Count 성격의 작업을 Redis를 이용해 어떻게 최적화할 수 있을지 다뤄보았습니다.
 ---

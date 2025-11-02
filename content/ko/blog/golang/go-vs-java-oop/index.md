@@ -8,7 +8,8 @@ noDisqus: false
 draft: false
 categories:
   - Golang
-image: declaration.png
+cover:
+  image: declaration.png
 description: |
   주로 Java로 설명되는 객체지향적인 특징들을 Go에서는 어떻게 적용할 수 있는지 알아봤습니다.
 ---

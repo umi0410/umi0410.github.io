@@ -7,7 +7,8 @@ categories:
   - Istio
   - Network
   - Book
-image: preview.png
+cover:
+  image: preview.png
 ---
 ## 시작하며
 

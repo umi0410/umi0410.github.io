@@ -4,7 +4,8 @@ date: 2022-11-30T01:35:00+09:00
 weight: 25
 categories:
 - companion-server
-image: preview.png
+cover:
+  image: preview.png
 ---
 
 ## 시작하며

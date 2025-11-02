@@ -9,7 +9,8 @@ draft: false
 categories:
   - 도서
   - 데이터베이스
-image: cover.jpg
+cover:
+  image: cover.jpg
 description: |
   "NoSQL 철저 입문"이라는 책을 읽고 작성한 후기 시리즈의 첫 편 입니다. 
 ---

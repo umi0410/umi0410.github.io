@@ -1,5 +1,6 @@
 ---
 title: DevOps
-image: thumbnail.png
+cover:
+  image: thumbnail.png
 description: About DevOps Engineering
 ---

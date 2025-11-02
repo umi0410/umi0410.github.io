@@ -10,7 +10,8 @@ draft: false
 categories:
   - Golang
   - cs-with-golang
-image: server-client-socket.jpeg
+cover:
+  image: server-client-socket.jpeg
 description: |
   자세한 의미는 모른 채 들어보기만 했던 소켓이란 녀석! 어떤 종류의 소켓이 존재하는지, 어떤 차이가 있는지
   성능은 어떠한지 실제 Go 프로그램을 통해 확인해보고 벤치마크해보며 비교해봤습니다.

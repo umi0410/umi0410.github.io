@@ -1,5 +1,6 @@
 ---
 title: AWS
-image: thumbnail.png
+cover:
+  image: thumbnail.png
 description: About AWS
 ---

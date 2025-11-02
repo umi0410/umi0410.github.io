@@ -9,7 +9,8 @@ draft: false
 categories:
   - 도서
   - 데이터베이스
-image: partitioning.png
+cover:
+  image: partitioning.png
 description: |
   "NoSQL 철저 입문"이라는 책을 읽고 작성한 후기 시리즈의 두 번째 편 입니다.
   Key-Value DB와 문서 DB를 비교해봤습니다.

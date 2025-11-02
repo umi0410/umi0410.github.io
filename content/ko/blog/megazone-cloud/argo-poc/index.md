@@ -7,7 +7,8 @@ weight: 903
 categories:
   - experiences
   - megazone-cloud-internship
-image: argo-events-top-level.png
+cover:
+  image: argo-events-top-level.png
 description: |
   메가존 클라우드의 클라우드 원 팀에서 일하면서 Argo의 다양한 서비스들에 대한 Poc(개념 증명)을
   진행했던 이야기를 적어보았습니다.

@@ -5,7 +5,8 @@ weight: 16
 categories:
   - Book
   - System Design
-image: preview.png
+cover:
+  image: preview.png
 ---
 ## Overview of the book
 

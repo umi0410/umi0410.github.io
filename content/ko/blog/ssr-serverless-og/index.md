@@ -3,7 +3,8 @@ title: "AWS Lambda + API Gateway를 통해 SSR로 OpenGraph 메타데이터 제�
 date: 2021-11-07T3:46:54+09:00
 weight: 39
 categories: []
-image: architecture.png
+cover:
+  image: architecture.png
 description: |
   AWS API Gateway와 Labmda 등의 서비스를 이용해 OpenGraph를 제공하기 위한 SSR 서버에 적합한 아키텍쳐 구축해보았습니다.
 ---

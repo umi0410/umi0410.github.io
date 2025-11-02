@@ -7,7 +7,8 @@ weight: 901
 categories:
   - experiences
   - megazone-cloud-internship
-image: dev-architecture.svg
+cover:
+  image: dev-architecture.svg
 description: |
   Terraform을 이용해 구축한 인프라. 그 위에 Jenkins, Gitlab, Spinnaker 그 외 자체 마이크로 서비스
   등등을 배포한 이야기
