@@ -30,8 +30,9 @@ This problem occurs under the following conditions:
     - Version < 1.6.0
     - `RESERVED_ENIS` set to `1`
 2. aws-node(VPC CNI) and Pod ENI are enabled.
-3. A pod is scheduled that requests all the remaining allocatable memory
-   after DaemonSet pods. (This corresponds to the blue area(`A - B`) in the image below)
+3. A pod is scheduled that requests a certain amount of memory, which is slightly bigger than
+   all the remaining allocatable memory after DaemonSet pods.
+   (This corresponds to the blue area(`A - B`) in the image below)
    ![allocatable-memory.png](allocatable-memory.png)
 
 ## Root Cause
@@ -234,12 +235,12 @@ pod-sg-test-chx4d   m8g.large   on-demand   us-west-2a   ip-192-168-144-235.us-w
 
 This infinite node scaling issue shows what happens when two components
 make different assumptions about the same resource.
-Karpenter thought nodes would have less memory (based on maxPods=20),
-while kubelet used the full capacity (based on maxPods=29).
-Both were technically correct given their inputs — they just weren't talking about
-the same thing.
+Karpenter thought nodes would have more memory (based on maxPods=20),
+while the kubelet set a less allocatable memory capacity (based on the assumption that up to 29 pods
+can still be scheduled in the ideal case).
+Both are correct under their own assumptions — the assumptions just weren't aligned. 
 
-But beyond the immediate fix of upgrading karpenter versions,
+Beyond the immediate fix of upgrading karpenter versions,
 this was a good reminder for me that when we enable advanced features
 like Pod ENI without fully understanding and verifying them,
 they often affect our systems in unexpected ways.
