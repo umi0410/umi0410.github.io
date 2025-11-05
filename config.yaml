@@ -34,7 +34,7 @@ params:
   description: "Hello, this is a tech blog of a software engineer."
   keywords: [DevOps, SRE, Software, Blog, Tech Blog, Kubernetes, Cloud Infrastructure ]
   DateFormat: "January 2, 2006"
-  defaultTheme: auto # dark, light
+  defaultTheme: dark # dark, light
   disableThemeToggle: false
   ShowReadingTime: true
   ShowShareButtons: false
