@@ -73,18 +73,21 @@ params:
      Content: |
        _DevOps Engineer / SRE at a game publishing company_
        <br/><br/>
-       ## What I'm intereted in
-       
-       > - Cloud-native systems(e.g. Istio, ArgoCD, Kubernetes)
+       ## What I'm interested in
+
+       > - Cloud-native systems and tools (e.g., Kubernetes, Argo CD, Argo Workflows, Vault, Cert-Manager, Istio, ...)
        > - Public cloud services (e.g. AWS, GCP)
-       > - On-premise infrastructure
-       
+       > - How to build a cool(?) developer platform and actualize(?) DevOps
+       > - On-premise infrastructure (especially using Talos OS or Proxmox hypervisor)
+
        ## Specialization
-       
-       > - Istio - I'm managing Istio on Kubernetes clusters and can make use of its various features and configurations.
-       > - Argo projects like argo-cd, argo-rollouts, notifications-engine
+
        > - Kubernetes
        > - Platform Engineering
+       > - AWS
+       > - Argo projects like argo-cd, argo-rollouts, notifications-engine
+       > - Istio - I'm managing Istio on Kubernetes clusters and can make use of its various features and configurations.
+       > - Solutions Architect on AWS and Kubernetes
 
   socialIcons:
     - name: github
