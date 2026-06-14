@@ -25,7 +25,7 @@ ShowWordCount: true
 
 I have spent the past four years as a DevOps engineer reading, using, and writing Helm charts — from small internal deployment wrappers to large, multi-team platform charts. I have read through the internals of charts for Istio, CockroachDB, ArgoCD, cert-manager, and Vault, and written enough `_helpers.tpl` macros and validations to last a lifetime.
 
-Over that time, I arrived at a firm personal conclusion: Helm tends to work against teams managing Kubernetes manifests internally — and in my experience, it eventually becomes too cumbersome even for the application developers who have to use it. The team I worked with shared that frustration, and I spent considerable time personally researching alternatives: CUE, KCL, PKL, NixOS modules, and Nickel. A colleague even went as far as developing an open-source project called kubix to address some of these problems.
+Over that time, I arrived at a firm personal conclusion: Helm tends to work against teams managing Kubernetes manifests internally — and in my experience, it eventually becomes too cumbersome even for the application developers who have to use it. The team I worked with shared that frustration, and I spent considerable time personally researching alternatives: CUE, KCL, PKL, NixOS modules, and Nickel. A colleague even went as far as developing an open-source project called [kubix](https://github.com/skystar-p/kubix) to address some of these problems.
 
 This post is my personal reflection on that search — specifically, how to author Kubernetes manifests using CUE and why I think it handles this better than Helm. In short, **Helm is too limited for expressing proper configuration abstractions, NixOS modules do it well but carry a steep learning curve, and CUE sits at a practical sweet spot between the two.**
 
@@ -206,7 +206,7 @@ My real focus was on tools designed specifically for configuration at the organi
 - **KCL**: Natively integrated with ArgoCD and FluxCD, which lowers the bar for adoption in GitOps workflows. However, it lacks fixed-point evaluation, and writing it tends to feel like writing Python — which adds cognitive overhead for a task that is fundamentally about configuration values and constraints.
 - **PKL** (Apple): A capable general-purpose configuration language, but it is oriented toward general config rather than Kubernetes manifest authoring specifically. It lacks CUE's constraint and unification model.
 - **Nickel**: Borrows Nix's syntax aesthetics but cannot leverage NixOS module's composability guarantees. You inherit the unfamiliar syntax without the main benefit.
-- **NixOS modules**: Principled, with a very rich type system and strong guarantees. But the learning curve is steep enough that broad adoption within a mixed-experience team is difficult.
+- **NixOS modules** (e.g. [kubenix](https://github.com/hall/kubenix)): Principled, with a very rich type system and strong guarantees. But the learning curve is steep enough that broad adoption within a mixed-experience team is difficult.
 
 CUE sits at a practical sweet spot: enough expressiveness to model organizational policy correctly, with a learning curve that is manageable for most engineers.
 
