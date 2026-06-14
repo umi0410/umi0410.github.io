@@ -47,7 +47,7 @@ Helm became the de-facto answer to this problem. The core idea: treat your manif
 
 A Helm chart for the service above typically looks like this. Critically, the chart itself is shared across services — teams customize it by supplying their own values files:
 
-```
+```text
 common-component/
   Chart.yaml
   values.yaml          ← chart default values
@@ -128,7 +128,7 @@ spec:
           {{- end }}
 ```
 
-This is not simple text substitution. It contains programmatic logic — branching, iteration, function calls — embedded in a format that was not designed for it. The only way to know what the rendered YAML will look like is to run `helm template` and read the output.
+This is not simple text substitution. It contains programmatic logic — branching, iteration, function calls — embedded in a format that was not designed for it. **The only way to know what the rendered YAML will look like is to run `helm template` and read the output.**
 
 ### 2. Leaky Abstractions
 
@@ -144,7 +144,7 @@ Every knob that a user might ever need must be explicitly surfaced in `values.ya
 
 ### 3. Dynamic Defaults Cannot Be Expressed
 
-In `values.yaml`, every default is static. Consider `replicas`: its sensible default depends on `env` — 1 in dev, 3 in prod. You can bury this logic in a `_helpers.tpl` named template, but that makes the behavior invisible to anyone editing `values.yaml`. Any downstream field that also depends on `replicas` must invoke its own named template in turn. The chain of dependencies is hidden and scattered. There is no way to express relationships between values in the format itself — every workaround papers over a fundamental limitation.
+In `values.yaml`, every default is static. Consider `replicas`: its sensible default depends on `env` — 1 in dev, 3 in prod. You can bury this logic in a `_helpers.tpl` named template, but that makes the behavior invisible to anyone editing `values.yaml`. Any downstream field that also depends on `replicas` must invoke its own named template in turn. The chain of dependencies is hidden and scattered. **There is no way to express relationships between values in the format itself — every workaround papers over a fundamental limitation.**
 
 ### 4. The Golden Path Chart Problem
 
@@ -255,7 +255,7 @@ Unlike rolling update bounds or replica counts (which the Kubernetes API validat
 }
 ```
 
-These are not comments or documentation — CUE enforces them. Passing `env: "staging"` or `replicas: 200` fails immediately with a clear error pointing to the constraint definition.
+**These are not comments or documentation — CUE enforces them.** Passing `env: "staging"` or `replicas: 200` fails immediately with a clear error pointing to the constraint definition.
 
 When the set of valid values is constrained to a closed enumeration — three possible environments, replicas bounded to a sane range — all the code that consumes those values becomes simpler. Fewer branches, fewer edge cases, less defensive logic. Narrowing the problem space at the boundary eliminates entire categories of bugs downstream.
 
@@ -294,7 +294,7 @@ if env == "prod" {
 
 With `env: "stg"`, CUE resolves all constraints to their concrete defaults:
 
-```
+```text
 $ cue eval -c .
 env:      "stg"
 replicas: 1
@@ -305,7 +305,7 @@ autoScaling: {
 }
 ```
 
-A default is a preferred value within a constraint — not a hardcoded assignment. The team can override `minReplicas: 1` and set `maxReplicas: 20` explicitly; CUE picks both through unification with no conflict.
+*A default is a preferred value within a constraint — not a hardcoded assignment.* The team can override `minReplicas: 1` and set `maxReplicas: 20` explicitly; CUE picks both through unification with no conflict.
 
 ---
 
@@ -328,7 +328,7 @@ cue get go k8s.io/api/core/v1
 
 The directory structure we will build:
 
-```
+```text
 common-service/
   cue.mod/
     module.cue
@@ -568,7 +568,7 @@ _app: appConfig: components: "user-api": {
 }
 ```
 
-```
+```text
 $ cue vet ./apps/user/...
 _app.config.components["user-api"].env: 3 errors in empty disjunction:
     _app.config.components["user-api"].env: conflicting values "dev" and "staging":
