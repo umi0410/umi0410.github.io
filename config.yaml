@@ -77,7 +77,7 @@ params:
 
        > - Cloud-native systems and tools (e.g., Kubernetes, Argo CD, Argo Workflows, Vault, Cert-Manager, Istio, ...)
        > - Public cloud services (e.g. AWS, GCP)
-       > - How to build a cool(?) developer platform and actualize(?) DevOps
+       > - How to build an awesome developer platform and realize DevOps
        > - On-premise infrastructure (especially using Talos OS or Proxmox hypervisor)
 
        ## Specialization
